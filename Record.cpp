@@ -2,7 +2,6 @@
 
 #include <iostream>
 
-void Record::printRecord(std::ostream& os) const
-{
+void Record::printRecord(std::ostream &os) const {
     os << id << "\t" << type << "\t" << getRecord();
 }

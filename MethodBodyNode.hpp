@@ -6,24 +6,18 @@
 class MethodBodyNode : public Node {
     Node *body = nullptr, *returnValue;
 
-public:
-    MethodBodyNode(Node* body, Node* returnValue, int l)
-        : Node("Method body", l, { body, returnValue })
-        , body { body }
-        , returnValue { returnValue }
-    {
-    }
-    std::string checkTypes(SymbolTable& st) const override;
+  public:
+    MethodBodyNode(Node *body, Node *returnValue, int l)
+        : Node("Method body", l, {body, returnValue}), body{body},
+          returnValue{returnValue} {}
+    std::string checkTypes(SymbolTable &st) const override;
 };
 class ReturnOnlyMethodBodyNode : public Node {
-    Node* returnValue;
+    Node *returnValue;
 
-public:
-    ReturnOnlyMethodBodyNode(Node* returnValue, int l)
-        : Node("Method body", l, { returnValue })
-        , returnValue { returnValue }
-    {
-    }
-    std::string checkTypes(SymbolTable& st) const override;
+  public:
+    ReturnOnlyMethodBodyNode(Node *returnValue, int l)
+        : Node("Method body", l, {returnValue}), returnValue{returnValue} {}
+    std::string checkTypes(SymbolTable &st) const override;
 };
 #endif

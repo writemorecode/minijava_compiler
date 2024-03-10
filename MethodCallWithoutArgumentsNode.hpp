@@ -5,12 +5,10 @@
 class MethodCallWithoutArgumentsNode : public Node {
     Node *object, *id;
 
-public:
-    MethodCallWithoutArgumentsNode(Node* object, Node* id, int l)
-        : Node("Method call", l, { object, id })
-        , object { object }
-        , id { id } {};
-    std::string checkTypes(SymbolTable& st) const override;
+  public:
+    MethodCallWithoutArgumentsNode(Node *object, Node *id, int l)
+        : Node("Method call", l, {object, id}), object{object}, id{id} {};
+    std::string checkTypes(SymbolTable &st) const override;
 };
 
 #endif

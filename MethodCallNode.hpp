@@ -4,17 +4,15 @@
 #include "Node.h"
 
 class MethodCallNode : public Node {
-    Node* object;
-    Node* id;
-    Node* exprList;
+    Node *object;
+    Node *id;
+    Node *exprList;
 
-public:
-    MethodCallNode(Node* object, Node* id, Node* exprList, int l)
-        : Node("Method call", l, { object, id, exprList })
-        , object { object }
-        , id { id }
-        , exprList { exprList } {};
-    std::string checkTypes(SymbolTable& st) const override;
+  public:
+    MethodCallNode(Node *object, Node *id, Node *exprList, int l)
+        : Node("Method call", l, {object, id, exprList}), object{object},
+          id{id}, exprList{exprList} {};
+    std::string checkTypes(SymbolTable &st) const override;
 };
 
 #endif

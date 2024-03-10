@@ -1,7 +1,6 @@
 #include "MethodCallWithoutArgumentsNode.hpp"
 
-std::string MethodCallWithoutArgumentsNode::checkTypes(SymbolTable& st) const
-{
+std::string MethodCallWithoutArgumentsNode::checkTypes(SymbolTable &st) const {
     const auto caller = object->checkTypes(st);
     if (caller == "") {
         return "";

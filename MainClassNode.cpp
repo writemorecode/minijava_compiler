@@ -1,7 +1,6 @@
 #include "MainClassNode.hpp"
 
-bool MainClassNode::buildTable(SymbolTable& st) const
-{
+bool MainClassNode::buildTable(SymbolTable &st) const {
     if (st.lookupClass(id->value)) {
         std::cerr << "Error: (line " << lineno << ") Class '" << id->value
                   << "' already declared.\n";
@@ -18,8 +17,7 @@ bool MainClassNode::buildTable(SymbolTable& st) const
     return true;
 }
 
-std::string MainClassNode::checkTypes(SymbolTable& st) const
-{
+std::string MainClassNode::checkTypes(SymbolTable &st) const {
     st.enterScope("Class: " + id->value);
     body->checkTypes(st);
     st.exitScope();

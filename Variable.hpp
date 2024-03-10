@@ -6,9 +6,8 @@
 #include "Record.hpp"
 
 class Variable : public Record {
-public:
-    Variable(std::string type, std::string id)
-        : Record(id, type) {};
+  public:
+    Variable(std::string type, std::string id) : Record(id, type){};
     virtual ~Variable() = default;
     std::string getRecord() const override;
 };

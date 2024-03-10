@@ -6,15 +6,13 @@
 class MethodWithoutParametersNode : public Node {
     Node *type, *id, *body;
 
-public:
-    MethodWithoutParametersNode(Node* type, Node* id, Node* body, int l)
-        : Node("Method", l, { type, id, body })
-        , type { type }
-        , id { id }
-        , body { body } {};
+  public:
+    MethodWithoutParametersNode(Node *type, Node *id, Node *body, int l)
+        : Node("Method", l, {type, id, body}), type{type}, id{id}, body{
+                                                                       body} {};
 
-    bool buildTable(SymbolTable& st) const override;
-    std::string checkTypes(SymbolTable& st) const override;
+    bool buildTable(SymbolTable &st) const override;
+    std::string checkTypes(SymbolTable &st) const override;
 };
 
 #endif

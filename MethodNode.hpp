@@ -6,15 +6,12 @@
 class MethodNode : public Node {
     Node *type, *id, *params, *body;
 
-public:
-    MethodNode(Node* type, Node* id, Node* params, Node* body, int l)
-        : Node("Method", l, { type, id, params, body })
-        , type { type }
-        , id { id }
-        , params { params }
-        , body { body } {};
-    bool buildTable(SymbolTable& st) const override;
-    std::string checkTypes(SymbolTable& st) const override;
+  public:
+    MethodNode(Node *type, Node *id, Node *params, Node *body, int l)
+        : Node("Method", l, {type, id, params, body}), type{type}, id{id},
+          params{params}, body{body} {};
+    bool buildTable(SymbolTable &st) const override;
+    std::string checkTypes(SymbolTable &st) const override;
 };
 
 #endif

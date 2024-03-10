@@ -1,7 +1,6 @@
 #include "BooleanExpressionNode.hpp"
 
-std::string BooleanExpressionNode::checkTypes(SymbolTable& st) const
-{
+std::string BooleanExpressionNode::checkTypes(SymbolTable &st) const {
     const auto lhsType = left->checkTypes(st);
     const auto rhsType = right->checkTypes(st);
 

@@ -1,7 +1,6 @@
 #include "MethodNode.hpp"
 
-bool MethodNode::buildTable(SymbolTable& st) const
-{
+bool MethodNode::buildTable(SymbolTable &st) const {
     bool valid = true;
     if (st.lookupMethod(id->value)) {
         std::cerr << "Error: (line " << lineno << ") Method '" << id->value
@@ -10,7 +9,7 @@ bool MethodNode::buildTable(SymbolTable& st) const
     }
     st.addMethod(type->value, id->value);
     auto currentMethod = st.lookupMethod(id->value);
-    auto currentClass = dynamic_cast<Class*>(st.getCurrentRecord());
+    auto currentClass = dynamic_cast<Class *>(st.getCurrentRecord());
     currentClass->addMethod(currentMethod);
 
     st.enterScope("Method: " + id->value, currentMethod);
@@ -21,8 +20,7 @@ bool MethodNode::buildTable(SymbolTable& st) const
     return valid && validParams && validBody;
 }
 
-std::string MethodNode::checkTypes(SymbolTable& st) const
-{
+std::string MethodNode::checkTypes(SymbolTable &st) const {
     st.enterScope("Method: " + id->value);
     const auto signatureReturnType = type->checkTypes(st);
     const auto bodyReturnType = body->checkTypes(st);

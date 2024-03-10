@@ -6,13 +6,11 @@
 class ClassNode : public Node {
     Node *id, *body;
 
-public:
-    ClassNode(Node* id, Node* body, int l)
-        : Node("Class", l, { id, body })
-        , id { id }
-        , body { body } {};
-    bool buildTable(SymbolTable& st) const override;
-    std::string checkTypes(SymbolTable& st) const override;
+  public:
+    ClassNode(Node *id, Node *body, int l)
+        : Node("Class", l, {id, body}), id{id}, body{body} {};
+    bool buildTable(SymbolTable &st) const override;
+    std::string checkTypes(SymbolTable &st) const override;
 };
 
 #endif

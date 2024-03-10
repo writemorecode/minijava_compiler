@@ -1,7 +1,6 @@
 #include "ClassNode.hpp"
 
-bool ClassNode::buildTable(SymbolTable& st) const
-{
+bool ClassNode::buildTable(SymbolTable &st) const {
     bool valid = true;
     if (st.lookupClass(id->value)) {
         std::cerr << "Error: ";
@@ -20,8 +19,7 @@ bool ClassNode::buildTable(SymbolTable& st) const
     return valid;
 }
 
-std::string ClassNode::checkTypes(SymbolTable& st) const
-{
+std::string ClassNode::checkTypes(SymbolTable &st) const {
     st.enterScope("Class: " + id->value);
     auto type = body->checkTypes(st);
     st.exitScope();

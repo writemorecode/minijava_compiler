@@ -7,16 +7,13 @@
 #include "Method.hpp"
 #include "Variable.hpp"
 
-Scope::Scope(Record* record, Scope* parent, std::string name)
-    : record { record }
-    , parent { parent }
-    , scopeName { std::move(name) } {};
+Scope::Scope(Record *record, Scope *parent, std::string name)
+    : record{record}, parent{parent}, scopeName{std::move(name)} {};
 
-Scope* Scope::getParent() { return parent; }
+Scope *Scope::getParent() { return parent; }
 
-Scope* Scope::nextChild(const std::string& name, Record* record)
-{
-    Scope* nextChild = nullptr;
+Scope *Scope::nextChild(const std::string &name, Record *record) {
+    Scope *nextChild = nullptr;
     if (next == children.size()) {
         children.push_back(std::make_unique<Scope>(record, this, name));
         nextChild = children.back().get();
@@ -27,18 +24,15 @@ Scope* Scope::nextChild(const std::string& name, Record* record)
     return nextChild;
 }
 
-void Scope::addVariable(const std::string& type, const std::string& id)
-{
+void Scope::addVariable(const std::string &type, const std::string &id) {
     variables.emplace(id, Variable(type, id));
 }
-void Scope::addMethod(const std::string& type, const std::string& id)
-{
+void Scope::addMethod(const std::string &type, const std::string &id) {
     methods.emplace(id, Method(type, id));
 }
-void Scope::addClass(const std::string& id) { classes.emplace(id, Class(id)); }
+void Scope::addClass(const std::string &id) { classes.emplace(id, Class(id)); }
 
-Variable* Scope::lookupVariable(const std::string& key)
-{
+Variable *Scope::lookupVariable(const std::string &key) {
     auto it = variables.find(key);
     if (it != variables.end()) {
         return &(it->second);
@@ -49,8 +43,7 @@ Variable* Scope::lookupVariable(const std::string& key)
     return parent->lookupVariable(key);
 }
 
-Method* Scope::lookupMethod(const std::string& key)
-{
+Method *Scope::lookupMethod(const std::string &key) {
     auto it = methods.find(key);
     if (it != methods.end()) {
         return &(it->second);
@@ -61,8 +54,7 @@ Method* Scope::lookupMethod(const std::string& key)
     return parent->lookupMethod(key);
 }
 
-Class* Scope::lookupClass(const std::string& key)
-{
+Class *Scope::lookupClass(const std::string &key) {
     auto it = classes.find(key);
     if (it != classes.end()) {
         return &(it->second);
@@ -73,8 +65,7 @@ Class* Scope::lookupClass(const std::string& key)
     return parent->lookupClass(key);
 }
 
-Variable* Scope::lookupVariableInScope(const std::string& key)
-{
+Variable *Scope::lookupVariableInScope(const std::string &key) {
     auto it = variables.find(key);
     if (it != variables.end()) {
         return &(it->second);
@@ -82,38 +73,36 @@ Variable* Scope::lookupVariableInScope(const std::string& key)
     return nullptr;
 }
 
-void Scope::resetScope()
-{
+void Scope::resetScope() {
     next = 0;
-    for (auto& child : children) {
+    for (auto &child : children) {
         child->resetScope();
     }
 }
 
 std::string Scope::getName() const { return scopeName; }
 
-Record* Scope::getRecord() const { return record; }
+Record *Scope::getRecord() const { return record; }
 
-void Scope::printScope(int& count, std::ostream& os) const
-{
+void Scope::printScope(int &count, std::ostream &os) const {
     int id = count;
     os << "n" << id << "[label=\"Symbol table: (" << scopeName << ")\\n";
 
     os << "ID\tType\tRecord\n";
-    for (const auto& var : variables) {
+    for (const auto &var : variables) {
         (var.second).printRecord(os);
         os << "\\n";
     }
-    for (const auto& method : methods) {
+    for (const auto &method : methods) {
         (method.second).printRecord(os);
         os << "\\n";
     }
-    for (const auto& class_ : classes) {
+    for (const auto &class_ : classes) {
         (class_.second).printRecord(os);
         os << "\\n";
     }
     os << "\"];\n";
-    for (const auto& child : children) {
+    for (const auto &child : children) {
         int n = ++count;
         child->printScope(count, os);
         os << "n" << id << " -> n" << n << "\n";
