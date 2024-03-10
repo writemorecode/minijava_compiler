@@ -81,15 +81,25 @@ int main(int argc, char** argv)
     SymbolTable st;
     bool symbolTableSuccess = root->buildTable(st);
     if (!symbolTableSuccess) {
-        return errCodes::SEMANTIC_ERROR;
+        std::cout << "Symbol table construction failed.\n";
     }
 
     st.resetTable();
     auto rootType = root->checkTypes(st);
+    bool typeCheckSuccess = !rootType.empty();
+    if (!typeCheckSuccess) {
+        std::cout << "Type checking failed.\n";
+    }
+
+    if (!symbolTableSuccess || !typeCheckSuccess) {
+        return errCode;
+    }
 
     std::fstream stGraph("st.dot", std::ios::out);
     st.printTable(stGraph);
     generateGraphviz(root);
 
-    return errCode;
+    // Continue with next steps here...
+
+    return errCodes::SUCCESS;
 }

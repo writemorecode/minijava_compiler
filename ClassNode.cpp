@@ -2,10 +2,12 @@
 
 bool ClassNode::buildTable(SymbolTable& st) const
 {
+    bool valid = true;
     if (st.lookupClass(id->value)) {
         std::cerr << "Error: ";
         std::cerr << "(line " << lineno << ") ";
         std::cerr << "Class " << id->value << " already declared.\n";
+        valid = false;
     }
 
     st.addClass(id->value);
@@ -15,13 +17,16 @@ bool ClassNode::buildTable(SymbolTable& st) const
     body->buildTable(st);
     st.exitScope();
 
-    return true;
+    return valid;
 }
 
 std::string ClassNode::checkTypes(SymbolTable& st) const
 {
     st.enterScope("Class: " + id->value);
-    body->checkTypes(st);
+    auto type = body->checkTypes(st);
     st.exitScope();
-    return "";
+    if (type.empty()) {
+        return "";
+    }
+    return "void";
 }

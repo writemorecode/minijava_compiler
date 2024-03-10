@@ -4,15 +4,28 @@
 
 bool Node::buildTable(SymbolTable& st) const
 {
-    std::for_each(children.begin(), children.end(),
-        [&](Node* child) { return child->buildTable(st); });
-    return true;
+    // return std::all_of(children.begin(), children.end(),
+    //     [&](Node* child) { return child->buildTable(st); });
+    bool valid = true;
+    for (const auto& child : children) {
+        if (!child->buildTable(st)) {
+            valid = false;
+        }
+    }
+    return valid;
 }
 
 std::string Node::checkTypes(SymbolTable& st) const
 {
+    bool valid = true;
     for (const auto& child : children) {
-        child->checkTypes(st);
+        auto type = child->checkTypes(st);
+        if (type.empty()) {
+            valid = false;
+        }
+    }
+    if (valid) {
+        return "void";
     }
     return "";
 }

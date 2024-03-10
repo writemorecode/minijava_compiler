@@ -2,9 +2,11 @@
 
 bool MethodNode::buildTable(SymbolTable& st) const
 {
+    bool valid = true;
     if (st.lookupMethod(id->value)) {
         std::cerr << "Error: (line " << lineno << ") Method '" << id->value
                   << "' already declared.\n";
+        valid = false;
     }
     st.addMethod(type->value, id->value);
     auto currentMethod = st.lookupMethod(id->value);
@@ -16,7 +18,7 @@ bool MethodNode::buildTable(SymbolTable& st) const
     bool validBody = body->buildTable(st);
     st.exitScope();
 
-    return true;
+    return valid && validParams && validBody;
 }
 
 std::string MethodNode::checkTypes(SymbolTable& st) const
@@ -33,6 +35,7 @@ std::string MethodNode::checkTypes(SymbolTable& st) const
         std::cerr << "in method '" << id->value << "' ";
         std::cerr << "does not match returned type '";
         std::cerr << bodyReturnType << "'.\n";
+        return "";
     }
 
     return type->value;

@@ -23,5 +23,5 @@ std::string MainClassNode::checkTypes(SymbolTable& st) const
     st.enterScope("Class: " + id->value);
     body->checkTypes(st);
     st.exitScope();
-    return "";
+    return "void";
 }
