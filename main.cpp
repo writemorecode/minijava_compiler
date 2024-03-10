@@ -1,10 +1,11 @@
 #include <iostream>
 
+#include "CFG.hpp"
 #include "Node.h"
 #include "parser.tab.hh"
 
-extern Node* root;
-extern FILE* yyin;
+extern Node *root;
+extern FILE *yyin;
 extern int yylineno;
 extern int lexical_errors;
 extern yy::parser::symbol_type yylex();
@@ -21,8 +22,7 @@ enum errCodes {
 int errCode = errCodes::SUCCESS;
 
 // Handling Syntax Errors
-void yy::parser::error(std::string const& err)
-{
+void yy::parser::error(std::string const &err) {
     if (!lexical_errors) {
         std::cerr << "Syntax errors found! See the logs below:" << std::endl;
         std::cerr << "\t@error at line " << yylineno
@@ -33,10 +33,9 @@ void yy::parser::error(std::string const& err)
     }
 }
 
-void generateGraphviz(Node* root)
-{
+void generateGraphviz(Node *root) {
     std::ofstream outStream;
-    std::string filename { "tree.dot" };
+    std::string filename{"tree.dot"};
     outStream.open(filename);
 
     int count = 0;
@@ -46,14 +45,12 @@ void generateGraphviz(Node* root)
     outStream.close();
 }
 
-void printTree(const Node* root)
-{
+void printTree(const Node *root) {
     int depth = 0;
     root->print(depth);
 }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char **argv) {
     // Reads from file if a file name is passed as an argument. Otherwise, reads
     // from stdin.
     if (argc > 1) {
@@ -99,7 +96,9 @@ int main(int argc, char** argv)
     st.printTable(stGraph);
     generateGraphviz(root);
 
-    // Continue with next steps here...
+    CFG graph;
+    root->generateIR(graph);
+    graph.printGraphviz();
 
     return errCodes::SUCCESS;
 }

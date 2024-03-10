@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+#include "BBlock.hpp"
+#include "CFG.hpp"
 #include "SymbolTable.hpp"
 
 class Node {
@@ -27,6 +29,8 @@ class Node {
     virtual bool buildTable(SymbolTable &st) const;
 
     virtual std::string checkTypes(SymbolTable &st) const;
+
+    virtual std::string generateIR(CFG &graph);
 
     void print(int depth) const;
     void printGraphviz(int &count, std::ostream &outStream);

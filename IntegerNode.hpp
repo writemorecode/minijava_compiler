@@ -9,14 +9,13 @@
 class IntegerNode : public Node {
     int value;
 
-public:
-    IntegerNode(const std::string& value_, int l)
-        : Node("Integer", value_, l)
-        , value { std::stoi(value_) }
-    {
-    }
+  public:
+    IntegerNode(const std::string &value_, int l)
+        : Node("Integer", value_, l), value{std::stoi(value_)} {}
 
-    std::string checkTypes(SymbolTable& st) const override;
+    std::string checkTypes(SymbolTable &st) const override;
+
+    std::string generateIR(CFG &graph) override;
 };
 
 #endif

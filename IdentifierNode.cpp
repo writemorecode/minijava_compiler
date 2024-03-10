@@ -3,8 +3,7 @@
 #include <algorithm>
 #include <utility>
 
-std::string IdentifierNode::checkTypes(SymbolTable& st) const
-{
+std::string IdentifierNode::checkTypes(SymbolTable &st) const {
     auto variableLookup = st.lookupVariable(value);
     if (variableLookup) {
         return variableLookup->getType();
@@ -23,3 +22,5 @@ std::string IdentifierNode::checkTypes(SymbolTable& st) const
     std::cerr << "Undeclared identifier " << value << ".\n";
     return "";
 }
+
+std::string IdentifierNode::generateIR(CFG &graph) { return value; }
