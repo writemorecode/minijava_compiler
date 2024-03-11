@@ -19,3 +19,18 @@ std::string LogicalExpressionNode::checkTypes(SymbolTable &st) const {
     }
     return "";
 }
+
+std::string LessThanNode::generateIR(CFG &graph) {
+    auto name = graph.getTemporaryName();
+    auto lhs_name = left->generateIR(graph);
+    auto rhs_name = right->generateIR(graph);
+    graph.addInstruction(new ExpressionTac(name, lhs_name, "<", rhs_name));
+    return name;
+}
+std::string GreaterThanNode::generateIR(CFG &graph) {
+    auto name = graph.getTemporaryName();
+    auto lhs_name = left->generateIR(graph);
+    auto rhs_name = right->generateIR(graph);
+    graph.addInstruction(new ExpressionTac(name, lhs_name, ">", rhs_name));
+    return name;
+}
