@@ -1,8 +1,7 @@
 #include "BBlock.hpp"
 #include <iostream>
 
-void BBlock::printGraphviz(int &count) const {
-    int id = count;
+void BBlock::printGraphviz() const {
     std::cout << name << " [label=\"";
     std::cout << name << "\n";
     for (const auto &instr : instructions) {
@@ -13,14 +12,12 @@ void BBlock::printGraphviz(int &count) const {
         std::cout << "\"]\n";
         std::cout << name << " -> " << trueExit->name << " ";
         std::cout << "[xlabel=\"true\"];\n";
-        int n = ++count;
-        trueExit->printGraphviz(n);
+        trueExit->printGraphviz();
     }
     if (falseExit) {
         std::cout << name << " -> " << falseExit->name << " ";
         std::cout << "[xlabel=\"false\"];\n";
-        int n = ++count;
-        trueExit->printGraphviz(n);
+        trueExit->printGraphviz();
     }
 }
 

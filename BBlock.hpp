@@ -21,7 +21,7 @@ class BBlock {
 
     void addInstruction(Tac *ptr);
 
-    void printGraphviz(int &count) const;
+    void printGraphviz() const;
 };
 
 #endif

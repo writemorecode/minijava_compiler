@@ -14,13 +14,11 @@ std::string CFG::getBlockName() {
 }
 
 void CFG::printGraphviz() const {
-    int count = 0;
-
     std::cout << "digraph {\n";
     std::cout << "graph [splines=ortho]\n";
     std::cout << "node [shape=box]\n";
 
-    currentBlock->printGraphviz(count);
+    currentBlock->printGraphviz();
 
     std::cout << "}\n";
 }
