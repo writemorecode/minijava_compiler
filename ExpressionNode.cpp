@@ -16,6 +16,11 @@ std::string BooleanNode::generateIR(CFG &graph) { return value; }
 std::string ClassAllocationNode::checkTypes(SymbolTable &st) const {
     return id;
 }
+std::string ClassAllocationNode::generateIR(CFG &graph) {
+    auto name = graph.getTemporaryName();
+    graph.addInstruction(new NewTac(name, id));
+    return name;
+}
 std::string NotNode::checkTypes(SymbolTable &st) const {
     const auto exprType = expr->checkTypes(st);
     if (exprType == "boolean") {

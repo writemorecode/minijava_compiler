@@ -61,4 +61,10 @@ class ArrayAccessTac : public Tac {
     void print() const override;
 };
 
+class NewTac : public Tac {
+  public:
+    NewTac(std::string result, std::string y_) : Tac(result, "", "new", y_){};
+    void print() const override;
+};
+
 #endif

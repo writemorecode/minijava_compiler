@@ -23,3 +23,5 @@ void ArrayCopyTac::print() const {
 void ArrayAccessTac::print() const {
     std::cout << result << " := " << lhs << "[" << rhs << "]\n";
 }
+
+void NewTac::print() const { std::cout << result << " := new " << rhs << "\n"; }
