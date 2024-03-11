@@ -23,6 +23,7 @@ class Tac {
     Tac(std::string result_, std::string lhs_, std::string op_,
         std::string rhs_)
         : result(result_), lhs(lhs_), op(op_), rhs(rhs_) {}
+    virtual ~Tac() = default;
 };
 
 class ExpressionTac : public Tac {

@@ -1,6 +1,7 @@
 #ifndef BBLOCK_HPP
 #define BBLOCK_HPP
 
+#include <memory>
 #include <vector>
 
 #include "Tac.hpp"
@@ -8,7 +9,7 @@
 class BBlock {
   private:
     std::string name;
-    std::vector<Tac *> instructions;
+    std::vector<std::unique_ptr<Tac>> instructions;
     Tac *condition = nullptr;
     BBlock *trueExit = nullptr;
     BBlock *falseExit = nullptr;

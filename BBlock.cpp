@@ -21,4 +21,4 @@ void BBlock::printGraphviz() const {
     }
 }
 
-void BBlock::addInstruction(Tac *ptr) { instructions.push_back(ptr); }
+void BBlock::addInstruction(Tac *ptr) { instructions.emplace_back(ptr); }
