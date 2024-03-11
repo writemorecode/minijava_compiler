@@ -8,8 +8,8 @@ class ArrayAccessNode : public Node {
 
   public:
     ArrayAccessNode(Node *array, Node *index, int l)
-        : Node("Array access", l, {array, index}), array{array}, index{
-                                                                     index} {};
+        : Node("Array access", l, {array, index}), array{array},
+          index{index} {};
     std::string checkTypes(SymbolTable &st) const override;
 };
 
@@ -73,6 +73,7 @@ class BooleanNode : public Node {
     BooleanNode(const std::string &value, int l)
         : Node(value, l), value{value} {}
     std::string checkTypes(SymbolTable &st) const override;
+    std::string generateIR(CFG &graph) override;
 };
 
 class ClassAllocationNode : public Node {

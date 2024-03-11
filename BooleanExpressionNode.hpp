@@ -4,6 +4,7 @@
 #include "Node.h"
 
 class BooleanExpressionNode : public Node {
+  protected:
     Node *left, *right;
 
   public:
@@ -16,12 +17,14 @@ class AndNode : public BooleanExpressionNode {
   public:
     AndNode(Node *left, Node *right, int l)
         : BooleanExpressionNode("AND", left, right, l){};
+    std::string generateIR(CFG &graph) override;
 };
 
 class OrNode : public BooleanExpressionNode {
   public:
     OrNode(Node *left, Node *right, int l)
         : BooleanExpressionNode("OR", left, right, l){};
+    std::string generateIR(CFG &graph) override;
 };
 
 #endif
