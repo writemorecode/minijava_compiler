@@ -1,5 +1,5 @@
 #include "CFG.hpp"
-#include "Node.h"
+#include <iostream>
 
 std::string CFG::getTemporaryName() {
     auto name = "_t" + std::to_string(temporaryIndex);
