@@ -81,6 +81,12 @@ std::string IntegerArrayAllocationNode::checkTypes(SymbolTable &st) const {
     }
     return "int[]";
 }
+std::string IntegerArrayAllocationNode::generateIR(CFG &graph) {
+    auto name = graph.getTemporaryName();
+    auto lengthName = length->generateIR(graph);
+    graph.addInstruction(new NewArrayTac(name, lengthName));
+    return name;
+}
 std::string ArrayLengthNode::checkTypes(SymbolTable &st) const {
     const auto arrayType = array->checkTypes(st);
     if (arrayType != "int[]") {

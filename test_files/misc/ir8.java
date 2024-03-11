@@ -10,6 +10,13 @@ class C {
     public int Func(){
         D dObj;
         dObj = new D();
-        return 0;
+
+        int[] intArr;
+        intArr = new int[4];
+        intArr[0] = 1;
+        int x;
+        x = intArr[0];
+
+        return x;
     }
 }

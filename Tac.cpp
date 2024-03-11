@@ -25,3 +25,7 @@ void ArrayAccessTac::print() const {
 }
 
 void NewTac::print() const { std::cout << result << " := new " << rhs << "\n"; }
+
+void NewArrayTac::print() const {
+    std::cout << result << " := new int, " << rhs << "\n";
+}
