@@ -32,3 +32,9 @@
 *.app
 
 *.dSYM
+*.hh
+compiler
+*.pdf
+*.dot
+lex.yy.c
+parser.tab.cc
