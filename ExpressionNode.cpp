@@ -27,6 +27,7 @@ std::string NotNode::checkTypes(SymbolTable &st) const {
               << "' for negation operator, expected type 'boolean'.\n";
     return "";
 }
+
 std::string NotNode::generateIR(CFG &graph) {
     auto name = graph.getTemporaryName();
     auto rhsName = expr->generateIR(graph);
@@ -85,6 +86,13 @@ std::string ArrayLengthNode::checkTypes(SymbolTable &st) const {
         return "";
     }
     return "int";
+}
+
+std::string ArrayLengthNode::generateIR(CFG &graph) {
+    auto name = graph.getTemporaryName();
+    auto arrayName = array->value;
+    graph.addInstruction(new UnaryExpressionTac(name, "length", arrayName));
+    return name;
 }
 
 std::string EqualToNode::checkTypes(SymbolTable &st) const {

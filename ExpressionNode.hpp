@@ -29,6 +29,7 @@ class ArrayLengthNode : public UnaryExpressionNode {
     ArrayLengthNode(Node *array, int l)
         : UnaryExpressionNode("Array length", array, l), array{array} {};
     std::string checkTypes(SymbolTable &st) const override;
+    std::string generateIR(CFG &graph) override;
 };
 
 class IntegerArrayAllocationNode : public UnaryExpressionNode {
