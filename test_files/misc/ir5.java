@@ -8,14 +8,8 @@ class C {
     public int Func(){
         int index;
         index = 2;
-
         int[] array;
-
-        int x;
-        x = array[2 * index];
-
         array[index] = array[index + 1];
-
-        return x;
+        return 0;
     }
 }

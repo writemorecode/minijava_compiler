@@ -40,6 +40,13 @@ class CopyTac : public Tac {
     void print() const override;
 };
 
+class ArrayCopyTac : public Tac {
+  public:
+    ArrayCopyTac(std::string result_, std::string index_, std::string z_)
+        : Tac(result_, index_, ":=", z_){};
+    void print() const override;
+};
+
 class ArrayAccessTac : public Tac {
   public:
     ArrayAccessTac(std::string result_, std::string y_, std::string z_)

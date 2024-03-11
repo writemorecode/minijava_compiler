@@ -25,6 +25,7 @@ class ArrayAssignNode : public Node {
         : Node("Array assign", l, {id, indexExpr}), id{id},
           indexExpr{indexExpr}, rightExpr{rightExpr} {}
     std::string checkTypes(SymbolTable &st) const override;
+    std::string generateIR(CFG &graph) override;
 };
 
 class PrintNode : public Node {

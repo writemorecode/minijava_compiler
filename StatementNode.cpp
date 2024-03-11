@@ -1,4 +1,5 @@
 #include "StatementNode.hpp"
+#include "Tac.hpp"
 
 std::string AssignNode::checkTypes(SymbolTable &st) const {
     const auto lhsType = id->checkTypes(st);
@@ -50,4 +51,12 @@ std::string ArrayAssignNode::checkTypes(SymbolTable &st) const {
     }
 
     return "";
+}
+
+std::string ArrayAssignNode::generateIR(CFG &graph) {
+    auto indexName = indexExpr->generateIR(graph);
+    auto rhsName = rightExpr->generateIR(graph);
+    auto arrayName = id->value;
+    graph.addInstruction(new ArrayCopyTac(arrayName, indexName, rhsName));
+    return arrayName;
 }
