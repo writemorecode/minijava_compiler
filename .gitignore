@@ -38,3 +38,4 @@ compiler
 *.dot
 lex.yy.c
 parser.tab.cc
+.ninja_log
