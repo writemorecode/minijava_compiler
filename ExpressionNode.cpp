@@ -49,6 +49,15 @@ std::string ArrayAccessNode::checkTypes(SymbolTable &st) const {
 
     return "int";
 }
+
+std::string ArrayAccessNode::generateIR(CFG &graph) {
+    auto indexName = index->generateIR(graph);
+    auto arrayName = array->value;
+    auto name = graph.getTemporaryName();
+    graph.addInstruction(new ArrayAccessTac(name, arrayName, indexName));
+    return name;
+}
+
 std::string IntegerArrayAllocationNode::checkTypes(SymbolTable &st) const {
     const auto lengthType = length->checkTypes(st);
     if (lengthType != "int") {

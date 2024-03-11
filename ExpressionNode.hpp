@@ -11,6 +11,7 @@ class ArrayAccessNode : public Node {
         : Node("Array access", l, {array, index}), array{array},
           index{index} {};
     std::string checkTypes(SymbolTable &st) const override;
+    std::string generateIR(CFG &graph) override;
 };
 
 class UnaryExpressionNode : public Node {

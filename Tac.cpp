@@ -10,3 +10,7 @@ void ExpressionTac::print() const {
 }
 
 void CopyTac::print() const { std::cout << result << " := " << lhs << "\n"; }
+
+void ArrayAccessTac::print() const {
+    std::cout << result << " := " << lhs << "[" << rhs << "]\n";
+}
