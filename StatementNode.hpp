@@ -10,7 +10,6 @@ class AssignNode : public Node {
   public:
     AssignNode(Node *id, Node *expr, int l)
         : Node("Assign", l, {id, expr}), id{id}, expr{expr} {}
-    // bool buildTable(SymbolTable &st) const override;
     std::string checkTypes(SymbolTable &st) const override;
     std::string generateIR(CFG &graph) override;
 };

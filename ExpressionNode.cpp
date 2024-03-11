@@ -27,6 +27,12 @@ std::string NotNode::checkTypes(SymbolTable &st) const {
               << "' for negation operator, expected type 'boolean'.\n";
     return "";
 }
+std::string NotNode::generateIR(CFG &graph) {
+    auto name = graph.getTemporaryName();
+    auto rhsName = expr->generateIR(graph);
+    graph.addInstruction(new UnaryExpressionTac(name, "!", rhsName));
+    return name;
+}
 
 std::string ArrayAccessNode::checkTypes(SymbolTable &st) const {
     const auto arrayType = array->checkTypes(st);

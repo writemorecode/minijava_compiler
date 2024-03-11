@@ -48,6 +48,7 @@ class NotNode : public UnaryExpressionNode {
     NotNode(Node *expr, int l)
         : UnaryExpressionNode("Negated expression", expr, l), expr{expr} {};
     std::string checkTypes(SymbolTable &st) const override;
+    std::string generateIR(CFG &graph) override;
 };
 
 class EqualToNode : public Node {

@@ -34,6 +34,13 @@ class ExpressionTac : public Tac {
     void print() const override;
 };
 
+class UnaryExpressionTac : public Tac {
+  public:
+    UnaryExpressionTac(std::string result_, std::string op_, std::string z_)
+        : Tac(result_, "", op_, z_){};
+    void print() const override;
+};
+
 class CopyTac : public Tac {
   public:
     CopyTac(std::string y_, std::string result_) : Tac(result_, y_, ":=", ""){};
