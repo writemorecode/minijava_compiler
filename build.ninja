@@ -1,0 +1,42 @@
+cflags = -Wall -Wpedantic -Wno-unused-private-field -std=c++17 -g
+rule cc
+  command = g++ $cflags -c $in -o $out
+rule cc_main
+  command = g++ $cflags $in -o $out
+rule bison
+  command = bison $in
+rule flex
+  command = flex $in
+build parser.tab.cc: bison parser.yy
+build parser.tab.o: cc parser.tab.cc
+build lex.yy.c: flex lexer.flex
+build ArithmeticExpressionNode.o: cc ArithmeticExpressionNode.cpp
+build BBlock.o: cc BBlock.cpp
+build BooleanExpressionNode.o: cc BooleanExpressionNode.cpp
+build BooleanNode.o: cc BooleanNode.cpp
+build CFG.o: cc CFG.cpp
+build Class.o: cc Class.cpp
+build ClassNode.o: cc ClassNode.cpp
+build ControlStatementNode.o: cc ControlStatementNode.cpp
+build ExpressionNode.o: cc ExpressionNode.cpp
+build IdentifierNode.o: cc IdentifierNode.cpp
+build IntegerNode.o: cc IntegerNode.cpp
+build LogicalExpressionNode.o: cc LogicalExpressionNode.cpp
+build MainClassNode.o: cc MainClassNode.cpp
+build Method.o: cc Method.cpp
+build MethodBodyNode.o: cc MethodBodyNode.cpp
+build MethodCallNode.o: cc MethodCallNode.cpp
+build MethodCallWithoutArgumentsNode.o: cc MethodCallWithoutArgumentsNode.cpp
+build MethodNode.o: cc MethodNode.cpp
+build MethodParameterNode.o: cc MethodParameterNode.cpp
+build MethodWithoutParametersNode.o: cc MethodWithoutParametersNode.cpp
+build Node.o: cc Node.cpp
+build Record.o: cc Record.cpp
+build Scope.o: cc Scope.cpp
+build StatementNode.o: cc StatementNode.cpp
+build SymbolTable.o: cc SymbolTable.cpp
+build Tac.o: cc Tac.cpp
+build TypeNode.o: cc TypeNode.cpp
+build Variable.o: cc Variable.cpp
+build VariableNode.o: cc VariableNode.cpp
+build compiler: cc_main lex.yy.c parser.tab.o main.cpp ArithmeticExpressionNode.o BBlock.o BooleanExpressionNode.o BooleanNode.o CFG.o Class.o ClassNode.o ControlStatementNode.o ExpressionNode.o IdentifierNode.o IntegerNode.o LogicalExpressionNode.o MainClassNode.o Method.o MethodBodyNode.o MethodCallNode.o MethodCallWithoutArgumentsNode.o MethodNode.o MethodParameterNode.o MethodWithoutParametersNode.o Node.o Record.o Scope.o StatementNode.o SymbolTable.o Tac.o TypeNode.o Variable.o VariableNode.o 
