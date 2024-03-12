@@ -3,8 +3,6 @@
 #include <algorithm>
 
 bool Node::buildTable(SymbolTable &st) const {
-    // return std::all_of(children.begin(), children.end(),
-    //     [&](Node* child) { return child->buildTable(st); });
     bool valid = true;
     for (const auto &child : children) {
         if (!child->buildTable(st)) {
@@ -49,7 +47,7 @@ void Node::print(int depth = 0) const {
 void Node::printGraphviz(int &count, std::ostream &outStream) {
     id = count++;
     outStream << "n" << id << " [label=\"" << type;
-    if (value != "") {
+    if (!value.empty()) {
         outStream << ": " << value;
     }
     outStream << "\"];" << '\n';
