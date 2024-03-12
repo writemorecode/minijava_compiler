@@ -29,3 +29,9 @@ void NewTac::print() const { std::cout << result << " := new " << rhs << "\n"; }
 void NewArrayTac::print() const {
     std::cout << result << " := new int, " << rhs << "\n";
 }
+
+void JumpTac::print() const { std::cout << op << " " << result << "\n"; }
+
+void CondJumpTac::print() const {
+    std::cout << "iffalse " << lhs << " " << op << " " << result << "\n";
+}

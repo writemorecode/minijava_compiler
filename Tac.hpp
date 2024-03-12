@@ -73,4 +73,18 @@ class NewArrayTac : public Tac {
         : Tac(result, "", "new", length_){};
     void print() const override;
 };
+
+class JumpTac : public Tac {
+  public:
+    JumpTac(std::string _label) : Tac(_label, "", "goto", ""){};
+    void print() const override;
+};
+
+class CondJumpTac : public Tac {
+  public:
+    CondJumpTac(std::string label, std::string cond)
+        : Tac("", cond, "goto", label){};
+    void print() const override;
+};
+
 #endif
