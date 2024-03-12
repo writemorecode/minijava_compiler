@@ -1,0 +1,2 @@
+---
+Checks:          'clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*,-modernize-use-trailing-return-type,-cppcoreguidelines-owning-memory,-readability-identifier-length'
