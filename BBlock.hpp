@@ -17,6 +17,8 @@ class BBlock {
   public:
     BBlock(std::string name_) : name(name_){};
 
+    const auto &getName() const { return name; }
+
     void setTrueBlock(BBlock *ptr) { trueExit = ptr; }
     void setFalseBlock(BBlock *ptr) { falseExit = ptr; }
 
