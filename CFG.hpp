@@ -10,6 +10,8 @@ class CFG {
     int blockIndex = 0;
 
   public:
+    CFG() { currentBlock = new BBlock(getBlockName()); };
+
     std::string getTemporaryName();
     std::string getBlockName();
 

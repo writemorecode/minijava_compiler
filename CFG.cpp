@@ -25,9 +25,4 @@ void CFG::printGraphviz() const {
 
 BBlock *CFG::newBlock() { return new BBlock(getBlockName()); }
 
-void CFG::addInstruction(Tac *ptr) {
-    if (!currentBlock) {
-        currentBlock = new BBlock(getBlockName());
-    }
-    currentBlock->addInstruction(ptr);
-}
+void CFG::addInstruction(Tac *ptr) { currentBlock->addInstruction(ptr); }
