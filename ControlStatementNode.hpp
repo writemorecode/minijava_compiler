@@ -17,6 +17,7 @@ class IfNode : public ControlStatementNode {
   public:
     IfNode(Node *cond, Node *stmt, int l)
         : ControlStatementNode("If", cond, stmt, l), cond{cond}, stmt{stmt} {}
+    std::string generateIR(CFG &graph) override;
 };
 class IfElseNode : public ControlStatementNode {
     Node *cond, *stmt, *elseStmt;

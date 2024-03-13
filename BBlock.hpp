@@ -13,6 +13,7 @@ class BBlock {
     Tac *condition = nullptr;
     BBlock *trueExit = nullptr;
     BBlock *falseExit = nullptr;
+    bool visited = false;
 
   public:
     BBlock(std::string name_) : name(name_){};
@@ -22,9 +23,14 @@ class BBlock {
     void setTrueBlock(BBlock *ptr) { trueExit = ptr; }
     void setFalseBlock(BBlock *ptr) { falseExit = ptr; }
 
+    bool hasTrueBlock() const { return trueExit != nullptr; };
+    bool hasFalseBlock() const { return falseExit != nullptr; };
+
     void addInstruction(Tac *ptr);
 
     void printGraphviz() const;
+
+    void markVisited() { visited = true; };
 };
 
 #endif

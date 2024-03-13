@@ -33,5 +33,5 @@ void NewArrayTac::print() const {
 void JumpTac::print() const { std::cout << op << " " << result << "\n"; }
 
 void CondJumpTac::print() const {
-    std::cout << "iffalse " << lhs << " " << op << " " << result << "\n";
+    std::cout << "iffalse " << lhs << " goto " << rhs << "\n";
 }

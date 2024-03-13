@@ -83,7 +83,7 @@ class JumpTac : public Tac {
 class CondJumpTac : public Tac {
   public:
     CondJumpTac(std::string label, std::string cond)
-        : Tac("", cond, "goto", label){};
+        : Tac("", cond, "", label){};
     void print() const override;
 };
 

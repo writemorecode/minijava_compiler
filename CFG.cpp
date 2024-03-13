@@ -18,7 +18,7 @@ void CFG::printGraphviz() const {
     std::cout << "graph [splines=ortho]\n";
     std::cout << "node [shape=box]\n";
 
-    currentBlock->printGraphviz();
+    rootBlock->printGraphviz();
 
     std::cout << "}\n";
 }

@@ -8,8 +8,8 @@ class ArrayAccessNode : public Node {
 
   public:
     ArrayAccessNode(Node *array, Node *index, int l)
-        : Node("Array access", l, {array, index}), array{array},
-          index{index} {};
+        : Node("Array access", l, {array, index}), array{array}, index{
+                                                                     index} {};
     std::string checkTypes(SymbolTable &st) const override;
     std::string generateIR(CFG &graph) override;
 };
@@ -60,6 +60,7 @@ class EqualToNode : public Node {
     EqualToNode(Node *left, Node *right, int l)
         : Node("EQ", l, {left, right}), left{left}, right{right} {};
     std::string checkTypes(SymbolTable &st) const override;
+    std::string generateIR(CFG &graph) override;
 };
 
 class ThisNode : public Node {

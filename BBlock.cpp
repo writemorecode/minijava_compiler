@@ -3,21 +3,20 @@
 
 void BBlock::printGraphviz() const {
     std::cout << name << " [label=\"";
-    std::cout << name << "\n";
+    std::cout << "[" << name << "]\n";
     for (const auto &instr : instructions) {
         instr->print();
     }
     std::cout << "\"]\n";
-    if (trueExit) {
-        std::cout << "\"]\n";
+    if (trueExit != nullptr && !trueExit->visited) {
         std::cout << name << " -> " << trueExit->name << " ";
         std::cout << "[xlabel=\"true\"];\n";
         trueExit->printGraphviz();
     }
-    if (falseExit) {
+    if (falseExit != nullptr && !falseExit->visited) {
         std::cout << name << " -> " << falseExit->name << " ";
         std::cout << "[xlabel=\"false\"];\n";
-        trueExit->printGraphviz();
+        falseExit->printGraphviz();
     }
 }
 
