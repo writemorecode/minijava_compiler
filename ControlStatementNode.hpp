@@ -28,6 +28,7 @@ class IfElseNode : public ControlStatementNode {
           stmt{stmt}, elseStmt{elseStmt} {
         children.push_back(elseStmt);
     }
+    std::string generateIR(CFG &graph) override;
 };
 class WhileNode : public ControlStatementNode {
     Node *cond, *stmt;
