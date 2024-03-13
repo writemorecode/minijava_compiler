@@ -37,6 +37,7 @@ class WhileNode : public ControlStatementNode {
     WhileNode(Node *cond, Node *stmt, int l)
         : ControlStatementNode("While", cond, stmt, l), cond{cond}, stmt{stmt} {
     }
+    std::string generateIR(CFG &graph) override;
 };
 
 #endif

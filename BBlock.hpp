@@ -28,8 +28,9 @@ class BBlock {
 
     void addInstruction(Tac *ptr);
 
-    void printGraphviz() const;
+    void printBlockGraphviz();
 
+    bool isVisited() const { return visited; }
     void markVisited() { visited = true; };
 };
 

@@ -66,3 +66,31 @@ std::string IfElseNode::generateIR(CFG &graph) {
 
     return "placeholder ifelsenode::generateir";
 }
+
+std::string WhileNode::generateIR(CFG &graph) {
+    auto *headerBlock = graph.newBlock();
+    const auto &headerLabel = headerBlock->getName();
+    auto *bodyBlock = graph.newBlock();
+    bodyBlock->setTrueBlock(headerBlock);
+    auto *joinBlock = graph.newBlock();
+
+    auto *currentBlock = graph.getCurrentBlock();
+    currentBlock->setTrueBlock(headerBlock);
+    graph.addInstruction(new JumpTac(headerLabel));
+
+    graph.setCurrentBlock(headerBlock);
+    const auto &condName = cond->generateIR(graph);
+    graph.addInstruction(new CondJumpTac(joinBlock->getName(), condName));
+
+    graph.setCurrentBlock(bodyBlock);
+    currentBlock->setTrueBlock(headerBlock);
+    stmt->generateIR(graph);
+    graph.addInstruction(new JumpTac(headerLabel));
+
+    headerBlock->setTrueBlock(bodyBlock);
+    headerBlock->setFalseBlock(joinBlock);
+
+    graph.setCurrentBlock(joinBlock);
+
+    return "placeholder whilenode::generateir";
+}
