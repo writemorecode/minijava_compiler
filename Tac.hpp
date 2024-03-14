@@ -101,4 +101,10 @@ class MethodCallTac : public Tac {
     void print() const override;
 };
 
+class ReturnTac : public Tac {
+  public:
+    ReturnTac(const std::string &name) : Tac(name, "", "", ""){};
+    void print() const override;
+};
+
 #endif

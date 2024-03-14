@@ -41,3 +41,5 @@ void ParamTac::print() const { std::cout << "param " << rhs << "\n"; }
 void MethodCallTac::print() const {
     std::cout << result << " := call " << lhs << ", " << rhs << "\n";
 }
+
+void ReturnTac::print() const { std::cout << "return " << result << "\n"; }
