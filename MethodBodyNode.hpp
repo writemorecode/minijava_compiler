@@ -4,7 +4,7 @@
 #include "Node.h"
 
 class MethodBodyNode : public Node {
-    Node *body = nullptr, *returnValue;
+    Node *body, *returnValue;
 
   public:
     MethodBodyNode(Node *body, Node *returnValue, int l)
