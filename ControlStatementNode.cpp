@@ -30,6 +30,7 @@ std::string IfNode::generateIR(CFG &graph) {
     graph.setCurrentBlock(trueBlock);
     stmt->generateIR(graph);
     graph.addInstruction(new JumpTac(joinLabel));
+    graph.getCurrentBlock()->setTrueBlock(joinBlock);
 
     graph.setCurrentBlock(joinBlock);
 
