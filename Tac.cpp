@@ -35,3 +35,9 @@ void JumpTac::print() const { std::cout << op << " " << result << "\n"; }
 void CondJumpTac::print() const {
     std::cout << "iffalse " << lhs << " goto " << rhs << "\n";
 }
+
+void ParamTac::print() const { std::cout << "param " << rhs << "\n"; }
+
+void MethodCallTac::print() const {
+    std::cout << result << " := call " << lhs << ", " << rhs << "\n";
+}

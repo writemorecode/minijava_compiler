@@ -87,4 +87,18 @@ class CondJumpTac : public Tac {
     void print() const override;
 };
 
+class ParamTac : public Tac {
+  public:
+    ParamTac(const std::string &param) : Tac("", "", "", param){};
+    void print() const override;
+};
+
+class MethodCallTac : public Tac {
+  public:
+    MethodCallTac(const std::string &result, const std::string &methodName,
+                  const std::string &argCount)
+        : Tac(result, methodName, "", argCount){};
+    void print() const override;
+};
+
 #endif
