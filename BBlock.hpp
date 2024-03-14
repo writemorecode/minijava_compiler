@@ -26,6 +26,9 @@ class BBlock {
     bool hasTrueBlock() const { return trueExit != nullptr; };
     bool hasFalseBlock() const { return falseExit != nullptr; };
 
+    BBlock *getTrueBlock() { return trueExit; }
+    BBlock *getFalseBlock() { return falseExit; }
+
     void addInstruction(Tac *ptr);
 
     void printBlockGraphviz();
