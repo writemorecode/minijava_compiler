@@ -85,6 +85,7 @@ std::string WhileNode::generateIR(CFG &graph) {
     graph.setCurrentBlock(bodyBlock);
     currentBlock->setTrueBlock(headerBlock);
     stmt->generateIR(graph);
+    graph.getCurrentBlock()->setTrueBlock(headerBlock);
     graph.addInstruction(new JumpTac(headerLabel));
 
     headerBlock->setTrueBlock(bodyBlock);
