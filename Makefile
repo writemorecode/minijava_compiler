@@ -20,4 +20,5 @@ st:
 
 clean:
 		rm -f parser.tab.* lex.yy.c* compiler stack.hh position.hh location.hh *.dot *.pdf *.o 
+		rm -rf compiler.dSYM
 	
