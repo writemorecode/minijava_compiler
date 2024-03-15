@@ -7,9 +7,12 @@ rule bison
   command = bison $in
 rule flex
   command = flex $in
-build parser.tab.cc: bison parser.yy
+
+build parser.tab.cc | parser.tab.hh: bison parser.yy
 build parser.tab.o: cc parser.tab.cc
 build lex.yy.c: flex lexer.flex
+build lex.yy.o: cc lex.yy.c | parser.tab.hh
+
 build ArithmeticExpressionNode.o: cc ArithmeticExpressionNode.cpp
 build BBlock.o: cc BBlock.cpp
 build BooleanExpressionNode.o: cc BooleanExpressionNode.cpp
@@ -39,4 +42,4 @@ build Tac.o: cc Tac.cpp
 build TypeNode.o: cc TypeNode.cpp
 build Variable.o: cc Variable.cpp
 build VariableNode.o: cc VariableNode.cpp
-build compiler: cc_main lex.yy.c parser.tab.o main.cpp ArithmeticExpressionNode.o BBlock.o BooleanExpressionNode.o BooleanNode.o CFG.o Class.o ClassNode.o ControlStatementNode.o ExpressionNode.o IdentifierNode.o IntegerNode.o LogicalExpressionNode.o MainClassNode.o Method.o MethodBodyNode.o MethodCallNode.o MethodCallWithoutArgumentsNode.o MethodNode.o MethodParameterNode.o MethodWithoutParametersNode.o Node.o Record.o Scope.o StatementNode.o SymbolTable.o Tac.o TypeNode.o Variable.o VariableNode.o 
+build compiler: cc_main parser.tab.o lex.yy.o main.cpp ArithmeticExpressionNode.o BBlock.o BooleanExpressionNode.o BooleanNode.o CFG.o Class.o ClassNode.o ControlStatementNode.o ExpressionNode.o IdentifierNode.o IntegerNode.o LogicalExpressionNode.o MainClassNode.o Method.o MethodBodyNode.o MethodCallNode.o MethodCallWithoutArgumentsNode.o MethodNode.o MethodParameterNode.o MethodWithoutParametersNode.o Node.o Record.o Scope.o StatementNode.o SymbolTable.o Tac.o TypeNode.o Variable.o VariableNode.o 

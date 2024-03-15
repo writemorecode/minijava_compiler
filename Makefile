@@ -4,7 +4,7 @@ CXXFLAGS := -g -Wall -Wextra -Wpedantic -std=c++17
 NODES := $(wildcard *Node.cpp)
 NODES_OBJ := $(NODES:.cpp=.o)
 
-compiler: lex.yy.c parser.tab.o main.cpp $(NODES_OBJ) SymbolTable.o Scope.o Record.o Variable.o Method.o Class.o Tac.o BBlock.o CFG.o
+compiler: lex.yy.o parser.tab.o main.cpp $(NODES_OBJ) SymbolTable.o Scope.o Record.o Variable.o Method.o Class.o Tac.o BBlock.o CFG.o
 		$(CXX) $(CXXFLAGS) $^ -o $@
 parser.tab.o: parser.tab.cc
 		$(CXX) $(CXXFLAGS) $^ -c -o $@
@@ -12,6 +12,8 @@ parser.tab.cc: parser.yy
 		bison parser.yy
 lex.yy.c: lexer.flex parser.tab.cc
 		flex lexer.flex
+lex.yy.o: lex.yy.c
+		$(CXX) $(CXXFLAGS) $^ -c -o $@
 
 tree: 
 	dot -Tpdf tree.dot -o tree.pdf
