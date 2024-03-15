@@ -60,3 +60,9 @@ std::string ArrayAssignNode::generateIR(CFG &graph) {
     graph.addInstruction(new ArrayCopyTac(arrayName, indexName, rhsName));
     return arrayName;
 }
+
+std::string PrintNode::generateIR(CFG &graph) {
+    const auto &value = expr->generateIR(graph);
+    graph.addInstruction(new PrintTac(value));
+    return "";
+}

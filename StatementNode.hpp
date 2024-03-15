@@ -32,6 +32,7 @@ class PrintNode : public Node {
 
   public:
     PrintNode(Node *expr, int l) : Node("Print", l, {expr}), expr{expr} {}
+    std::string generateIR(CFG &graph) override;
 };
 
 #endif

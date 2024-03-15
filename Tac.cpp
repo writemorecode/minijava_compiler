@@ -43,3 +43,5 @@ void MethodCallTac::print() const {
 }
 
 void ReturnTac::print() const { std::cout << "return " << result << "\n"; }
+
+void PrintTac::print() const { std::cout << "print " << result << "\n"; }

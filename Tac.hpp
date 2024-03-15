@@ -107,4 +107,10 @@ class ReturnTac : public Tac {
     void print() const override;
 };
 
+class PrintTac : public Tac {
+  public:
+    PrintTac(const std::string &value) : Tac(value, "", "", ""){};
+    void print() const override;
+};
+
 #endif
