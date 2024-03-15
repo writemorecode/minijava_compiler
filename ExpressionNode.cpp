@@ -1,7 +1,7 @@
 #include "ExpressionNode.hpp"
 
 std::string ThisNode::checkTypes(SymbolTable &st) const {
-    const auto lookup = st.lookupVariable(type);
+    auto const *lookup = st.lookupVariable(type);
     if (!lookup) {
         std::cerr << "Error: ";
         std::cerr << "(line " << lineno << ") ";

@@ -14,16 +14,15 @@
 
 class Node {
   public:
-    std::string type{"uninitialized"}, value{"uninitialized"};
+    std::string type{}, value{};
     int id = 0, lineno = 0;
     std::list<Node *> children;
 
-    Node(std::string t, int l) : type(std::move(t)), value(""), lineno(l) {}
-    Node(std::string t, std::string v, int l)
-        : type(std::move(t)), value(std::move(v)), lineno(l) {}
-    Node(std::string t, int l, std::list<Node *> children_)
-        : type(std::move(t)), value(""), lineno(l),
-          children(std::move(children_)) {}
+    Node(const std::string &t, int l) : type(t), lineno(l) {}
+    Node(const std::string &t, const std::string &v, int l)
+        : type(t), value(v), lineno(l) {}
+    Node(const std::string &t, int l, std::list<Node *> children_)
+        : type(t), lineno(l), children(std::move(children_)) {}
     virtual ~Node() = default;
 
     virtual bool buildTable(SymbolTable &st) const;

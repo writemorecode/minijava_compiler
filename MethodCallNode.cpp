@@ -4,17 +4,17 @@
 
 std::string MethodCallNode::checkTypes(SymbolTable &st) const {
     const auto caller = object->checkTypes(st);
-    if (caller == "") {
+    if (caller.empty()) {
         return "";
     }
-    const auto callingClass = st.lookupClass(caller);
+    auto *callingClass = st.lookupClass(caller);
     if (!callingClass) {
         std::cerr << "Error: (line " << lineno << ") Method '" << id->value
                   << "' not declared for class '" << caller << "'.\n";
         return "";
     }
 
-    const auto method = callingClass->lookupMethod(id->value);
+    auto *const method = callingClass->lookupMethod(id->value);
     if (method == nullptr) {
         std::cerr << "Error: (line " << lineno << ") Method '" << id->value
                   << "' not declared for class '" << callingClass->getID()
@@ -41,7 +41,7 @@ std::string MethodCallNode::checkTypes(SymbolTable &st) const {
     while (paramsIter != params.end() && argsIter != args.end()) {
         const auto paramType = (*paramsIter)->getType();
         const auto argType = (*argsIter)->checkTypes(st);
-        if (argType == "") {
+        if (argType.empty()) {
             return "";
         }
         const auto argNumber = 1 + std::distance(args.cbegin(), argsIter);

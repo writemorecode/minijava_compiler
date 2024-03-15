@@ -15,11 +15,11 @@ bool VariableNode::buildTable(SymbolTable &st) const {
     Record *curRecord = st.getCurrentRecord();
     if (curRecord->getType() == curRecord->getID()) {
         // Record is a class
-        auto curClass = dynamic_cast<Class *>(curRecord);
+        auto *curClass = dynamic_cast<Class *>(curRecord);
         curClass->addVariable(currentVariable);
     } else {
         // Record is a method
-        auto curMethod = dynamic_cast<Method *>(curRecord);
+        auto *curMethod = dynamic_cast<Method *>(curRecord);
         curMethod->addVariable(currentVariable);
     }
 
@@ -31,7 +31,7 @@ std::string VariableNode::checkTypes(SymbolTable &st) const {
     const bool hasBaseType =
         (variableType == "int" || variableType == "int[]" ||
          variableType == "boolean");
-    const auto classLookup = st.lookupClass(variableType);
+    auto *classLookup = st.lookupClass(variableType);
     if (!hasBaseType && !classLookup) {
         std::cout << "Error: (line " << lineno << ") "
                   << "Unknown type '" << variableType << "' "

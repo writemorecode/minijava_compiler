@@ -16,15 +16,15 @@ class BBlock {
     bool visited = false;
 
   public:
-    BBlock(std::string name_) : name(name_){};
+    BBlock(const std::string &name_) : name(name_){};
 
-    const auto &getName() const { return name; }
+    [[nodiscard]] const auto &getName() const { return name; }
 
     void setTrueBlock(BBlock *ptr) { trueExit = ptr; }
     void setFalseBlock(BBlock *ptr) { falseExit = ptr; }
 
-    bool hasTrueBlock() const { return trueExit != nullptr; };
-    bool hasFalseBlock() const { return falseExit != nullptr; };
+    [[nodiscard]] bool hasTrueBlock() const { return trueExit != nullptr; };
+    [[nodiscard]] bool hasFalseBlock() const { return falseExit != nullptr; };
 
     BBlock *getTrueBlock() { return trueExit; }
     BBlock *getFalseBlock() { return falseExit; }
@@ -33,7 +33,7 @@ class BBlock {
 
     void printBlockGraphviz();
 
-    bool isVisited() const { return visited; }
+    [[nodiscard]] bool isVisited() const { return visited; }
     void markVisited() { visited = true; };
 };
 

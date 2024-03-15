@@ -7,10 +7,9 @@ bool MethodParameterNode::buildTable(SymbolTable &st) const {
         return false;
     }
     st.addVariable(type->value, id->value);
-    const auto parameter = st.lookupVariable(id->value);
-    const auto currentScope = st.getCurrentScope();
-    const auto currentMethod =
-        dynamic_cast<Method *>(currentScope->getRecord());
+    auto *parameter = st.lookupVariable(id->value);
+    auto *currentScope = st.getCurrentScope();
+    auto *currentMethod = dynamic_cast<Method *>(currentScope->getRecord());
     currentMethod->addParameter(parameter);
     return true;
 }

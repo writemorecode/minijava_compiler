@@ -1,6 +1,5 @@
 #include "Scope.hpp"
 
-#include <algorithm>
 #include <iostream>
 
 #include "Class.hpp"

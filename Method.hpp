@@ -1,8 +1,6 @@
 #ifndef METHOD_HPP
 #define METHOD_HPP
 
-#include <iostream>
-#include <list>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -15,8 +13,7 @@ class Method : public Record {
     std::vector<Variable *> parameters;
 
   public:
-    Method(std::string type, std::string id) : Record(id, type){};
-    // virtual ~Method() = default;
+    Method(const std::string &type, const std::string &id) : Record(id, type){};
 
     std::string getRecord() const override;
 

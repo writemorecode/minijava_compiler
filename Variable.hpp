@@ -7,7 +7,8 @@
 
 class Variable : public Record {
   public:
-    Variable(std::string type, std::string id) : Record(id, type){};
+    Variable(const std::string &type, const std::string &id)
+        : Record(id, type){};
     virtual ~Variable() = default;
     std::string getRecord() const override;
 };

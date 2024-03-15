@@ -2,7 +2,6 @@
 
 #include <iostream>
 
-#include "Node.h"
 #include "Scope.hpp"
 
 SymbolTable::SymbolTable()
@@ -24,7 +23,7 @@ void SymbolTable::addClass(const std::string &id) { current->addClass(id); }
 
 void SymbolTable::printTable(std::ostream &os) const {
     int count = 0;
-    const auto scope = root.get();
+    auto *scope = root.get();
     os << "digraph {\n";
     scope->printScope(count, os);
     os << "}\n";
@@ -37,14 +36,14 @@ std::string SymbolTable::getCurrentScopeName() const {
 Scope *SymbolTable::getParentScope() const { return current->getParent(); }
 Scope *SymbolTable::getCurrentScope() const { return current; }
 
-Variable *SymbolTable::lookupVariable(const std::string &key) {
-    return current->lookupVariable(key);
+Variable *SymbolTable::lookupVariable(const std::string &id) {
+    return current->lookupVariable(id);
 }
-Method *SymbolTable::lookupMethod(const std::string &key) {
-    return current->lookupMethod(key);
+Method *SymbolTable::lookupMethod(const std::string &id) {
+    return current->lookupMethod(id);
 }
-Class *SymbolTable::lookupClass(const std::string &key) {
-    return current->lookupClass(key);
+Class *SymbolTable::lookupClass(const std::string &id) {
+    return current->lookupClass(id);
 }
 Variable *SymbolTable::lookupVariableInScope(const std::string &key) {
     return current->lookupVariableInScope(key);

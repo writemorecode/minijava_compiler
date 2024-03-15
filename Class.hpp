@@ -3,7 +3,6 @@
 
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 #include "Method.hpp"
 #include "Record.hpp"
@@ -20,7 +19,6 @@ class Class : public Record {
 
   public:
     Class(const std::string &id) : Record(id, id){};
-    // virtual ~Class() = default;
 
     void addVariable(Variable *variable);
     void addMethod(Method *method);
