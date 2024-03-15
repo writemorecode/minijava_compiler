@@ -11,6 +11,7 @@ std::string ThisNode::checkTypes(SymbolTable &st) const {
     }
     return lookup->getType();
 }
+std::string ThisNode::generateIR(CFG &graph) { return value; }
 std::string BooleanNode::checkTypes(SymbolTable &st) const { return "boolean"; }
 std::string BooleanNode::generateIR(CFG &graph) { return value; }
 std::string ClassAllocationNode::checkTypes(SymbolTable &st) const {
