@@ -31,3 +31,12 @@ std::string MethodCallWithoutArgumentsNode::checkTypes(SymbolTable &st) const {
     }
     return method->getType();
 }
+
+std::string MethodCallWithoutArgumentsNode::generateIR(CFG &graph) {
+    const auto &methodName = id->value;
+    const auto &name = graph.getTemporaryName();
+    const auto &callerName = object->generateIR(graph);
+    graph.addInstruction(new ParamTac(callerName));
+    graph.addInstruction(new MethodCallTac(name, methodName, "1"));
+    return name;
+}

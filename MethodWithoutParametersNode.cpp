@@ -37,3 +37,9 @@ std::string MethodWithoutParametersNode::checkTypes(SymbolTable &st) const {
 
     return type->value;
 }
+
+std::string MethodWithoutParametersNode::generateIR(CFG &graph) {
+    graph.setCurrentBlock(graph.addMethodBlock());
+    body->generateIR(graph);
+    return graph.getCurrentBlock()->getName();
+}

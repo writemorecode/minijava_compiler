@@ -8,11 +8,12 @@ class MethodWithoutParametersNode : public Node {
 
   public:
     MethodWithoutParametersNode(Node *type, Node *id, Node *body, int l)
-        : Node("Method", l, {type, id, body}), type{type}, id{id}, body{
-                                                                       body} {};
+        : Node("Method", l, {type, id, body}), type{type}, id{id},
+          body{body} {};
 
     bool buildTable(SymbolTable &st) const override;
     std::string checkTypes(SymbolTable &st) const override;
+    std::string generateIR(CFG &graph) override;
 };
 
 #endif
