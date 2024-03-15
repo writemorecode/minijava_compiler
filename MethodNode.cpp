@@ -38,3 +38,9 @@ std::string MethodNode::checkTypes(SymbolTable &st) const {
 
     return type->value;
 }
+
+std::string MethodNode::generateIR(CFG &graph) {
+    graph.setCurrentBlock(graph.addMethodBlock());
+    body->generateIR(graph);
+    return graph.getCurrentBlock()->getName();
+}

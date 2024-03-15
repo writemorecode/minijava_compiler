@@ -11,8 +11,6 @@ class C {
         return c;
     }
     public int Func(int n) {
-        int x;
-        x = this.Add(n, 10);
-        return x;
+        return this.Add(n, 10);
     }
 }

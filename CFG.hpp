@@ -2,11 +2,12 @@
 #define CFG_HPP
 
 #include "BBlock.hpp"
-
+#include <vector>
 class CFG {
   private:
     BBlock *currentBlock = nullptr;
     BBlock *rootBlock = nullptr;
+    std::vector<BBlock *> methods;
     int temporaryIndex = 0;
     int blockIndex = 1;
 
@@ -28,6 +29,7 @@ class CFG {
     void printGraphviz() const;
 
     [[nodiscard]] BBlock *newBlock();
+    [[nodiscard]] BBlock *addMethodBlock();
 };
 
 #endif

@@ -21,6 +21,9 @@ void CFG::printGraphviz() const {
     if (rootBlock != nullptr) {
         rootBlock->printBlockGraphviz();
     }
+    for (const auto &el : methods) {
+        el->printBlockGraphviz();
+    }
 
     std::cout << "}\n";
 }
@@ -28,3 +31,9 @@ void CFG::printGraphviz() const {
 BBlock *CFG::newBlock() { return new BBlock(getBlockName()); }
 
 void CFG::addInstruction(Tac *ptr) { currentBlock->addInstruction(ptr); }
+
+BBlock *CFG::addMethodBlock() {
+    auto *ptr = new BBlock(getBlockName());
+    methods.push_back(ptr);
+    return ptr;
+}

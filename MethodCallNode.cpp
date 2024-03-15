@@ -1,5 +1,6 @@
 
 #include "MethodCallNode.hpp"
+#include "Tac.hpp"
 
 std::string MethodCallNode::checkTypes(SymbolTable &st) const {
     const auto caller = object->checkTypes(st);
@@ -55,4 +56,20 @@ std::string MethodCallNode::checkTypes(SymbolTable &st) const {
         ++argsIter;
     }
     return method->getType();
+}
+
+std::string MethodCallNode::generateIR(CFG &graph) {
+    const auto &methodName = id->value;
+    const auto argCount = std::to_string(exprList->children.size() + 1);
+    const auto &name = graph.getTemporaryName();
+
+    const auto &callerName = object->generateIR(graph);
+    graph.addInstruction(new ParamTac(callerName));
+    for (const auto &arg : exprList->children) {
+        const auto &argName = arg->generateIR(graph);
+        graph.addInstruction(new ParamTac(argName));
+    }
+
+    graph.addInstruction(new MethodCallTac(name, methodName, argCount));
+    return name;
 }

@@ -11,6 +11,7 @@ class MethodBodyNode : public Node {
         : Node("Method body", l, {body, returnValue}), body{body},
           returnValue{returnValue} {}
     std::string checkTypes(SymbolTable &st) const override;
+    std::string generateIR(CFG &graph) override;
 };
 class ReturnOnlyMethodBodyNode : public Node {
     Node *returnValue;
@@ -19,5 +20,6 @@ class ReturnOnlyMethodBodyNode : public Node {
     ReturnOnlyMethodBodyNode(Node *returnValue, int l)
         : Node("Method body", l, {returnValue}), returnValue{returnValue} {}
     std::string checkTypes(SymbolTable &st) const override;
+    std::string generateIR(CFG &graph) override;
 };
 #endif
