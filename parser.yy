@@ -139,7 +139,10 @@ ClassDeclarationList: ClassDeclaration {
     $$->children.push_back($2);
 };
 
-Statement: L_CURLY StatementList R_CURLY {
+Statement: L_CURLY R_CURLY {
+	$$ = new Node("Empty statement", yylineno);
+};
+| L_CURLY StatementList R_CURLY {
     $$ = $2;
 };
 | IF L_PAREN Expression R_PAREN Statement %prec "then" {
