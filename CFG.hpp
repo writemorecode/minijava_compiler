@@ -6,27 +6,20 @@
 class CFG {
   private:
     BBlock *currentBlock = nullptr;
-    BBlock *rootBlock = nullptr;
     std::vector<BBlock *> methods;
     int temporaryIndex = 0;
-    int blockIndex = 1;
+    int blockIndex = 0;
 
   public:
-    CFG() {
-        currentBlock = new BBlock("block_0");
-        rootBlock = currentBlock;
-    };
-
     std::string getTemporaryName();
     std::string getBlockName();
 
     BBlock *getCurrentBlock() const { return currentBlock; }
-    BBlock *getRootBlock() const { return rootBlock; }
     void setCurrentBlock(BBlock *ptr) { currentBlock = ptr; }
 
     void addInstruction(Tac *ptr);
 
-    void printGraphviz() const;
+    void printGraphviz(std::ostream &os) const;
 
     [[nodiscard]] BBlock *newBlock();
     [[nodiscard]] BBlock *addMethodBlock();

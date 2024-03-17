@@ -13,19 +13,14 @@ std::string CFG::getBlockName() {
     return name;
 }
 
-void CFG::printGraphviz() const {
-    std::cout << "digraph {\n";
-    std::cout << "graph [splines=ortho]\n";
-    std::cout << "node [shape=box]\n";
-
-    if (rootBlock != nullptr) {
-        rootBlock->printBlockGraphviz();
-    }
+void CFG::printGraphviz(std::ostream &os) const {
+    os << "digraph {\n";
+    os << "graph [splines=ortho]\n";
+    os << "node [shape=box]\n";
     for (const auto &el : methods) {
-        el->printBlockGraphviz();
+        el->printBlockGraphviz(os);
     }
-
-    std::cout << "}\n";
+    os << "}\n";
 }
 
 BBlock *CFG::newBlock() { return new BBlock(getBlockName()); }

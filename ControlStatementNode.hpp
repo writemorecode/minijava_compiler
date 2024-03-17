@@ -17,7 +17,7 @@ class IfNode : public ControlStatementNode {
   public:
     IfNode(Node *cond, Node *stmt, int l)
         : ControlStatementNode("If", cond, stmt, l), cond{cond}, stmt{stmt} {}
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 class IfElseNode : public ControlStatementNode {
     Node *cond, *stmt, *elseStmt;
@@ -28,7 +28,7 @@ class IfElseNode : public ControlStatementNode {
           stmt{stmt}, elseStmt{elseStmt} {
         children.push_back(elseStmt);
     }
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 class WhileNode : public ControlStatementNode {
     Node *cond, *stmt;
@@ -37,7 +37,7 @@ class WhileNode : public ControlStatementNode {
     WhileNode(Node *cond, Node *stmt, int l)
         : ControlStatementNode("While", cond, stmt, l), cond{cond}, stmt{stmt} {
     }
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

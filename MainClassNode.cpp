@@ -23,3 +23,11 @@ std::string MainClassNode::checkTypes(SymbolTable &st) const {
     st.exitScope();
     return "void";
 }
+
+std::string MainClassNode::generateIR(CFG &graph, SymbolTable &st) {
+    st.enterScope("Class: " + id->value);
+    graph.setCurrentBlock(graph.addMethodBlock());
+    body->generateIR(graph, st);
+    st.exitScope();
+    return graph.getCurrentBlock()->getName();
+}

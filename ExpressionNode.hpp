@@ -11,7 +11,7 @@ class ArrayAccessNode : public Node {
         : Node("Array access", l, {array, index}), array{array},
           index{index} {};
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class UnaryExpressionNode : public Node {
@@ -29,7 +29,7 @@ class ArrayLengthNode : public UnaryExpressionNode {
     ArrayLengthNode(Node *array, int l)
         : UnaryExpressionNode("Array length", array, l), array{array} {};
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class IntegerArrayAllocationNode : public UnaryExpressionNode {
@@ -40,7 +40,7 @@ class IntegerArrayAllocationNode : public UnaryExpressionNode {
         : UnaryExpressionNode("Integer array allocation", length, l),
           length{length} {};
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class NotNode : public UnaryExpressionNode {
@@ -50,7 +50,7 @@ class NotNode : public UnaryExpressionNode {
     NotNode(Node *expr, int l)
         : UnaryExpressionNode("Negated expression", expr, l), expr{expr} {};
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class EqualToNode : public Node {
@@ -60,7 +60,7 @@ class EqualToNode : public Node {
     EqualToNode(Node *left, Node *right, int l)
         : Node("EQ", l, {left, right}), left{left}, right{right} {};
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class ThisNode : public Node {
@@ -69,7 +69,7 @@ class ThisNode : public Node {
   public:
     ThisNode(int l) : Node("this", l) {}
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class BooleanNode : public Node {
@@ -79,7 +79,7 @@ class BooleanNode : public Node {
     BooleanNode(const std::string &value, int l)
         : Node(value, l), value{value} {}
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class ClassAllocationNode : public Node {
@@ -89,7 +89,7 @@ class ClassAllocationNode : public Node {
     ClassAllocationNode(Node *object, int l)
         : Node("Class allocation", object->value, l), id{object->value} {};
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

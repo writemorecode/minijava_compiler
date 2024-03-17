@@ -13,7 +13,7 @@ class MethodCallNode : public Node {
         : Node("Method call", l, {object, id, exprList}), object{object},
           id{id}, exprList{exprList} {};
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

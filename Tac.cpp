@@ -1,47 +1,57 @@
 #include "Tac.hpp"
 #include <iostream>
 
-void Tac::print() const {
-    std::cout << result << " := " << lhs << " " << op << " " << rhs << "\n";
+void Tac::print(std::ostream &os) const {
+    os << result << " := " << lhs << " " << op << " " << rhs << "\n";
 }
 
-void ExpressionTac::print() const {
-    std::cout << result << " := " << lhs << " " << op << " " << rhs << "\n";
+void ExpressionTac::print(std::ostream &os) const {
+    os << result << " := " << lhs << " " << op << " " << rhs << "\n";
 }
 
-void UnaryExpressionTac::print() const {
-    std::cout << result << " := " << op << " " << rhs << "\n";
+void UnaryExpressionTac::print(std::ostream &os) const {
+    os << result << " := " << op << " " << rhs << "\n";
 }
 
-void CopyTac::print() const { std::cout << result << " := " << lhs << "\n"; }
-
-void ArrayCopyTac::print() const {
-    std::cout << result << "[" << lhs << "]"
-              << " := " << rhs << "\n";
+void CopyTac::print(std::ostream &os) const {
+    os << result << " := " << lhs << "\n";
 }
 
-void ArrayAccessTac::print() const {
-    std::cout << result << " := " << lhs << "[" << rhs << "]\n";
+void ArrayCopyTac::print(std::ostream &os) const {
+    os << result << "[" << lhs << "]"
+       << " := " << rhs << "\n";
 }
 
-void NewTac::print() const { std::cout << result << " := new " << rhs << "\n"; }
-
-void NewArrayTac::print() const {
-    std::cout << result << " := new int, " << rhs << "\n";
+void ArrayAccessTac::print(std::ostream &os) const {
+    os << result << " := " << lhs << "[" << rhs << "]\n";
 }
 
-void JumpTac::print() const { std::cout << op << " " << result << "\n"; }
-
-void CondJumpTac::print() const {
-    std::cout << "iffalse " << lhs << " goto " << rhs << "\n";
+void NewTac::print(std::ostream &os) const {
+    os << result << " := new " << rhs << "\n";
 }
 
-void ParamTac::print() const { std::cout << "param " << rhs << "\n"; }
-
-void MethodCallTac::print() const {
-    std::cout << result << " := call " << lhs << ", " << rhs << "\n";
+void NewArrayTac::print(std::ostream &os) const {
+    os << result << " := new int, " << rhs << "\n";
 }
 
-void ReturnTac::print() const { std::cout << "return " << result << "\n"; }
+void JumpTac::print(std::ostream &os) const {
+    os << op << " " << result << "\n";
+}
 
-void PrintTac::print() const { std::cout << "print " << result << "\n"; }
+void CondJumpTac::print(std::ostream &os) const {
+    os << "iffalse " << lhs << " goto " << rhs << "\n";
+}
+
+void ParamTac::print(std::ostream &os) const { os << "param " << rhs << "\n"; }
+
+void MethodCallTac::print(std::ostream &os) const {
+    os << result << " := call " << lhs << ", " << rhs << "\n";
+}
+
+void ReturnTac::print(std::ostream &os) const {
+    os << "return " << result << "\n";
+}
+
+void PrintTac::print(std::ostream &os) const {
+    os << "print " << result << "\n";
+}

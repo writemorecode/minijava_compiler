@@ -13,6 +13,7 @@ class MainClassNode : public Node {
 
     bool buildTable(SymbolTable &st) const override;
     std::string checkTypes(SymbolTable &st) const override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

@@ -25,6 +25,10 @@ void SymbolTable::addIntegerVariable(const std::string &id) {
     current->addVariable("int", id);
 }
 
+void SymbolTable::addBooleanVariable(const std::string &id) {
+    current->addVariable("boolean", id);
+}
+
 void SymbolTable::printTable(std::ostream &os) const {
     int count = 0;
     auto *scope = root.get();

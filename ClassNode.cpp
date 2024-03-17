@@ -28,3 +28,10 @@ std::string ClassNode::checkTypes(SymbolTable &st) const {
     }
     return "void";
 }
+
+std::string ClassNode::generateIR(CFG &graph, SymbolTable &st) {
+    st.enterScope("Class: " + id->value);
+    body->generateIR(graph, st);
+    st.exitScope();
+    return "";
+}

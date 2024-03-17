@@ -13,12 +13,12 @@ std::string ControlStatementNode::checkTypes(SymbolTable &st) const {
     return "void";
 }
 
-std::string IfNode::generateIR(CFG &graph) {
+std::string IfNode::generateIR(CFG &graph, SymbolTable &st) {
     auto *trueBlock = graph.newBlock();
     auto *joinBlock = graph.newBlock();
     const auto &joinLabel = joinBlock->getName();
 
-    const auto &condName = cond->generateIR(graph);
+    const auto &condName = cond->generateIR(graph, st);
     graph.addInstruction(new CondJumpTac(joinLabel, condName));
 
     auto *currentBlock = graph.getCurrentBlock();
@@ -28,7 +28,7 @@ std::string IfNode::generateIR(CFG &graph) {
     trueBlock->setTrueBlock(joinBlock);
 
     graph.setCurrentBlock(trueBlock);
-    stmt->generateIR(graph);
+    stmt->generateIR(graph, st);
     graph.addInstruction(new JumpTac(joinLabel));
     graph.getCurrentBlock()->setTrueBlock(joinBlock);
 
@@ -37,7 +37,7 @@ std::string IfNode::generateIR(CFG &graph) {
     return "placeholder ifnode::generateir";
 }
 
-std::string IfElseNode::generateIR(CFG &graph) {
+std::string IfElseNode::generateIR(CFG &graph, SymbolTable &st) {
     auto *trueBlock = graph.newBlock();
     auto *falseBlock = graph.newBlock();
     auto *joinBlock = graph.newBlock();
@@ -45,7 +45,7 @@ std::string IfElseNode::generateIR(CFG &graph) {
     const auto &falseLabel = falseBlock->getName();
     const auto &joinLabel = joinBlock->getName();
 
-    const auto &condName = cond->generateIR(graph);
+    const auto &condName = cond->generateIR(graph, st);
     graph.addInstruction(new CondJumpTac(falseLabel, condName));
 
     auto *currentBlock = graph.getCurrentBlock();
@@ -56,11 +56,11 @@ std::string IfElseNode::generateIR(CFG &graph) {
     falseBlock->setTrueBlock(joinBlock);
 
     graph.setCurrentBlock(trueBlock);
-    stmt->generateIR(graph);
+    stmt->generateIR(graph, st);
     graph.addInstruction(new JumpTac(joinLabel));
 
     graph.setCurrentBlock(falseBlock);
-    elseStmt->generateIR(graph);
+    elseStmt->generateIR(graph, st);
     graph.addInstruction(new JumpTac(joinLabel));
 
     graph.setCurrentBlock(joinBlock);
@@ -68,7 +68,7 @@ std::string IfElseNode::generateIR(CFG &graph) {
     return "placeholder ifelsenode::generateir";
 }
 
-std::string WhileNode::generateIR(CFG &graph) {
+std::string WhileNode::generateIR(CFG &graph, SymbolTable &st) {
     auto *headerBlock = graph.newBlock();
     const auto &headerLabel = headerBlock->getName();
     auto *bodyBlock = graph.newBlock();
@@ -80,12 +80,12 @@ std::string WhileNode::generateIR(CFG &graph) {
     graph.addInstruction(new JumpTac(headerLabel));
 
     graph.setCurrentBlock(headerBlock);
-    const auto &condName = cond->generateIR(graph);
+    const auto &condName = cond->generateIR(graph, st);
     graph.addInstruction(new CondJumpTac(joinBlock->getName(), condName));
 
     graph.setCurrentBlock(bodyBlock);
     currentBlock->setTrueBlock(headerBlock);
-    stmt->generateIR(graph);
+    stmt->generateIR(graph, st);
     graph.getCurrentBlock()->setTrueBlock(headerBlock);
     graph.addInstruction(new JumpTac(headerLabel));
 

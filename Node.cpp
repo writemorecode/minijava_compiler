@@ -1,4 +1,5 @@
 #include "Node.h"
+#include "SymbolTable.hpp"
 
 #include <algorithm>
 
@@ -26,9 +27,9 @@ std::string Node::checkTypes(SymbolTable &st) const {
     return "";
 }
 
-std::string Node::generateIR(CFG &graph) {
+std::string Node::generateIR(CFG &graph, SymbolTable &st) {
     for (auto &child : children) {
-        child->generateIR(graph);
+        child->generateIR(graph, st);
     }
     return "foobar";
 }

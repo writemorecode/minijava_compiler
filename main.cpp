@@ -96,8 +96,9 @@ int main(int argc, char **argv) {
 
     CFG graph;
     st.resetTable();
+    std::fstream controlFlowGraph("cfg.dot", std::ios::out);
     root->generateIR(graph, st);
-    graph.printGraphviz();
+    graph.printGraphviz(controlFlowGraph);
 
     std::fstream stGraph("st.dot", std::ios::out);
     st.printTable(stGraph);

@@ -11,14 +11,17 @@ std::string ThisNode::checkTypes(SymbolTable &st) const {
     }
     return lookup->getType();
 }
-std::string ThisNode::generateIR(CFG &graph) { return value; }
+std::string ThisNode::generateIR(CFG &graph, SymbolTable &st) { return value; }
 std::string BooleanNode::checkTypes(SymbolTable &st) const { return "boolean"; }
-std::string BooleanNode::generateIR(CFG &graph) { return value; }
+std::string BooleanNode::generateIR(CFG &graph, SymbolTable &st) {
+    return value;
+}
 std::string ClassAllocationNode::checkTypes(SymbolTable &st) const {
     return id;
 }
-std::string ClassAllocationNode::generateIR(CFG &graph) {
+std::string ClassAllocationNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
+    st.addVariable(id, name);
     graph.addInstruction(new NewTac(name, id));
     return name;
 }
@@ -34,9 +37,10 @@ std::string NotNode::checkTypes(SymbolTable &st) const {
     return "";
 }
 
-std::string NotNode::generateIR(CFG &graph) {
+std::string NotNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
-    auto rhsName = expr->generateIR(graph);
+    st.addBooleanVariable(name);
+    auto rhsName = expr->generateIR(graph, st);
     graph.addInstruction(new UnaryExpressionTac(name, "!", rhsName));
     return name;
 }
@@ -63,10 +67,11 @@ std::string ArrayAccessNode::checkTypes(SymbolTable &st) const {
     return "int";
 }
 
-std::string ArrayAccessNode::generateIR(CFG &graph) {
-    auto indexName = index->generateIR(graph);
+std::string ArrayAccessNode::generateIR(CFG &graph, SymbolTable &st) {
+    auto indexName = index->generateIR(graph, st);
     auto arrayName = array->value;
     auto name = graph.getTemporaryName();
+    st.addIntegerVariable(name);
     graph.addInstruction(new ArrayAccessTac(name, arrayName, indexName));
     return name;
 }
@@ -82,9 +87,11 @@ std::string IntegerArrayAllocationNode::checkTypes(SymbolTable &st) const {
     }
     return "int[]";
 }
-std::string IntegerArrayAllocationNode::generateIR(CFG &graph) {
+std::string IntegerArrayAllocationNode::generateIR(CFG &graph,
+                                                   SymbolTable &st) {
     auto name = graph.getTemporaryName();
-    auto lengthName = length->generateIR(graph);
+    st.addVariable("int[]", name);
+    auto lengthName = length->generateIR(graph, st);
     graph.addInstruction(new NewArrayTac(name, lengthName));
     return name;
 }
@@ -100,8 +107,9 @@ std::string ArrayLengthNode::checkTypes(SymbolTable &st) const {
     return "int";
 }
 
-std::string ArrayLengthNode::generateIR(CFG &graph) {
+std::string ArrayLengthNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
+    st.addIntegerVariable(name);
     auto arrayName = array->value;
     graph.addInstruction(new UnaryExpressionTac(name, "length", arrayName));
     return name;
@@ -122,10 +130,11 @@ std::string EqualToNode::checkTypes(SymbolTable &st) const {
     return "";
 }
 
-std::string EqualToNode::generateIR(CFG &graph) {
+std::string EqualToNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
-    auto lhs_name = left->generateIR(graph);
-    auto rhs_name = right->generateIR(graph);
+    st.addBooleanVariable(name);
+    auto lhs_name = left->generateIR(graph, st);
+    auto rhs_name = right->generateIR(graph, st);
     graph.addInstruction(new ExpressionTac(name, lhs_name, "==", rhs_name));
     return name;
 }

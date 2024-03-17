@@ -1,4 +1,3 @@
-
 #include "MethodCallNode.hpp"
 #include "Tac.hpp"
 
@@ -58,18 +57,23 @@ std::string MethodCallNode::checkTypes(SymbolTable &st) const {
     return method->getType();
 }
 
-std::string MethodCallNode::generateIR(CFG &graph) {
-    const auto &methodName = id->value;
-    const auto argCount = std::to_string(exprList->children.size() + 1);
+std::string MethodCallNode::generateIR(CFG &graph, SymbolTable &st) {
+    const auto &caller = object->checkTypes(st);
+    auto *callingClass = st.lookupClass(caller);
+    auto const *method = callingClass->lookupMethod(id->value);
+    const auto &methodType = method->getType();
     const auto &name = graph.getTemporaryName();
+    st.addVariable(methodType, name);
 
-    const auto &callerName = object->generateIR(graph);
+    const auto &callerName = object->generateIR(graph, st);
     graph.addInstruction(new ParamTac(callerName));
     for (const auto &arg : exprList->children) {
-        const auto &argName = arg->generateIR(graph);
+        const auto &argName = arg->generateIR(graph, st);
         graph.addInstruction(new ParamTac(argName));
     }
 
+    const auto &methodName = id->value;
+    const auto argCount = std::to_string(exprList->children.size() + 1);
     graph.addInstruction(new MethodCallTac(name, methodName, argCount));
     return name;
 }

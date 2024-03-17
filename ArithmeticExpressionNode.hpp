@@ -20,7 +20,7 @@ class PlusNode : public ArithmeticExpressionNode {
   public:
     PlusNode(Node *left, Node *right, int l)
         : ArithmeticExpressionNode("Plus", left, right, l){};
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class MinusNode : public ArithmeticExpressionNode {
@@ -28,7 +28,7 @@ class MinusNode : public ArithmeticExpressionNode {
   public:
     MinusNode(Node *left, Node *right, int l)
         : ArithmeticExpressionNode("Minus", left, right, l){};
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class MultiplicationNode : public ArithmeticExpressionNode {
@@ -36,7 +36,7 @@ class MultiplicationNode : public ArithmeticExpressionNode {
   public:
     MultiplicationNode(Node *left, Node *right, int l)
         : ArithmeticExpressionNode("Multiplication", left, right, l){};
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class DivisionNode : public ArithmeticExpressionNode {
@@ -44,7 +44,7 @@ class DivisionNode : public ArithmeticExpressionNode {
   public:
     DivisionNode(Node *left, Node *right, int l)
         : ArithmeticExpressionNode("Division", left, right, l){};
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

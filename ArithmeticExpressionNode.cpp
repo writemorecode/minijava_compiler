@@ -16,31 +16,35 @@ std::string ArithmeticExpressionNode::checkTypes(SymbolTable &st) const {
     return "";
 }
 
-std::string PlusNode::generateIR(CFG &graph) {
+std::string PlusNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
-    auto lhs_name = left->generateIR(graph);
-    auto rhs_name = right->generateIR(graph);
+    st.addIntegerVariable(name);
+    auto lhs_name = left->generateIR(graph, st);
+    auto rhs_name = right->generateIR(graph, st);
     graph.addInstruction(new ExpressionTac(name, lhs_name, "+", rhs_name));
     return name;
 }
-std::string MinusNode::generateIR(CFG &graph) {
+std::string MinusNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
-    auto lhs_name = left->generateIR(graph);
-    auto rhs_name = right->generateIR(graph);
+    st.addIntegerVariable(name);
+    auto lhs_name = left->generateIR(graph, st);
+    auto rhs_name = right->generateIR(graph, st);
     graph.addInstruction(new ExpressionTac(name, lhs_name, "-", rhs_name));
     return name;
 }
-std::string MultiplicationNode::generateIR(CFG &graph) {
+std::string MultiplicationNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
-    auto lhs_name = left->generateIR(graph);
-    auto rhs_name = right->generateIR(graph);
+    st.addIntegerVariable(name);
+    auto lhs_name = left->generateIR(graph, st);
+    auto rhs_name = right->generateIR(graph, st);
     graph.addInstruction(new ExpressionTac(name, lhs_name, "*", rhs_name));
     return name;
 }
-std::string DivisionNode::generateIR(CFG &graph) {
+std::string DivisionNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
-    auto lhs_name = left->generateIR(graph);
-    auto rhs_name = right->generateIR(graph);
+    st.addIntegerVariable(name);
+    auto lhs_name = left->generateIR(graph, st);
+    auto rhs_name = right->generateIR(graph, st);
     graph.addInstruction(new ExpressionTac(name, lhs_name, "/", rhs_name));
     return name;
 }

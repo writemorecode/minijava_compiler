@@ -29,7 +29,7 @@ class Node {
 
     virtual std::string checkTypes(SymbolTable &st) const;
 
-    virtual std::string generateIR(CFG &graph);
+    virtual std::string generateIR(CFG &graph, SymbolTable &st);
 
     void print(int depth) const;
     void printGraphviz(int &count, std::ostream &outStream);

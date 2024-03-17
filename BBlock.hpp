@@ -31,7 +31,7 @@ class BBlock {
 
     void addInstruction(Tac *ptr);
 
-    void printBlockGraphviz();
+    void printBlockGraphviz(std::ostream &os);
 
     [[nodiscard]] bool isVisited() const { return visited; }
     void markVisited() { visited = true; };

@@ -13,7 +13,7 @@ class IdentifierNode : public Node {
 
     std::string checkTypes(SymbolTable &st) const override;
 
-    std::string generateIR(CFG &graph) override;
+    std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

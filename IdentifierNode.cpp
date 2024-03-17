@@ -23,4 +23,4 @@ std::string IdentifierNode::checkTypes(SymbolTable &st) const {
     return "";
 }
 
-std::string IdentifierNode::generateIR(CFG &graph) { return value; }
+std::string IdentifierNode::generateIR(CFG &graph, SymbolTable &st) { return value; }
