@@ -39,3 +39,5 @@ compiler
 lex.yy.c
 parser.tab.cc
 .ninja_log
+*.png
+*.svg
