@@ -21,6 +21,8 @@ class SymbolTable {
     void addMethod(const std::string &type, const std::string &id);
     void addClass(const std::string &id);
 
+    void addIntegerVariable(const std::string &id);
+
     Variable *lookupVariable(const std::string &id);
     Method *lookupMethod(const std::string &id);
     Class *lookupClass(const std::string &id);

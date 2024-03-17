@@ -21,6 +21,10 @@ void SymbolTable::addMethod(const std::string &type, const std::string &id) {
 }
 void SymbolTable::addClass(const std::string &id) { current->addClass(id); }
 
+void SymbolTable::addIntegerVariable(const std::string &id) {
+    current->addVariable("int", id);
+}
+
 void SymbolTable::printTable(std::ostream &os) const {
     int count = 0;
     auto *scope = root.get();
