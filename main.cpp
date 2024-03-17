@@ -92,13 +92,15 @@ int main(int argc, char **argv) {
         return errCode;
     }
 
-    std::fstream stGraph("st.dot", std::ios::out);
-    st.printTable(stGraph);
     generateGraphviz(root);
 
     CFG graph;
-    root->generateIR(graph);
+    st.resetTable();
+    root->generateIR(graph, st);
     graph.printGraphviz();
+
+    std::fstream stGraph("st.dot", std::ios::out);
+    st.printTable(stGraph);
 
     return errCodes::SUCCESS;
 }
