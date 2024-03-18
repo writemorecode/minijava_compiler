@@ -39,7 +39,10 @@ build Scope.o: cc Scope.cpp
 build StatementNode.o: cc StatementNode.cpp
 build SymbolTable.o: cc SymbolTable.cpp
 build Tac.o: cc Tac.cpp
+build ArithmeticTac.o: cc ArithmeticTac.cpp
+build LogicalTac.o: cc LogicalTac.cpp
+build BooleanTac.o: cc BooleanTac.cpp
 build TypeNode.o: cc TypeNode.cpp
 build Variable.o: cc Variable.cpp
 build VariableNode.o: cc VariableNode.cpp
-build compiler: cc_main parser.tab.o lex.yy.o main.cpp ArithmeticExpressionNode.o BBlock.o BooleanExpressionNode.o BooleanNode.o CFG.o Class.o ClassNode.o ControlStatementNode.o ExpressionNode.o IdentifierNode.o IntegerNode.o LogicalExpressionNode.o MainClassNode.o Method.o MethodBodyNode.o MethodCallNode.o MethodCallWithoutArgumentsNode.o MethodNode.o MethodParameterNode.o MethodWithoutParametersNode.o Node.o Record.o Scope.o StatementNode.o SymbolTable.o Tac.o TypeNode.o Variable.o VariableNode.o 
+build compiler: cc_main parser.tab.o lex.yy.o main.cpp ArithmeticExpressionNode.o BBlock.o BooleanExpressionNode.o BooleanNode.o CFG.o Class.o ClassNode.o ControlStatementNode.o ExpressionNode.o IdentifierNode.o IntegerNode.o LogicalExpressionNode.o MainClassNode.o Method.o MethodBodyNode.o MethodCallNode.o MethodCallWithoutArgumentsNode.o MethodNode.o MethodParameterNode.o MethodWithoutParametersNode.o Node.o Record.o Scope.o StatementNode.o SymbolTable.o Tac.o ArithmeticTac.o LogicalTac.o BooleanTac.o TypeNode.o Variable.o VariableNode.o 

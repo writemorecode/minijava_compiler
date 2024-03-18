@@ -1,4 +1,5 @@
 #include "BooleanExpressionNode.hpp"
+#include "BooleanTac.hpp"
 
 std::string BooleanExpressionNode::checkTypes(SymbolTable &st) const {
     const auto lhsType = left->checkTypes(st);
@@ -20,7 +21,7 @@ std::string AndNode::generateIR(CFG &graph, SymbolTable &st) {
     st.addBooleanVariable(name);
     auto lhs_name = left->generateIR(graph, st);
     auto rhs_name = right->generateIR(graph, st);
-    graph.addInstruction(new ExpressionTac(name, lhs_name, "&&", rhs_name));
+    graph.addInstruction(new AndTac(name, lhs_name, rhs_name));
     return name;
 }
 
@@ -29,6 +30,6 @@ std::string OrNode::generateIR(CFG &graph, SymbolTable &st) {
     st.addBooleanVariable(name);
     auto lhs_name = left->generateIR(graph, st);
     auto rhs_name = right->generateIR(graph, st);
-    graph.addInstruction(new ExpressionTac(name, lhs_name, "||", rhs_name));
+    graph.addInstruction(new OrTac(name, lhs_name, rhs_name));
     return name;
 }

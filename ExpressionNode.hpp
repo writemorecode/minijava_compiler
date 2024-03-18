@@ -53,16 +53,6 @@ class NotNode : public UnaryExpressionNode {
     std::string generateIR(CFG &graph, SymbolTable &st) override;
 };
 
-class EqualToNode : public Node {
-    Node *left, *right;
-
-  public:
-    EqualToNode(Node *left, Node *right, int l)
-        : Node("EQ", l, {left, right}), left{left}, right{right} {};
-    std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph, SymbolTable &st) override;
-};
-
 class ThisNode : public Node {
     std::string value{"this"};
 
