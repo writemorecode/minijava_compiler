@@ -7,8 +7,8 @@ class Record {
     std::string id, type;
 
   public:
-    Record(std::string id, std::string type)
-        : id{std::move(id)}, type{std::move(type)} {}
+    Record(const std::string &id, const std::string &type)
+        : id{id}, type{type} {}
 
     virtual ~Record() = default;
 

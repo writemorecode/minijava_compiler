@@ -8,84 +8,75 @@ class Tac {
     std::string result, lhs, op, rhs;
 
   public:
-    [[nodiscard]] std::string getResult() const { return result; }
-    [[nodiscard]] std::string getLhs() const { return lhs; }
-    [[nodiscard]] std::string getOp() const { return op; }
-    [[nodiscard]] std::string getRhs() const { return rhs; }
-
-    void setResult(std::string result_) { result = std::move(result_); }
-    void setLhs(std::string lhs_) { lhs = std::move(lhs_); }
-    void setOp(std::string op_) { op = std::move(op_); }
-    void setRhs(std::string rhs_) { rhs = std::move(rhs_); }
-
     virtual void print(std::ostream &os) const;
 
-    Tac(std::string result_, std::string lhs_, std::string op_,
-        std::string rhs_)
-        : result(std::move(std::move(result_))),
-          lhs(std::move(std::move(lhs_))), op(std::move(std::move(op_))),
-          rhs(std::move(std::move(rhs_))) {}
+    Tac(const std::string &result_, const std::string &lhs_,
+        const std::string &op_, const std::string &rhs_)
+        : result(result_), lhs(lhs_), op(op_), rhs(rhs_) {}
     virtual ~Tac() = default;
 };
 
 class UnaryExpressionTac : public Tac {
   public:
-    UnaryExpressionTac(std::string result_, std::string op_, std::string z_)
-        : Tac(std::move(result_), "", std::move(op_), std::move(z_)){};
+    UnaryExpressionTac(const std::string &result_, const std::string &op_,
+                       const std::string &z_)
+        : Tac(result_, "", op_, z_){};
     void print(std::ostream &os) const override;
 };
 
 class NotTac : public UnaryExpressionTac {
   public:
-    NotTac(std::string result_, std::string z_)
-        : UnaryExpressionTac(std::move(result_), "!", std::move(z_)){};
+    NotTac(const std::string &result_, const std::string &z_)
+        : UnaryExpressionTac(result_, "!", z_){};
 };
 
 class CopyTac : public Tac {
   public:
-    CopyTac(std::string y_, std::string result_)
-        : Tac(std::move(result_), std::move(y_), ":=", ""){};
+    CopyTac(const std::string &y_, const std::string &result_)
+        : Tac(result_, y_, ":=", ""){};
     void print(std::ostream &os) const override;
 };
 
 class ArrayCopyTac : public Tac {
   public:
-    ArrayCopyTac(std::string result_, std::string index_, std::string z_)
-        : Tac(std::move(result_), std::move(index_), ":=", std::move(z_)){};
+    ArrayCopyTac(const std::string &result_, const std::string &index_,
+                 const std::string &z_)
+        : Tac(result_, index_, ":=", z_){};
     void print(std::ostream &os) const override;
 };
 
 class ArrayAccessTac : public Tac {
   public:
-    ArrayAccessTac(std::string result_, std::string y_, std::string z_)
-        : Tac(std::move(result_), std::move(y_), "", std::move(z_)){};
+    ArrayAccessTac(const std::string &result_, const std::string &y_,
+                   const std::string &z_)
+        : Tac(result_, y_, "", z_){};
     void print(std::ostream &os) const override;
 };
 
 class NewTac : public Tac {
   public:
-    NewTac(std::string result, std::string y_)
-        : Tac(std::move(result), "", "new", std::move(y_)){};
+    NewTac(const std::string &result, const std::string &y_)
+        : Tac(result, "", "new", y_){};
     void print(std::ostream &os) const override;
 };
 
 class NewArrayTac : public Tac {
   public:
-    NewArrayTac(std::string result, std::string length_)
-        : Tac(std::move(result), "", "new", std::move(length_)){};
+    NewArrayTac(const std::string &result, const std::string &length_)
+        : Tac(result, "", "new", length_){};
     void print(std::ostream &os) const override;
 };
 
 class JumpTac : public Tac {
   public:
-    JumpTac(std::string _label) : Tac(std::move(_label), "", "goto", ""){};
+    JumpTac(const std::string &_label) : Tac(_label, "", "goto", ""){};
     void print(std::ostream &os) const override;
 };
 
 class CondJumpTac : public Tac {
   public:
-    CondJumpTac(std::string label, std::string cond)
-        : Tac("", std::move(cond), "", std::move(label)){};
+    CondJumpTac(const std::string &label, const std::string &cond)
+        : Tac("", cond, "", label){};
     void print(std::ostream &os) const override;
 };
 

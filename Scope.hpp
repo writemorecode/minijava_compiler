@@ -26,7 +26,7 @@ class Scope {
 
   public:
     Scope(Record *record = nullptr, Scope *parent = nullptr,
-          std::string name = "Program");
+          const std::string &name = "Program");
 
     Scope *nextChild(const std::string &name, Record *record);
     Scope *getParent();

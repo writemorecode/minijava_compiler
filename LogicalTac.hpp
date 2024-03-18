@@ -5,20 +5,23 @@
 
 class LessThanTac : public Tac {
   public:
-    LessThanTac(std::string result_, std::string y_, std::string z_)
-        : Tac(std::move(result_), std::move(y_), "<", std::move(z_)){};
+    LessThanTac(const std::string &result_, const std::string &y_,
+                const std::string &z_)
+        : Tac(result_, y_, "<", z_){};
 };
 
 class GreaterThanTac : public Tac {
   public:
-    GreaterThanTac(std::string result_, std::string y_, std::string z_)
-        : Tac(std::move(result_), std::move(y_), ">", std::move(z_)){};
+    GreaterThanTac(const std::string &result_, const std::string &y_,
+                   const std::string &z_)
+        : Tac(result_, y_, ">", z_){};
 };
 
 class EqualToTac : public Tac {
   public:
-    EqualToTac(std::string result_, std::string y_, std::string z_)
-        : Tac(std::move(result_), std::move(y_), "==", std::move(z_)){};
+    EqualToTac(const std::string &result_, const std::string &y_,
+               const std::string &z_)
+        : Tac(result_, y_, "==", z_){};
 };
 
 #endif

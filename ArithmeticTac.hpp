@@ -5,26 +5,30 @@
 
 class AddTac : public Tac {
   public:
-    AddTac(std::string result_, std::string y_, std::string z_)
-        : Tac(std::move(result_), std::move(y_), "+", std::move(z_)){};
+    AddTac(const std::string &result_, const std::string &y_,
+           const std::string &z_)
+        : Tac(result_, y_, "+", z_){};
 };
 
 class SubtractTac : public Tac {
   public:
-    SubtractTac(std::string result_, std::string y_, std::string z_)
-        : Tac(std::move(result_), std::move(y_), "-", std::move(z_)){};
+    SubtractTac(const std::string &result_, const std::string &y_,
+                const std::string &z_)
+        : Tac(result_, y_, "-", z_){};
 };
 
 class MultiplyTac : public Tac {
   public:
-    MultiplyTac(std::string result_, std::string y_, std::string z_)
-        : Tac(std::move(result_), std::move(y_), "*", std::move(z_)){};
+    MultiplyTac(const std::string &result_, const std::string &y_,
+                const std::string &z_)
+        : Tac(result_, y_, "*", z_){};
 };
 
 class DivideTac : public Tac {
   public:
-    DivideTac(std::string result_, std::string y_, std::string z_)
-        : Tac(std::move(result_), std::move(y_), "/", std::move(z_)){};
+    DivideTac(const std::string &result_, const std::string &y_,
+              const std::string &z_)
+        : Tac(result_, y_, "/", z_){};
 };
 
 #endif

@@ -6,8 +6,8 @@
 #include "Method.hpp"
 #include "Variable.hpp"
 
-Scope::Scope(Record *record, Scope *parent, std::string name)
-    : record{record}, parent{parent}, scopeName{std::move(name)} {};
+Scope::Scope(Record *record, Scope *parent, const std::string &name)
+    : record{record}, parent{parent}, scopeName{name} {};
 
 Scope *Scope::getParent() { return parent; }
 
