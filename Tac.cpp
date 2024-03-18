@@ -5,10 +5,6 @@ void Tac::print(std::ostream &os) const {
     os << result << " := " << lhs << " " << op << " " << rhs << "\n";
 }
 
-void ExpressionTac::print(std::ostream &os) const {
-    os << result << " := " << lhs << " " << op << " " << rhs << "\n";
-}
-
 void UnaryExpressionTac::print(std::ostream &os) const {
     os << result << " := " << op << " " << rhs << "\n";
 }

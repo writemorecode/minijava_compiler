@@ -28,15 +28,6 @@ class Tac {
     virtual ~Tac() = default;
 };
 
-class ExpressionTac : public Tac {
-  public:
-    ExpressionTac(std::string result_, std::string y_, std::string op_,
-                  std::string z_)
-        : Tac(std::move(result_), std::move(y_), std::move(op_),
-              std::move(z_)){};
-    void print(std::ostream &os) const override;
-};
-
 class UnaryExpressionTac : public Tac {
   public:
     UnaryExpressionTac(std::string result_, std::string op_, std::string z_)
