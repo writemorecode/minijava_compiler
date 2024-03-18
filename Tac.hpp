@@ -35,6 +35,12 @@ class UnaryExpressionTac : public Tac {
     void print(std::ostream &os) const override;
 };
 
+class NotTac : public UnaryExpressionTac {
+  public:
+    NotTac(std::string result_, std::string z_)
+        : UnaryExpressionTac(std::move(result_), "!", std::move(z_)){};
+};
+
 class CopyTac : public Tac {
   public:
     CopyTac(std::string y_, std::string result_)

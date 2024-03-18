@@ -42,7 +42,7 @@ std::string NotNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
     st.addBooleanVariable(name);
     auto rhsName = expr->generateIR(graph, st);
-    graph.addInstruction(new UnaryExpressionTac(name, "!", rhsName));
+    graph.addInstruction(new NotTac(name, rhsName));
     return name;
 }
 
