@@ -23,6 +23,7 @@ class CFG {
 
     [[nodiscard]] BBlock *newBlock();
     [[nodiscard]] BBlock *addMethodBlock();
+    [[nodiscard]] BBlock *addMethodBlock(const std::string &name);
 };
 
 #endif

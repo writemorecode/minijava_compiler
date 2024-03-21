@@ -1,23 +1,24 @@
 #include "BBlock.hpp"
+#include <iomanip>
 #include <iostream>
 
 void BBlock::printBlockGraphviz(std::ostream &os) {
     markVisited();
-    os << name << " [label=\"";
+    os << std::quoted(name) << " [label=\"";
     os << "[" << name << "]\n";
     for (const auto &instr : instructions) {
         instr->print(os);
     }
     os << "\"]\n";
     if (trueExit != nullptr) {
-        os << name << " -> " << trueExit->getName() << " ";
+        os << std::quoted(name) << " -> " << trueExit->getName() << " ";
         os << "[xlabel=\"true\"];\n";
         if (!trueExit->isVisited()) {
             trueExit->printBlockGraphviz(os);
         }
     }
     if (falseExit != nullptr) {
-        os << name << " -> " << falseExit->getName() << " ";
+        os << std::quoted(name) << " -> " << falseExit->getName() << " ";
         os << "[xlabel=\"false\"];\n";
         if (!falseExit->isVisited()) {
             falseExit->printBlockGraphviz(os);
