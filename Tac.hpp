@@ -2,67 +2,85 @@
 #define TAC_HPP
 
 #include <string>
+#include <variant>
 
 class Tac {
+
   protected:
-    std::string result, lhs, op, rhs;
+    using Operand = std::variant<std::string, int>;
+    std::string result;
+    Operand lhsOp;
+    std::string op;
+    Operand rhsOp;
+    std::string lhs, rhs;
 
   public:
     virtual void print(std::ostream &os) const;
 
-    Tac(const std::string &result_, const std::string &lhs_,
-        const std::string &op_, const std::string &rhs_)
-        : result(result_), lhs(lhs_), op(op_), rhs(rhs_) {}
+    Tac(const std::string &result_, const Operand &lhs_, const std::string &op_,
+        const Operand &rhs_)
+        : result(result_), lhsOp(lhs_), op(op_), rhsOp(rhs_) {
+        if (const int *ptr = std::get_if<int>(&lhsOp)) {
+            lhs = std::to_string(*ptr);
+        } else {
+            lhs = std::get<std::string>(lhsOp);
+        }
+        if (const int *ptr = std::get_if<int>(&rhsOp)) {
+            rhs = std::to_string(*ptr);
+        } else {
+            rhs = std::get<std::string>(rhsOp);
+        }
+    }
     virtual ~Tac() = default;
 };
 
 class UnaryExpressionTac : public Tac {
   public:
     UnaryExpressionTac(const std::string &result_, const std::string &op_,
-                       const std::string &z_)
+                       const Operand &z_)
         : Tac(result_, "", op_, z_){};
     void print(std::ostream &os) const override;
 };
 
 class NotTac : public UnaryExpressionTac {
   public:
-    NotTac(const std::string &result_, const std::string &z_)
+    NotTac(const std::string &result_, const Operand &z_)
         : UnaryExpressionTac(result_, "!", z_){};
 };
 
 class CopyTac : public Tac {
   public:
-    CopyTac(const std::string &y_, const std::string &result_)
+    CopyTac(const Operand &y_, const std::string &result_)
         : Tac(result_, y_, ":=", ""){};
     void print(std::ostream &os) const override;
 };
 
 class ArrayCopyTac : public Tac {
   public:
-    ArrayCopyTac(const std::string &result_, const std::string &index_,
-                 const std::string &z_)
+    ArrayCopyTac(const std::string &result_, const Operand &index_,
+                 const Operand &z_)
         : Tac(result_, index_, ":=", z_){};
     void print(std::ostream &os) const override;
 };
 
 class ArrayAccessTac : public Tac {
   public:
-    ArrayAccessTac(const std::string &result_, const std::string &y_,
-                   const std::string &z_)
+    ArrayAccessTac(const std::string &result_, const Operand &y_,
+                   const Operand &z_)
         : Tac(result_, y_, "", z_){};
     void print(std::ostream &os) const override;
 };
 
 class NewTac : public Tac {
   public:
-    NewTac(const std::string &result, const std::string &y_)
+    NewTac(const std::string &result, const Operand &y_)
         : Tac(result, "", "new", y_){};
     void print(std::ostream &os) const override;
 };
 
 class NewArrayTac : public Tac {
   public:
-    NewArrayTac(const std::string &result, const std::string &length_)
+    NewArrayTac(const std::string &result, const Operand &length_)
         : Tac(result, "", "new", length_){};
     void print(std::ostream &os) const override;
 };
@@ -75,22 +93,22 @@ class JumpTac : public Tac {
 
 class CondJumpTac : public Tac {
   public:
-    CondJumpTac(const std::string &label, const std::string &cond)
+    CondJumpTac(const Operand &label, const Operand &cond)
         : Tac("", cond, "", label){};
-    void print(std::ostream &os) const override;
-};
-
-class ParamTac : public Tac {
-  public:
-    ParamTac(const std::string &param) : Tac("", "", "", param){};
     void print(std::ostream &os) const override;
 };
 
 class MethodCallTac : public Tac {
   public:
-    MethodCallTac(const std::string &result, const std::string &methodName,
-                  const std::string &argCount)
+    MethodCallTac(const std::string &result, const Operand &methodName,
+                  const Operand &argCount)
         : Tac(result, methodName, "", argCount){};
+    void print(std::ostream &os) const override;
+};
+
+class ParamTac : public Tac {
+  public:
+    ParamTac(const std::string &param) : Tac(param, "", "", ""){};
     void print(std::ostream &os) const override;
 };
 

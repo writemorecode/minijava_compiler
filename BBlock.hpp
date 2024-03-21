@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 
+#include "Bytecode.hpp"
 #include "Tac.hpp"
 
 class BBlock {
@@ -34,6 +35,8 @@ class BBlock {
 
     [[nodiscard]] bool isVisited() const { return visited; }
     void markVisited() { visited = true; };
+
+    // void generateBytecode(BytecodeMethod &method);
 };
 
 #endif

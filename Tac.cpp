@@ -5,6 +5,11 @@ void Tac::print(std::ostream &os) const {
     os << result << " := " << lhs << " " << op << " " << rhs << "\n";
 }
 
+// std::variant<std::string, int>
+// Tac::generateBytecode(BytecodeMethodBlock &methodBlock) const {
+//     return 0;
+// }
+
 void UnaryExpressionTac::print(std::ostream &os) const {
     os << result << " := " << op << " " << rhs << "\n";
 }
@@ -38,10 +43,12 @@ void CondJumpTac::print(std::ostream &os) const {
     os << "iffalse " << lhs << " goto " << rhs << "\n";
 }
 
-void ParamTac::print(std::ostream &os) const { os << "param " << rhs << "\n"; }
-
 void MethodCallTac::print(std::ostream &os) const {
     os << result << " := call " << lhs << ", " << rhs << "\n";
+}
+
+void ParamTac::print(std::ostream &os) const {
+    os << "param " << result << "\n";
 }
 
 void ReturnTac::print(std::ostream &os) const {

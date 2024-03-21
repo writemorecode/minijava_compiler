@@ -27,3 +27,10 @@ void BBlock::printBlockGraphviz(std::ostream &os) {
 }
 
 void BBlock::addInstruction(Tac *ptr) { instructions.emplace_back(ptr); }
+
+// void BBlock::generateBytecode(BytecodeMethod &method) {
+//     // auto &methodBlock = method.addMethodBlock(name);
+//     // for (const auto &instruction : instructions) {
+//     //     instruction->generateBytecode(methodBlock);
+//     // }
+// }

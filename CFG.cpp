@@ -38,3 +38,10 @@ BBlock *CFG::addMethodBlock(const std::string &name) {
     methods.push_back(ptr);
     return ptr;
 }
+
+// void CFG::generateBytecode(BytecodeProgram &program) {
+//     for (const auto *methodBlock : methods) {
+//         auto &method = program.addMethod(methodBlock->getName());
+//         methodBlock->generateBytecode(method);
+//     }
+// }

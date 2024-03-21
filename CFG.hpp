@@ -2,6 +2,7 @@
 #define CFG_HPP
 
 #include "BBlock.hpp"
+#include "Bytecode.hpp"
 #include <vector>
 class CFG {
   private:
@@ -24,6 +25,8 @@ class CFG {
     [[nodiscard]] BBlock *newBlock();
     [[nodiscard]] BBlock *addMethodBlock();
     [[nodiscard]] BBlock *addMethodBlock(const std::string &name);
+
+    // void generateBytecode(BytecodeProgram &program);
 };
 
 #endif
