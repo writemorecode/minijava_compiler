@@ -10,7 +10,6 @@ class BBlock {
   private:
     std::string name;
     std::vector<std::unique_ptr<Tac>> instructions;
-    Tac *condition = nullptr;
     BBlock *trueExit = nullptr;
     BBlock *falseExit = nullptr;
     bool visited = false;

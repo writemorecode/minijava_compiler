@@ -15,11 +15,9 @@ class ArrayAccessNode : public Node {
 };
 
 class UnaryExpressionNode : public Node {
-    Node *arg;
-
   public:
-    UnaryExpressionNode(const std::string &t, Node *arg, int l)
-        : Node(t, l, {arg}), arg{arg} {};
+    UnaryExpressionNode(const std::string &t, Node *arg_, int l)
+        : Node(t, l, {arg_}){};
 };
 
 class ArrayLengthNode : public UnaryExpressionNode {

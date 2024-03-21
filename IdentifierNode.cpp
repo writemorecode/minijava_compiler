@@ -1,8 +1,5 @@
 #include "IdentifierNode.hpp"
 
-#include <algorithm>
-#include <utility>
-
 std::string IdentifierNode::checkTypes(SymbolTable &st) const {
     auto variableLookup = st.lookupVariable(value);
     if (variableLookup) {
@@ -23,4 +20,6 @@ std::string IdentifierNode::checkTypes(SymbolTable &st) const {
     return "";
 }
 
-std::string IdentifierNode::generateIR(CFG &graph, SymbolTable &st) { return value; }
+std::string IdentifierNode::generateIR(CFG &graph, SymbolTable &st) {
+    return value;
+}
