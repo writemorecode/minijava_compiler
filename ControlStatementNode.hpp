@@ -7,8 +7,8 @@ class ControlStatementNode : public Node {
     Node *cond, *stmts;
 
   public:
-    ControlStatementNode(const std::string &t, Node *cond, Node *stmts, int l)
-        : Node(t, l, {cond, stmts}), cond{cond}, stmts{stmts} {}
+    ControlStatementNode(const std::string &t, Node *cond_, Node *stmts_, int l)
+        : Node(t, l, {cond_, stmts_}), cond(cond_), stmts(stmts_) {}
     std::string checkTypes(SymbolTable &st) const override;
 };
 class IfNode : public ControlStatementNode {

@@ -7,24 +7,28 @@ rule bison
   command = bison $in
 rule flex
   command = flex $in
-
-build parser.tab.cc | parser.tab.hh: bison parser.yy
+build parser.tab.cc: bison parser.yy
 build parser.tab.o: cc parser.tab.cc
 build lex.yy.c: flex lexer.flex
-build lex.yy.o: cc lex.yy.c | parser.tab.hh
-
 build ArithmeticExpressionNode.o: cc ArithmeticExpressionNode.cpp
+build ArithmeticTac.o: cc ArithmeticTac.cpp
+build ArrayAccessNode.o: cc ArrayAccessNode.cpp
+build ArrayLengthNode.o: cc ArrayLengthNode.cpp
 build BBlock.o: cc BBlock.cpp
 build BooleanExpressionNode.o: cc BooleanExpressionNode.cpp
 build BooleanNode.o: cc BooleanNode.cpp
+build BooleanTac.o: cc BooleanTac.cpp
 build CFG.o: cc CFG.cpp
 build Class.o: cc Class.cpp
+build ClassAllocationNode.o: cc ClassAllocationNode.cpp
 build ClassNode.o: cc ClassNode.cpp
 build ControlStatementNode.o: cc ControlStatementNode.cpp
 build ExpressionNode.o: cc ExpressionNode.cpp
 build IdentifierNode.o: cc IdentifierNode.cpp
+build IntegerArrayAllocationNode.o: cc IntegerArrayAllocationNode.cpp
 build IntegerNode.o: cc IntegerNode.cpp
 build LogicalExpressionNode.o: cc LogicalExpressionNode.cpp
+build LogicalTac.o: cc LogicalTac.cpp
 build MainClassNode.o: cc MainClassNode.cpp
 build Method.o: cc Method.cpp
 build MethodBodyNode.o: cc MethodBodyNode.cpp
@@ -34,15 +38,15 @@ build MethodNode.o: cc MethodNode.cpp
 build MethodParameterNode.o: cc MethodParameterNode.cpp
 build MethodWithoutParametersNode.o: cc MethodWithoutParametersNode.cpp
 build Node.o: cc Node.cpp
+build NotNode.o: cc NotNode.cpp
 build Record.o: cc Record.cpp
 build Scope.o: cc Scope.cpp
 build StatementNode.o: cc StatementNode.cpp
 build SymbolTable.o: cc SymbolTable.cpp
 build Tac.o: cc Tac.cpp
-build ArithmeticTac.o: cc ArithmeticTac.cpp
-build LogicalTac.o: cc LogicalTac.cpp
-build BooleanTac.o: cc BooleanTac.cpp
+build ThisNode.o: cc ThisNode.cpp
 build TypeNode.o: cc TypeNode.cpp
 build Variable.o: cc Variable.cpp
 build VariableNode.o: cc VariableNode.cpp
-build compiler: cc_main parser.tab.o lex.yy.o main.cpp ArithmeticExpressionNode.o BBlock.o BooleanExpressionNode.o BooleanNode.o CFG.o Class.o ClassNode.o ControlStatementNode.o ExpressionNode.o IdentifierNode.o IntegerNode.o LogicalExpressionNode.o MainClassNode.o Method.o MethodBodyNode.o MethodCallNode.o MethodCallWithoutArgumentsNode.o MethodNode.o MethodParameterNode.o MethodWithoutParametersNode.o Node.o Record.o Scope.o StatementNode.o SymbolTable.o Tac.o ArithmeticTac.o LogicalTac.o BooleanTac.o TypeNode.o Variable.o VariableNode.o 
+build compiler: cc_main lex.yy.c parser.tab.o main.cpp ArithmeticExpressionNode.o ArithmeticTac.o ArrayAccessNode.o ArrayLengthNode.o BBlock.o BooleanExpressionNode.o BooleanNode.o BooleanTac.o CFG.o Class.o ClassAllocationNode.o ClassNode.o ControlStatementNode.o ExpressionNode.o IdentifierNode.o IntegerArrayAllocationNode.o IntegerNode.o LogicalExpressionNode.o LogicalTac.o MainClassNode.o Method.o MethodBodyNode.o MethodCallNode.o MethodCallWithoutArgumentsNode.o MethodNode.o MethodParameterNode.o MethodWithoutParametersNode.o Node.o NotNode.o Record.o Scope.o StatementNode.o SymbolTable.o Tac.o ThisNode.o TypeNode.o Variable.o VariableNode.o 
+

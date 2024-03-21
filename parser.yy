@@ -7,9 +7,13 @@
 %code requires{
   #include <string>
   #include "Node.h"
+  #include "ArrayAccessNode.hpp"
+  #include "ArrayLengthNode.hpp"
   #include "ExpressionNode.hpp"
   #include "ArithmeticExpressionNode.hpp"
   #include "BooleanExpressionNode.hpp"
+  #include "BooleanNode.hpp"
+  #include "ClassAllocationNode.hpp"
   #include "LogicalExpressionNode.hpp"
   #include "MethodNode.hpp"
   #include "MethodWithoutParametersNode.hpp"
@@ -17,14 +21,17 @@
   #include "MethodCallWithoutArgumentsNode.hpp"
   #include "MethodCallNode.hpp"
   #include "MethodBodyNode.hpp"
+  #include "NotNode.hpp"
   #include "VariableNode.hpp"
   #include "ClassNode.hpp"
   #include "MainClassNode.hpp"
   #include "ControlStatementNode.hpp"
   #include "StatementNode.hpp"
   #include "IntegerNode.hpp"
+  #include "IntegerArrayAllocationNode.hpp"
   #include "IdentifierNode.hpp"
   #include "TypeNode.hpp"
+  #include "ThisNode.hpp"
   #define USE_LEX_ONLY false //change this macro to true if you want to isolate the lexer from the parser.
 }
 %code{
