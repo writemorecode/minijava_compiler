@@ -31,6 +31,7 @@ class Tac {
             rhs = std::get<std::string>(rhsOp);
         }
     }
+    Tac(const std::string &result_) : result{result_} {}
     virtual ~Tac() = default;
 };
 
@@ -85,12 +86,6 @@ class NewArrayTac : public Tac {
     void print(std::ostream &os) const override;
 };
 
-class JumpTac : public Tac {
-  public:
-    JumpTac(const std::string &_label) : Tac(_label, "", "goto", ""){};
-    void print(std::ostream &os) const override;
-};
-
 class CondJumpTac : public Tac {
   public:
     CondJumpTac(const Operand &label, const Operand &cond)
@@ -106,21 +101,27 @@ class MethodCallTac : public Tac {
     void print(std::ostream &os) const override;
 };
 
+class JumpTac : public Tac {
+  public:
+    JumpTac(const std::string &_label) : Tac(_label){};
+    void print(std::ostream &os) const override;
+};
+
 class ParamTac : public Tac {
   public:
-    ParamTac(const std::string &param) : Tac(param, "", "", ""){};
+    ParamTac(const std::string &param) : Tac(param){};
     void print(std::ostream &os) const override;
 };
 
 class ReturnTac : public Tac {
   public:
-    ReturnTac(const std::string &name) : Tac(name, "", "", ""){};
+    ReturnTac(const std::string &name) : Tac(name){};
     void print(std::ostream &os) const override;
 };
 
 class PrintTac : public Tac {
   public:
-    PrintTac(const std::string &value) : Tac(value, "", "", ""){};
+    PrintTac(const std::string &value) : Tac(value){};
     void print(std::ostream &os) const override;
 };
 

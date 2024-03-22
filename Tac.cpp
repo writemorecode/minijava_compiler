@@ -35,16 +35,16 @@ void NewArrayTac::print(std::ostream &os) const {
     os << result << " := new int, " << rhs << "\n";
 }
 
-void JumpTac::print(std::ostream &os) const {
-    os << op << " " << result << "\n";
-}
-
 void CondJumpTac::print(std::ostream &os) const {
     os << "iffalse " << lhs << " goto " << rhs << "\n";
 }
 
 void MethodCallTac::print(std::ostream &os) const {
     os << result << " := call " << lhs << ", " << rhs << "\n";
+}
+
+void JumpTac::print(std::ostream &os) const {
+    os << op << " " << result << "\n";
 }
 
 void ParamTac::print(std::ostream &os) const {
