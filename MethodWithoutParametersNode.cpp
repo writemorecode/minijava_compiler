@@ -38,10 +38,11 @@ std::string MethodWithoutParametersNode::checkTypes(SymbolTable &st) const {
     return type->value;
 }
 
-std::string MethodWithoutParametersNode::generateIR(CFG &graph,
-                                                    SymbolTable &st) {
+Operand MethodWithoutParametersNode::generateIR(CFG &graph, SymbolTable &st) {
+    auto *currentClass = dynamic_cast<Class *>(st.getCurrentRecord());
     st.enterScope("Method: " + id->value);
-    graph.setCurrentBlock(graph.addMethodBlock());
+    const auto methodBlockName = currentClass->getID() + "." + id->value;
+    graph.setCurrentBlock(graph.addMethodBlock(methodBlockName));
     body->generateIR(graph, st);
     st.exitScope();
     return graph.getCurrentBlock()->getName();

@@ -18,14 +18,14 @@ class LessThanNode : public LogicalExpressionNode {
   public:
     LessThanNode(Node *left, Node *right, int l)
         : LogicalExpressionNode("Less-than", left, right, l){};
-    std::string generateIR(CFG &graph, SymbolTable &st) override;
+    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class GreaterThanNode : public LogicalExpressionNode {
   public:
     GreaterThanNode(Node *left, Node *right, int l)
         : LogicalExpressionNode("Greater-than", left, right, l){};
-    std::string generateIR(CFG &graph, SymbolTable &st) override;
+    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class EqualToNode : public Node {
@@ -35,7 +35,7 @@ class EqualToNode : public Node {
     EqualToNode(Node *left, Node *right, int l)
         : Node("EQ", l, {left, right}), left{left}, right{right} {};
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph, SymbolTable &st) override;
+    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

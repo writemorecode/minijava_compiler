@@ -5,15 +5,13 @@
 
 class AndTac : public Tac {
   public:
-    AndTac(const std::string &result_, const std::string &y_,
-           const std::string &z_)
+    AndTac(const std::string &result_, const Operand &y_, const Operand &z_)
         : Tac(result_, y_, "&&", z_){};
 };
 
 class OrTac : public Tac {
   public:
-    OrTac(const std::string &result_, const std::string &y_,
-          const std::string &z_)
+    OrTac(const std::string &result_, const Operand &y_, const Operand &z_)
         : Tac(result_, y_, "||", z_){};
 };
 

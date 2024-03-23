@@ -27,7 +27,7 @@ std::string Node::checkTypes(SymbolTable &st) const {
     return "";
 }
 
-std::string Node::generateIR(CFG &graph, SymbolTable &st) {
+Operand Node::generateIR(CFG &graph, SymbolTable &st) {
     for (auto &child : children) {
         child->generateIR(graph, st);
     }

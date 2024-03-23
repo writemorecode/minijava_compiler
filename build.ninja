@@ -7,10 +7,10 @@ rule bison
   command = bison $in
 rule flex
   command = flex $in
-build parser.tab.cc: bison parser.yy
+build parser.tab.cc | parser.tab.hh: bison parser.yy
 build parser.tab.o: cc parser.tab.cc
 build lex.yy.c: flex lexer.flex
-build lex.yy.o: cc lex.yy.c
+build lex.yy.o: cc lex.yy.c | parser.tab.hh
 build ArithmeticExpressionNode.o: cc ArithmeticExpressionNode.cpp
 build ArithmeticTac.o: cc ArithmeticTac.cpp
 build ArrayAccessNode.o: cc ArrayAccessNode.cpp

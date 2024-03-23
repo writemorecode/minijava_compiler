@@ -20,6 +20,6 @@ std::string IdentifierNode::checkTypes(SymbolTable &st) const {
     return "";
 }
 
-std::string IdentifierNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand IdentifierNode::generateIR(CFG &graph, SymbolTable &st) {
     return value;
 }

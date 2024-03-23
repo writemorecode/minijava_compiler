@@ -14,7 +14,7 @@ std::string AssignNode::checkTypes(SymbolTable &st) const {
     return "";
 }
 
-std::string AssignNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand AssignNode::generateIR(CFG &graph, SymbolTable &st) {
     auto rhsName = expr->generateIR(graph, st);
     auto lhsName = id->value;
     graph.addInstruction(new CopyTac(rhsName, lhsName));
@@ -53,7 +53,7 @@ std::string ArrayAssignNode::checkTypes(SymbolTable &st) const {
     return "";
 }
 
-std::string ArrayAssignNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand ArrayAssignNode::generateIR(CFG &graph, SymbolTable &st) {
     auto indexName = indexExpr->generateIR(graph, st);
     auto rhsName = rightExpr->generateIR(graph, st);
     auto arrayName = id->value;
@@ -61,7 +61,7 @@ std::string ArrayAssignNode::generateIR(CFG &graph, SymbolTable &st) {
     return arrayName;
 }
 
-std::string PrintNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand PrintNode::generateIR(CFG &graph, SymbolTable &st) {
     const auto &value = expr->generateIR(graph, st);
     graph.addInstruction(new PrintTac(value));
     return "";

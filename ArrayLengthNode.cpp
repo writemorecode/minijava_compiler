@@ -13,7 +13,7 @@ std::string ArrayLengthNode::checkTypes(SymbolTable &st) const {
     return "int";
 }
 
-std::string ArrayLengthNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand ArrayLengthNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
     st.addIntegerVariable(name);
     auto arrayName = array->value;

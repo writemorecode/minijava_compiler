@@ -1,13 +1,13 @@
 #ifndef TAC_HPP
 #define TAC_HPP
 
+#include <iostream>
 #include <string>
 #include <variant>
 
+using Operand = std::variant<std::string, int>;
 class Tac {
-
   protected:
-    using Operand = std::variant<std::string, int>;
     std::string result;
     Operand lhsOp;
     std::string op;
@@ -17,6 +17,7 @@ class Tac {
   public:
     virtual void print(std::ostream &os) const;
 
+    Tac(const std::string &result_) : result{result_} {}
     Tac(const std::string &result_, const Operand &lhs_, const std::string &op_,
         const Operand &rhs_)
         : result(result_), lhsOp(lhs_), op(op_), rhsOp(rhs_) {
@@ -31,9 +32,15 @@ class Tac {
             rhs = std::get<std::string>(rhsOp);
         }
     }
-    Tac(const std::string &result_) : result{result_} {}
     Tac(const std::string &result_, const Operand &rhs_)
         : result{result_}, rhsOp{rhs_} {
+        if (const int *ptr = std::get_if<int>(&rhsOp)) {
+            rhs = std::to_string(*ptr);
+        } else {
+            rhs = std::get<std::string>(rhsOp);
+        }
+    }
+    Tac(const Operand &rhs_) : rhsOp{rhs_} {
         if (const int *ptr = std::get_if<int>(&rhsOp)) {
             rhs = std::to_string(*ptr);
         } else {
@@ -115,19 +122,19 @@ class JumpTac : public Tac {
 
 class ParamTac : public Tac {
   public:
-    ParamTac(const std::string &param) : Tac(param){};
+    ParamTac(const Operand &param) : Tac(param){};
     void print(std::ostream &os) const override;
 };
 
 class ReturnTac : public Tac {
   public:
-    ReturnTac(const std::string &name) : Tac(name){};
+    ReturnTac(const Operand &name) : Tac(name){};
     void print(std::ostream &os) const override;
 };
 
 class PrintTac : public Tac {
   public:
-    PrintTac(const std::string &value) : Tac(value){};
+    PrintTac(const Operand &value) : Tac(value){};
     void print(std::ostream &os) const override;
 };
 

@@ -23,7 +23,7 @@ std::string ArrayAccessNode::checkTypes(SymbolTable &st) const {
     return "int";
 }
 
-std::string ArrayAccessNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand ArrayAccessNode::generateIR(CFG &graph, SymbolTable &st) {
     auto indexName = index->generateIR(graph, st);
     auto arrayName = array->value;
     auto name = graph.getTemporaryName();

@@ -10,7 +10,7 @@ class ClassAllocationNode : public Node {
     ClassAllocationNode(Node *object, int l)
         : Node("Class allocation", object->value, l), id{object->value} {};
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph, SymbolTable &st) override;
+    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif // CLASSALLOCATIONNODE_HPP

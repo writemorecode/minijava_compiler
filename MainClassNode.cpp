@@ -24,7 +24,7 @@ std::string MainClassNode::checkTypes(SymbolTable &st) const {
     return "void";
 }
 
-std::string MainClassNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand MainClassNode::generateIR(CFG &graph, SymbolTable &st) {
     st.enterScope("Class: " + id->value);
     const auto methodBlockName = id->value + ".main";
     graph.setCurrentBlock(graph.addMethodBlock(methodBlockName));

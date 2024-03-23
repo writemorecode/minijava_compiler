@@ -18,7 +18,7 @@ std::string ArithmeticExpressionNode::checkTypes(SymbolTable &st) const {
     return "";
 }
 
-std::string PlusNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand PlusNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
     st.addIntegerVariable(name);
     auto lhs_name = left->generateIR(graph, st);
@@ -26,7 +26,7 @@ std::string PlusNode::generateIR(CFG &graph, SymbolTable &st) {
     graph.addInstruction(new AddTac(name, lhs_name, rhs_name));
     return name;
 }
-std::string MinusNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand MinusNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
     st.addIntegerVariable(name);
     auto lhs_name = left->generateIR(graph, st);
@@ -34,7 +34,7 @@ std::string MinusNode::generateIR(CFG &graph, SymbolTable &st) {
     graph.addInstruction(new SubtractTac(name, lhs_name, rhs_name));
     return name;
 }
-std::string MultiplicationNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand MultiplicationNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
     st.addIntegerVariable(name);
     auto lhs_name = left->generateIR(graph, st);
@@ -42,7 +42,7 @@ std::string MultiplicationNode::generateIR(CFG &graph, SymbolTable &st) {
     graph.addInstruction(new MultiplyTac(name, lhs_name, rhs_name));
     return name;
 }
-std::string DivisionNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand DivisionNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
     st.addIntegerVariable(name);
     auto lhs_name = left->generateIR(graph, st);

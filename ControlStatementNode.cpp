@@ -13,7 +13,7 @@ std::string ControlStatementNode::checkTypes(SymbolTable &st) const {
     return "void";
 }
 
-std::string IfNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand IfNode::generateIR(CFG &graph, SymbolTable &st) {
     auto *trueBlock = graph.newBlock();
     auto *joinBlock = graph.newBlock();
     const auto &joinLabel = joinBlock->getName();
@@ -37,7 +37,7 @@ std::string IfNode::generateIR(CFG &graph, SymbolTable &st) {
     return "placeholder ifnode::generateir";
 }
 
-std::string IfElseNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand IfElseNode::generateIR(CFG &graph, SymbolTable &st) {
     auto *trueBlock = graph.newBlock();
     auto *falseBlock = graph.newBlock();
     auto *joinBlock = graph.newBlock();
@@ -68,7 +68,7 @@ std::string IfElseNode::generateIR(CFG &graph, SymbolTable &st) {
     return "placeholder ifelsenode::generateir";
 }
 
-std::string WhileNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand WhileNode::generateIR(CFG &graph, SymbolTable &st) {
     auto *headerBlock = graph.newBlock();
     const auto &headerLabel = headerBlock->getName();
     auto *bodyBlock = graph.newBlock();

@@ -39,10 +39,10 @@ std::string MethodNode::checkTypes(SymbolTable &st) const {
     return type->value;
 }
 
-std::string MethodNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand MethodNode::generateIR(CFG &graph, SymbolTable &st) {
     auto *currentClass = dynamic_cast<Class *>(st.getCurrentRecord());
     st.enterScope("Method: " + id->value);
-    const auto methodBlockName = id->value + "." + currentClass->getID();
+    const auto methodBlockName = currentClass->getID() + "." + id->value;
     graph.setCurrentBlock(graph.addMethodBlock(methodBlockName));
     body->generateIR(graph, st);
     st.exitScope();

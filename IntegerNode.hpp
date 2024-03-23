@@ -15,7 +15,7 @@ class IntegerNode : public Node {
 
     std::string checkTypes(SymbolTable &st) const override;
 
-    std::string generateIR(CFG &graph, SymbolTable &st) override;
+    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

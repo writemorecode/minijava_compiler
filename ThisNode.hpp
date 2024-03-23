@@ -9,7 +9,7 @@ class ThisNode : public Node {
   public:
     ThisNode(int l) : Node("this", l) {}
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph, SymbolTable &st) override;
+    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif // THISNODE_HPP

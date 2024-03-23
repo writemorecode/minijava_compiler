@@ -13,7 +13,7 @@ std::string NotNode::checkTypes(SymbolTable &st) const {
     return "";
 }
 
-std::string NotNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand NotNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
     st.addBooleanVariable(name);
     auto rhsName = expr->generateIR(graph, st);

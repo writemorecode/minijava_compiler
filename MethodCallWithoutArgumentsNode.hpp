@@ -9,7 +9,7 @@ class MethodCallWithoutArgumentsNode : public Node {
     MethodCallWithoutArgumentsNode(Node *object, Node *id, int l)
         : Node("Method call", l, {object, id}), object{object}, id{id} {};
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph, SymbolTable &st) override;
+    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

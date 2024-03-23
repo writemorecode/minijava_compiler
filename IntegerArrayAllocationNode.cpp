@@ -13,7 +13,7 @@ std::string IntegerArrayAllocationNode::checkTypes(SymbolTable &st) const {
     return "int[]";
 }
 
-std::string IntegerArrayAllocationNode::generateIR(CFG &graph,
+Operand IntegerArrayAllocationNode::generateIR(CFG &graph,
                                                    SymbolTable &st) {
     auto name = graph.getTemporaryName();
     st.addVariable("int[]", name);

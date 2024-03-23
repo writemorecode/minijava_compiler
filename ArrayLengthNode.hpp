@@ -11,7 +11,7 @@ class ArrayLengthNode : public UnaryExpressionNode {
     ArrayLengthNode(Node *array, int l)
         : UnaryExpressionNode("Array length", array, l), array{array} {};
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph, SymbolTable &st) override;
+    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif // ARRAYLENGTHNODE_HPP

@@ -11,7 +11,7 @@ class ClassNode : public Node {
         : Node("Class", l, {id, body}), id{id}, body{body} {};
     bool buildTable(SymbolTable &st) const override;
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph, SymbolTable &st) override;
+    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

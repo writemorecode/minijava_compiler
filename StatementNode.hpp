@@ -11,7 +11,7 @@ class AssignNode : public Node {
     AssignNode(Node *id, Node *expr, int l)
         : Node("Assign", l, {id, expr}), id{id}, expr{expr} {}
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph, SymbolTable &st) override;
+    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class ArrayAssignNode : public Node {
@@ -24,7 +24,7 @@ class ArrayAssignNode : public Node {
         : Node("Array assign", l, {id, indexExpr}), id{id},
           indexExpr{indexExpr}, rightExpr{rightExpr} {}
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph, SymbolTable &st) override;
+    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class PrintNode : public Node {
@@ -32,7 +32,7 @@ class PrintNode : public Node {
 
   public:
     PrintNode(Node *expr, int l) : Node("Print", l, {expr}), expr{expr} {}
-    std::string generateIR(CFG &graph, SymbolTable &st) override;
+    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

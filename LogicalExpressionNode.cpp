@@ -21,7 +21,7 @@ std::string LogicalExpressionNode::checkTypes(SymbolTable &st) const {
     return "";
 }
 
-std::string LessThanNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand LessThanNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
     st.addBooleanVariable(name);
     auto lhs_name = left->generateIR(graph, st);
@@ -29,7 +29,7 @@ std::string LessThanNode::generateIR(CFG &graph, SymbolTable &st) {
     graph.addInstruction(new LessThanTac(name, lhs_name, rhs_name));
     return name;
 }
-std::string GreaterThanNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand GreaterThanNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
     st.addBooleanVariable(name);
     auto lhs_name = left->generateIR(graph, st);
@@ -52,7 +52,7 @@ std::string EqualToNode::checkTypes(SymbolTable &st) const {
     return "";
 }
 
-std::string EqualToNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand EqualToNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
     st.addBooleanVariable(name);
     auto lhs_name = left->generateIR(graph, st);

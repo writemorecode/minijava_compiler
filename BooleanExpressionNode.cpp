@@ -16,7 +16,7 @@ std::string BooleanExpressionNode::checkTypes(SymbolTable &st) const {
     return "";
 }
 
-std::string AndNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand AndNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
     st.addBooleanVariable(name);
     auto lhs_name = left->generateIR(graph, st);
@@ -25,7 +25,7 @@ std::string AndNode::generateIR(CFG &graph, SymbolTable &st) {
     return name;
 }
 
-std::string OrNode::generateIR(CFG &graph, SymbolTable &st) {
+Operand OrNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
     st.addBooleanVariable(name);
     auto lhs_name = left->generateIR(graph, st);

@@ -12,7 +12,7 @@ class IntegerArrayAllocationNode : public UnaryExpressionNode {
         : UnaryExpressionNode("Integer array allocation", length, l),
           length{length} {};
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph, SymbolTable &st) override;
+    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif // INTEGERARRAYALLOCATIONNODE_HPP

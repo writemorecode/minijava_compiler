@@ -11,7 +11,7 @@ class NotNode : public UnaryExpressionNode {
     NotNode(Node *expr, int l)
         : UnaryExpressionNode("Negated expression", expr, l), expr{expr} {};
     std::string checkTypes(SymbolTable &st) const override;
-    std::string generateIR(CFG &graph, SymbolTable &st) override;
+    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif // NOTNODE_HPP

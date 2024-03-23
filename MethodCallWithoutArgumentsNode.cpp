@@ -32,7 +32,7 @@ std::string MethodCallWithoutArgumentsNode::checkTypes(SymbolTable &st) const {
     return method->getType();
 }
 
-std::string MethodCallWithoutArgumentsNode::generateIR(CFG &graph,
+Operand MethodCallWithoutArgumentsNode::generateIR(CFG &graph,
                                                        SymbolTable &st) {
     const auto &caller = object->checkTypes(st);
     auto *callingClass = st.lookupClass(caller);

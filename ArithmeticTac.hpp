@@ -5,29 +5,27 @@
 
 class AddTac : public Tac {
   public:
-    AddTac(const std::string &result_, const std::string &y_,
-           const std::string &z_)
+    AddTac(const std::string &result_, const Operand &y_, const Operand &z_)
         : Tac(result_, y_, "+", z_){};
 };
 
 class SubtractTac : public Tac {
   public:
-    SubtractTac(const std::string &result_, const std::string &y_,
-                const std::string &z_)
+    SubtractTac(const std::string &result_, const Operand &y_,
+                const Operand &z_)
         : Tac(result_, y_, "-", z_){};
 };
 
 class MultiplyTac : public Tac {
   public:
-    MultiplyTac(const std::string &result_, const std::string &y_,
-                const std::string &z_)
+    MultiplyTac(const std::string &result_, const Operand &y_,
+                const Operand &z_)
         : Tac(result_, y_, "*", z_){};
 };
 
 class DivideTac : public Tac {
   public:
-    DivideTac(const std::string &result_, const std::string &y_,
-              const std::string &z_)
+    DivideTac(const std::string &result_, const Operand &y_, const Operand &z_)
         : Tac(result_, y_, "/", z_){};
 };
 

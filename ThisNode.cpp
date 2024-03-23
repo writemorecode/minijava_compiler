@@ -13,4 +13,4 @@ std::string ThisNode::checkTypes(SymbolTable &st) const {
     return lookup->getType();
 }
 
-std::string ThisNode::generateIR(CFG &graph, SymbolTable &st) { return value; }
+Operand ThisNode::generateIR(CFG &graph, SymbolTable &st) { return value; }
