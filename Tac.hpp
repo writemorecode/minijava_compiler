@@ -32,6 +32,14 @@ class Tac {
         }
     }
     Tac(const std::string &result_) : result{result_} {}
+    Tac(const std::string &result_, const Operand &rhs_)
+        : result{result_}, rhsOp{rhs_} {
+        if (const int *ptr = std::get_if<int>(&rhsOp)) {
+            rhs = std::to_string(*ptr);
+        } else {
+            rhs = std::get<std::string>(rhsOp);
+        }
+    }
     virtual ~Tac() = default;
 };
 
@@ -51,8 +59,7 @@ class NotTac : public UnaryExpressionTac {
 
 class CopyTac : public Tac {
   public:
-    CopyTac(const Operand &y_, const std::string &result_)
-        : Tac(result_, y_, ":=", ""){};
+    CopyTac(const Operand &y_, const std::string &result_) : Tac(result_, y_){};
     void print(std::ostream &os) const override;
 };
 
@@ -74,15 +81,14 @@ class ArrayAccessTac : public Tac {
 
 class NewTac : public Tac {
   public:
-    NewTac(const std::string &result, const Operand &y_)
-        : Tac(result, "", "new", y_){};
+    NewTac(const std::string &result, const Operand &y_) : Tac(result, y_){};
     void print(std::ostream &os) const override;
 };
 
 class NewArrayTac : public Tac {
   public:
     NewArrayTac(const std::string &result, const Operand &length_)
-        : Tac(result, "", "new", length_){};
+        : Tac(result, length_){};
     void print(std::ostream &os) const override;
 };
 

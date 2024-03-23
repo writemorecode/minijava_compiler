@@ -15,7 +15,7 @@ void UnaryExpressionTac::print(std::ostream &os) const {
 }
 
 void CopyTac::print(std::ostream &os) const {
-    os << result << " := " << lhs << "\n";
+    os << result << " := " << rhs << "\n";
 }
 
 void ArrayCopyTac::print(std::ostream &os) const {
