@@ -14,9 +14,9 @@ std::string NotNode::checkTypes(SymbolTable &st) const {
 }
 
 Operand NotNode::generateIR(CFG &graph, SymbolTable &st) {
+    auto rhsName = expr->generateIR(graph, st);
     auto name = graph.getTemporaryName();
     st.addBooleanVariable(name);
-    auto rhsName = expr->generateIR(graph, st);
     graph.addInstruction(new NotTac(name, rhsName));
     return name;
 }

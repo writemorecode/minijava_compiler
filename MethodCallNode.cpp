@@ -62,8 +62,6 @@ Operand MethodCallNode::generateIR(CFG &graph, SymbolTable &st) {
     auto *callingClass = st.lookupClass(caller);
     auto const *method = callingClass->lookupMethod(id->value);
     const auto &methodType = method->getType();
-    const auto &name = graph.getTemporaryName();
-    st.addVariable(methodType, name);
 
     const auto &callerName = object->generateIR(graph, st);
     graph.addInstruction(new ParamTac(callerName));
@@ -71,6 +69,9 @@ Operand MethodCallNode::generateIR(CFG &graph, SymbolTable &st) {
         const auto &argName = arg->generateIR(graph, st);
         graph.addInstruction(new ParamTac(argName));
     }
+
+    const auto &name = graph.getTemporaryName();
+    st.addVariable(methodType, name);
 
     const auto &methodName = id->value;
     const auto argCount = std::to_string(exprList->children.size() + 1);

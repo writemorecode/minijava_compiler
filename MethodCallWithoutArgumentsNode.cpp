@@ -33,15 +33,15 @@ std::string MethodCallWithoutArgumentsNode::checkTypes(SymbolTable &st) const {
 }
 
 Operand MethodCallWithoutArgumentsNode::generateIR(CFG &graph,
-                                                       SymbolTable &st) {
+                                                   SymbolTable &st) {
     const auto &caller = object->checkTypes(st);
     auto *callingClass = st.lookupClass(caller);
     auto const *method = callingClass->lookupMethod(id->value);
     const auto &methodType = method->getType();
-    const auto &name = graph.getTemporaryName();
-    st.addVariable(methodType, name);
 
     const auto &callerName = object->generateIR(graph, st);
+    const auto &name = graph.getTemporaryName();
+    st.addVariable(methodType, name);
     const auto &methodName = id->value;
     graph.addInstruction(new ParamTac(callerName));
     graph.addInstruction(new MethodCallTac(name, methodName, "1"));
