@@ -1,4 +1,5 @@
 #include "BBlock.hpp"
+#include "BytecodeInstruction.hpp"
 #include <iomanip>
 #include <iostream>
 
@@ -28,9 +29,21 @@ void BBlock::printBlockGraphviz(std::ostream &os) {
 
 void BBlock::addInstruction(Tac *ptr) { instructions.emplace_back(ptr); }
 
-// void BBlock::generateBytecode(BytecodeMethod &method) {
-//     // auto &methodBlock = method.addMethodBlock(name);
-//     // for (const auto &instruction : instructions) {
-//     //     instruction->generateBytecode(methodBlock);
-//     // }
-// }
+void BBlock::generateBytecode(BytecodeMethod &method) {
+    auto &methodBlock = method.addMethodBlock(name);
+    for (const auto &instruction : instructions) {
+        instruction->generateBytecode(methodBlock);
+    }
+
+    if (hasTrueBlock()) {
+        if (hasFalseBlock()) {
+            // iffalse _tcond goto false_block
+            methodBlock.addBytecodeInstruction(
+                new StringParameterInstruction(Opcode::CJMP, falseExit->name));
+        } else {
+            // goto true_block
+            methodBlock.addBytecodeInstruction(
+                new StringParameterInstruction(Opcode::JMP, trueExit->name));
+        }
+    }
+}

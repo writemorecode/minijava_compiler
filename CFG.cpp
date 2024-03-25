@@ -1,4 +1,5 @@
 #include "CFG.hpp"
+#include "BytecodeInstruction.hpp"
 #include <iostream>
 
 std::string CFG::getTemporaryName() {
@@ -17,7 +18,7 @@ void CFG::printGraphviz(std::ostream &os) const {
     os << "digraph {\n";
     os << "graph [splines=ortho]\n";
     os << "node [shape=box]\n";
-    for (const auto &el : methods) {
+    for (const auto &el : methodBlocks) {
         el->printBlockGraphviz(os);
     }
     os << "}\n";
@@ -29,19 +30,25 @@ void CFG::addInstruction(Tac *ptr) { currentBlock->addInstruction(ptr); }
 
 BBlock *CFG::addMethodBlock() {
     auto *ptr = new BBlock(getBlockName());
-    methods.push_back(ptr);
+    methodBlocks.push_back(ptr);
     return ptr;
 }
 
 BBlock *CFG::addMethodBlock(const std::string &name) {
     auto *ptr = new BBlock(name);
-    methods.push_back(ptr);
+    methodBlocks.push_back(ptr);
     return ptr;
 }
 
-// void CFG::generateBytecode(BytecodeProgram &program) {
-//     for (const auto *methodBlock : methods) {
-//         auto &method = program.addMethod(methodBlock->getName());
-//         methodBlock->generateBytecode(method);
-//     }
-// }
+void CFG::generateBytecode(BytecodeProgram &program) {
+    for (auto *basicBlock : methodBlocks) {
+        const auto &name = basicBlock->getName();
+        program.addMethod(name);
+        auto &method = program.getMethod(name);
+        basicBlock->generateBytecode(method);
+    }
+    const auto &mainName = methodBlocks.front()->getName();
+    auto &mainBlock = program.getMethod(mainName).getFirstBlock();
+    mainBlock.addBytecodeInstruction(
+        new StackParameterInstruction(Opcode::STOP));
+}

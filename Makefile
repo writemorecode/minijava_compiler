@@ -7,7 +7,10 @@ NODES_OBJ := $(NODES:.cpp=.o)
 TACS := $(wildcard *Tac.cpp)
 TACS_OBJ := $(TACS:.cpp=.o)
 
-compiler: lex.yy.o parser.tab.o main.cpp $(NODES_OBJ) $(TACS_OBJ) SymbolTable.o Scope.o Record.o Variable.o Method.o Class.o Tac.o BBlock.o CFG.o
+BYTECODES := $(wildcard Bytecode*.cpp)
+BYTECODES_OBJ := $(BYTECODES:.cpp=.o)
+
+compiler: lex.yy.o parser.tab.o main.cpp $(NODES_OBJ) $(TACS_OBJ) $(BYTECODES_OBJ) SymbolTable.o Scope.o Record.o Variable.o Method.o Class.o Tac.o BBlock.o CFG.o
 		$(CXX) $(CXXFLAGS) $^ -o $@
 parser.tab.o: parser.tab.cc
 		$(CXX) $(CXXFLAGS) $^ -c -o $@

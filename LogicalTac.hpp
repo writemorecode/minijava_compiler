@@ -8,6 +8,7 @@ class LessThanTac : public Tac {
     LessThanTac(const std::string &result_, const Operand &y_,
                 const Operand &z_)
         : Tac(result_, y_, "<", z_){};
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class GreaterThanTac : public Tac {
@@ -15,12 +16,14 @@ class GreaterThanTac : public Tac {
     GreaterThanTac(const std::string &result_, const Operand &y_,
                    const Operand &z_)
         : Tac(result_, y_, ">", z_){};
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class EqualToTac : public Tac {
   public:
     EqualToTac(const std::string &result_, const Operand &y_, const Operand &z_)
         : Tac(result_, y_, "==", z_){};
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 #endif

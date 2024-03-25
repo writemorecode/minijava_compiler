@@ -1,13 +1,15 @@
 #ifndef CFG_HPP
 #define CFG_HPP
 
-#include "BBlock.hpp"
-#include "Bytecode.hpp"
 #include <vector>
+
+#include "BBlock.hpp"
+#include "BytecodeProgram.hpp"
+
 class CFG {
   private:
     BBlock *currentBlock = nullptr;
-    std::vector<BBlock *> methods;
+    std::vector<BBlock *> methodBlocks;
     int temporaryIndex = 0;
     int blockIndex = 0;
 
@@ -26,7 +28,7 @@ class CFG {
     [[nodiscard]] BBlock *addMethodBlock();
     [[nodiscard]] BBlock *addMethodBlock(const std::string &name);
 
-    // void generateBytecode(BytecodeProgram &program);
+    void generateBytecode(BytecodeProgram &program);
 };
 
 #endif

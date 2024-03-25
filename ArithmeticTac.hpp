@@ -7,6 +7,7 @@ class AddTac : public Tac {
   public:
     AddTac(const std::string &result_, const Operand &y_, const Operand &z_)
         : Tac(result_, y_, "+", z_){};
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class SubtractTac : public Tac {
@@ -14,6 +15,7 @@ class SubtractTac : public Tac {
     SubtractTac(const std::string &result_, const Operand &y_,
                 const Operand &z_)
         : Tac(result_, y_, "-", z_){};
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class MultiplyTac : public Tac {
@@ -21,12 +23,14 @@ class MultiplyTac : public Tac {
     MultiplyTac(const std::string &result_, const Operand &y_,
                 const Operand &z_)
         : Tac(result_, y_, "*", z_){};
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class DivideTac : public Tac {
   public:
     DivideTac(const std::string &result_, const Operand &y_, const Operand &z_)
         : Tac(result_, y_, "/", z_){};
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 #endif

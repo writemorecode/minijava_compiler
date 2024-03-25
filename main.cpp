@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "BytecodeProgram.hpp"
 #include "CFG.hpp"
 #include "Node.h"
 #include "parser.tab.hh"
@@ -102,6 +103,10 @@ int main(int argc, char **argv) {
 
     std::fstream stGraph("st.dot", std::ios::out);
     st.printTable(stGraph);
+
+    BytecodeProgram program;
+    graph.generateBytecode(program);
+    program.print(std::cout);
 
     return errCodes::SUCCESS;
 }

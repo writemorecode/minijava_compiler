@@ -1,6 +1,7 @@
 #ifndef TAC_HPP
 #define TAC_HPP
 
+#include "BytecodeMethodBlock.hpp"
 #include <iostream>
 #include <string>
 #include <variant>
@@ -16,6 +17,9 @@ class Tac {
 
   public:
     virtual void print(std::ostream &os) const;
+
+    // TODO: Make pure virtual?
+    virtual void generateBytecode(BytecodeMethodBlock &block){};
 
     Tac(const std::string &result_) : result{result_} {}
     Tac(const std::string &result_, const Operand &lhs_, const std::string &op_,
@@ -62,12 +66,14 @@ class NotTac : public UnaryExpressionTac {
   public:
     NotTac(const std::string &result_, const Operand &z_)
         : UnaryExpressionTac(result_, "!", z_){};
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class CopyTac : public Tac {
   public:
     CopyTac(const Operand &y_, const std::string &result_) : Tac(result_, y_){};
     void print(std::ostream &os) const override;
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class ArrayCopyTac : public Tac {
@@ -130,12 +136,14 @@ class ReturnTac : public Tac {
   public:
     ReturnTac(const Operand &name) : Tac(name){};
     void print(std::ostream &os) const override;
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class PrintTac : public Tac {
   public:
     PrintTac(const Operand &value) : Tac(value){};
     void print(std::ostream &os) const override;
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 #endif
