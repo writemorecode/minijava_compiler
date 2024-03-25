@@ -221,10 +221,10 @@ Expression: Expression PLUSOP Expression {
 };
 | Integer { $$ = $1; };
 | TRUE {
-    $$ = new BooleanNode("TRUE", yylineno);
+    $$ = new TrueNode(yylineno);
 };
 | FALSE {
-    $$ = new BooleanNode("FALSE", yylineno);
+    $$ = new FalseNode(yylineno);
 };
 | Identifier { $$ = $1; };
 | THIS {

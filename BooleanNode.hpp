@@ -3,12 +3,15 @@
 
 #include "Node.h"
 
-class BooleanNode : public Node {
-    std::string value;
-
+class TrueNode : public Node {
   public:
-    BooleanNode(const std::string &value, int l)
-        : Node(value, l), value{value} {}
+    TrueNode(int l) : Node("TRUE", l){};
+    std::string checkTypes(SymbolTable &st) const override;
+    Operand generateIR(CFG &graph, SymbolTable &st) override;
+};
+class FalseNode : public Node {
+  public:
+    FalseNode(int l) : Node("FALSE", l){};
     std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };

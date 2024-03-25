@@ -1,8 +1,7 @@
 #include "BooleanNode.hpp"
 #include "Tac.hpp"
 
-std::string BooleanNode::checkTypes(SymbolTable &st) const { return "boolean"; }
-
-Operand BooleanNode::generateIR(CFG &graph, SymbolTable &st) {
-    return value;
-}
+std::string TrueNode::checkTypes(SymbolTable &st) const { return "boolean"; }
+std::string FalseNode::checkTypes(SymbolTable &st) const { return "boolean"; }
+Operand TrueNode::generateIR(CFG &graph, SymbolTable &st) { return true; }
+Operand FalseNode::generateIR(CFG &graph, SymbolTable &st) { return false; }
