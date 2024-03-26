@@ -18,10 +18,20 @@ class BytecodeMethodBlock {
     void print(std::ostream &os) const;
     void addBytecodeInstruction(BytecodeInstruction *instr);
 
-    void
-    addOperandPushInstruction(const std::variant<std::string, int> &operand);
+    BytecodeMethodBlock &push(const std::variant<std::string, int> &operand);
+    BytecodeMethodBlock &store(const std::string &result);
 
-    void addStoreInstruction(const std::string &result);
+    BytecodeMethodBlock &add();
+    BytecodeMethodBlock &subtract();
+    BytecodeMethodBlock &multiply();
+    BytecodeMethodBlock &divide();
+    BytecodeMethodBlock &less_than();
+    BytecodeMethodBlock &l_and();
+    BytecodeMethodBlock &l_or();
+    BytecodeMethodBlock &l_not();
+    BytecodeMethodBlock &ret();
+
+    BytecodeMethodBlock &write();
 };
 
 #endif

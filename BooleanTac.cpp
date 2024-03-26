@@ -1,15 +1,9 @@
 #include "BooleanTac.hpp"
 
 void AndTac::generateBytecode(BytecodeMethodBlock &block) {
-    block.addOperandPushInstruction(lhsOp);
-    block.addOperandPushInstruction(rhsOp);
-    block.addBytecodeInstruction(new StackParameterInstruction(Opcode::AND));
-    block.addStoreInstruction(result);
+    block.push(lhsOp).push(rhsOp).l_and().store(result);
 }
 
 void OrTac::generateBytecode(BytecodeMethodBlock &block) {
-    block.addOperandPushInstruction(lhsOp);
-    block.addOperandPushInstruction(rhsOp);
-    block.addBytecodeInstruction(new StackParameterInstruction(Opcode::OR));
-    block.addStoreInstruction(result);
+    block.push(lhsOp).push(rhsOp).l_or().store(result);
 }

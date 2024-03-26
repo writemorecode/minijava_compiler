@@ -1,27 +1,14 @@
 #include "ArithmeticTac.hpp"
-#include "BytecodeInstruction.hpp"
 
 void AddTac::generateBytecode(BytecodeMethodBlock &block) {
-    block.addOperandPushInstruction(lhsOp);
-    block.addOperandPushInstruction(rhsOp);
-    block.addBytecodeInstruction(new StackParameterInstruction(Opcode::ADD));
-    block.addStoreInstruction(result);
+    block.push(lhsOp).push(rhsOp).add().store(result);
 }
 void SubtractTac::generateBytecode(BytecodeMethodBlock &block) {
-    block.addOperandPushInstruction(lhsOp);
-    block.addOperandPushInstruction(rhsOp);
-    block.addBytecodeInstruction(new StackParameterInstruction(Opcode::SUB));
-    block.addStoreInstruction(result);
+    block.push(lhsOp).push(rhsOp).subtract().store(result);
 }
 void MultiplyTac::generateBytecode(BytecodeMethodBlock &block) {
-    block.addOperandPushInstruction(lhsOp);
-    block.addOperandPushInstruction(rhsOp);
-    block.addBytecodeInstruction(new StackParameterInstruction(Opcode::MUL));
-    block.addStoreInstruction(result);
+    block.push(lhsOp).push(rhsOp).multiply().store(result);
 }
 void DivideTac::generateBytecode(BytecodeMethodBlock &block) {
-    block.addOperandPushInstruction(lhsOp);
-    block.addOperandPushInstruction(rhsOp);
-    block.addBytecodeInstruction(new StackParameterInstruction(Opcode::DIV));
-    block.addStoreInstruction(result);
+    block.push(lhsOp).push(rhsOp).divide().store(result);
 }

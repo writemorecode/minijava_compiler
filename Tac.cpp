@@ -15,7 +15,7 @@ void CopyTac::print(std::ostream &os) const {
 }
 
 void CopyTac::generateBytecode(BytecodeMethodBlock &block) {
-    block.addStoreInstruction(result);
+    block.store(result);
 }
 
 void ArrayCopyTac::print(std::ostream &os) const {
@@ -51,19 +51,14 @@ void ReturnTac::print(std::ostream &os) const {
     os << "return " << rhs << "\n";
 }
 void ReturnTac::generateBytecode(BytecodeMethodBlock &block) {
-    block.addBytecodeInstruction(
-        new StringParameterInstruction(Opcode::LOAD, rhs));
-    block.addBytecodeInstruction(new StackParameterInstruction(Opcode::RET));
+    block.push(rhsOp).ret();
 }
 
 void PrintTac::print(std::ostream &os) const { os << "print " << rhs << "\n"; }
 void PrintTac::generateBytecode(BytecodeMethodBlock &block) {
-    block.addOperandPushInstruction(rhsOp);
-    block.addBytecodeInstruction(new StackParameterInstruction(Opcode::PRINT));
+    block.push(rhs).write();
 }
 
 void NotTac::generateBytecode(BytecodeMethodBlock &block) {
-    block.addOperandPushInstruction(rhsOp);
-    block.addBytecodeInstruction(new StackParameterInstruction(Opcode::NOT));
-    block.addStoreInstruction(result);
+    block.push(rhsOp).l_not().store(result);
 }
