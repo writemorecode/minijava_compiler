@@ -1,4 +1,6 @@
 #include "BytecodeMethodBlock.hpp"
+#include "BytecodeInstruction.hpp"
+#include <memory>
 
 using Operand = std::variant<std::string, int>;
 
@@ -14,6 +16,11 @@ void BytecodeMethodBlock::addOperandPushInstruction(const Operand &operand) {
         addBytecodeInstruction(
             new StringParameterInstruction(Opcode::LOAD, *ptr));
     }
+}
+
+void BytecodeMethodBlock::addStoreInstruction(const std::string &result) {
+    addBytecodeInstruction(
+        new StringParameterInstruction(Opcode::STORE, result));
 }
 
 void BytecodeMethodBlock::print(std::ostream &os) const {

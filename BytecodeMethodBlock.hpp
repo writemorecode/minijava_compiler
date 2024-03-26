@@ -20,6 +20,8 @@ class BytecodeMethodBlock {
 
     void
     addOperandPushInstruction(const std::variant<std::string, int> &operand);
+
+    void addStoreInstruction(const std::string &result);
 };
 
 #endif

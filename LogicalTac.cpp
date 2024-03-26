@@ -4,6 +4,7 @@ void LessThanTac::generateBytecode(BytecodeMethodBlock &block) {
     block.addOperandPushInstruction(lhsOp);
     block.addOperandPushInstruction(rhsOp);
     block.addBytecodeInstruction(new StackParameterInstruction(Opcode::LT));
+    block.addStoreInstruction(result);
 }
 void GreaterThanTac::generateBytecode(BytecodeMethodBlock &block) {
     // Note that operands are pushed in reverse order:
@@ -11,6 +12,7 @@ void GreaterThanTac::generateBytecode(BytecodeMethodBlock &block) {
     block.addOperandPushInstruction(rhsOp);
     block.addOperandPushInstruction(lhsOp);
     block.addBytecodeInstruction(new StackParameterInstruction(Opcode::LT));
+    block.addStoreInstruction(result);
 }
 void EqualToTac::generateBytecode(BytecodeMethodBlock &block) {
     block.addOperandPushInstruction(lhsOp);
@@ -18,4 +20,5 @@ void EqualToTac::generateBytecode(BytecodeMethodBlock &block) {
     // A == B iff A - B = 0
     block.addBytecodeInstruction(new StackParameterInstruction(Opcode::SUB));
     block.addBytecodeInstruction(new StackParameterInstruction(Opcode::NOT));
+    block.addStoreInstruction(result);
 }
