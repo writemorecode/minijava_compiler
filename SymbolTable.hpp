@@ -38,6 +38,8 @@ class SymbolTable {
 
     void printTable(std::ostream &os) const;
     void resetTable();
+
+    const Method *getMethodFromQualifiedName(const std::string &name);
 };
 
 #endif

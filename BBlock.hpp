@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "BytecodeMethod.hpp"
+#include "SymbolTable.hpp"
 #include "Tac.hpp"
 
 class BBlock {
@@ -14,6 +15,7 @@ class BBlock {
     BBlock *trueExit = nullptr;
     BBlock *falseExit = nullptr;
     bool visited = false;
+    bool generated = false;
 
   public:
     BBlock(const std::string &name_) : name(name_){};
@@ -36,7 +38,10 @@ class BBlock {
     [[nodiscard]] bool isVisited() const { return visited; }
     void markVisited() { visited = true; };
 
-    void generateBytecode(BytecodeMethod &method);
+    [[nodiscard]] bool isGenerated() const { return generated; }
+    void markGenerated() { generated = true; };
+
+    void generateBytecode(BytecodeMethod &method, SymbolTable &st);
 };
 
 #endif

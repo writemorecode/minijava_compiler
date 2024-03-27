@@ -1,5 +1,4 @@
 #include "CFG.hpp"
-#include "BytecodeInstruction.hpp"
 #include <iostream>
 
 std::string CFG::getTemporaryName() {
@@ -40,15 +39,26 @@ BBlock *CFG::addMethodBlock(const std::string &name) {
     return ptr;
 }
 
-void CFG::generateBytecode(BytecodeProgram &program) {
+void CFG::generateBytecode(BytecodeProgram &program, SymbolTable &st) {
     for (auto *basicBlock : methodBlocks) {
         const auto &name = basicBlock->getName();
-        program.addMethod(name);
-        auto &method = program.getMethod(name);
-        basicBlock->generateBytecode(method);
+        auto &method = program.addBytecodeMethod(name);
+
+        const auto *methodEntry = st.getMethodFromQualifiedName(name);
+        if (methodEntry == nullptr) {
+            std::cerr << "Qualified name '" << name << "' not found in ST!\n";
+            return;
+        }
+        const auto &params = methodEntry->getParameters();
+        auto &bytecodeBlock = method.addBytecodeMethodBlock(name);
+        for (auto it = params.rbegin(); it != params.rend(); ++it) {
+            const auto &paramID = (*it)->getID();
+            bytecodeBlock.store(paramID);
+        }
+
+        basicBlock->generateBytecode(method, st);
     }
     const auto &mainName = methodBlocks.front()->getName();
-    auto &mainBlock = program.getMethod(mainName).getFirstBlock();
-    mainBlock.addBytecodeInstruction(
-        new StackParameterInstruction(Opcode::STOP));
+    auto &mainBlock = program.getBytecodeMethod(mainName).getFirstBlock();
+    mainBlock.stop();
 }

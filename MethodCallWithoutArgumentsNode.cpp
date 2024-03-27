@@ -44,6 +44,6 @@ Operand MethodCallWithoutArgumentsNode::generateIR(CFG &graph,
     st.addVariable(methodType, name);
     const auto &methodName = id->value;
     graph.addInstruction(new ParamTac(callerName));
-    graph.addInstruction(new MethodCallTac(name, methodName, "1"));
+    graph.addInstruction(new MethodCallTac(name, methodName, caller, "1"));
     return name;
 }

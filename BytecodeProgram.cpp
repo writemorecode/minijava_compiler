@@ -1,17 +1,24 @@
 #include "BytecodeProgram.hpp"
 
-void BytecodeProgram::addMethod(const std::string &name) {
-    methods.insert(std::make_pair(name, BytecodeMethod()));
+#include <iostream>
+
+BytecodeMethod &BytecodeProgram::addBytecodeMethod(const std::string &name) {
+    const auto &[it, failed] =
+        methods.insert(std::make_pair(name, BytecodeMethod()));
+    return it->second;
 }
 
-BytecodeMethod &BytecodeProgram::getMethod(const std::string &name) {
+BytecodeMethod &BytecodeProgram::getBytecodeMethod(const std::string &name) {
     const auto &it = methods.find(name);
+    if (it == methods.end()) {
+        std::cerr << "Error: Failed to find key " << name
+                  << " in BytecodeProgram::methods table\n";
+    }
     return it->second;
 }
 
 void BytecodeProgram::print(std::ostream &os) const {
     for (const auto &method : methods) {
-        os << method.first << '\n';
         method.second.print(os);
     }
 }

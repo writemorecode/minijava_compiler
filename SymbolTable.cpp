@@ -58,3 +58,28 @@ Variable *SymbolTable::lookupVariableInScope(const std::string &key) {
 }
 
 Record *SymbolTable::getCurrentRecord() const { return current->getRecord(); }
+
+const Method *SymbolTable::getMethodFromQualifiedName(const std::string &name) {
+    auto splitStringOnPeriod = [](const std::string &str) {
+        const auto index = str.find('.');
+        const auto &first = str.substr(0, index);
+        const auto &second = str.substr(index + 1);
+        return std::make_pair(first, second);
+    };
+
+    const auto &[className, methodName] = splitStringOnPeriod(name);
+
+    auto *classLookup = lookupClass(className);
+    if (classLookup == nullptr) {
+        return nullptr;
+    }
+
+    enterScope("Class: " + className, classLookup);
+    const auto *methodLookup = lookupMethod(methodName);
+    exitScope();
+    if (methodLookup == nullptr) {
+        return nullptr;
+    }
+
+    return methodLookup;
+}

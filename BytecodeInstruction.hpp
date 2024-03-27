@@ -13,20 +13,23 @@ enum Opcode {
     MUL = 5,
     DIV = 6,
     LT = 7,
-    AND = 8,
-    OR = 9,
-    NOT = 10,
-    JMP = 11,
-    CJMP = 12,
-    CALL = 13,
-    RET = 14,
-    PRINT = 15,
-    STOP = 16
+    GT = 8,
+    EQ = 9,
+    AND = 10,
+    OR = 11,
+    NOT = 12,
+    JMP = 13,
+    CJMP = 14,
+    CALL = 15,
+    RET = 16,
+    PRINT = 17,
+    STOP = 18
 };
 
 const std::vector<std::string> mnemonics{
-    "LOAD", "CONST", "STORE", "ADD",  "SUB",  "MUL", "DIV",   "LT",  "AND",
-    "OR",   "NOT",   "JMP",   "CJMP", "CALL", "RET", "PRINT", "STOP"};
+    "ILOAD",        "ICONST",        "ISTORE",  "IADD",  "ISUB", "IMUL", "IDIV",
+    "ILT",          "IGT",           "IEQ",     "IAND",  "IOR",  "INOT", "GOTO",
+    "IFFALSE GOTO", "INVOKEVIRTUAL", "IRETURN", "PRINT", "STOP"};
 
 class BytecodeInstruction {
   protected:

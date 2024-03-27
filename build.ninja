@@ -1,8 +1,8 @@
-cflags = -Wall -Wpedantic -Wno-unused-private-field -std=c++17 -g
+cflags = -Wall -Wpedantic -Wno-unused-private-field -std=c++17 -ggdb3 -O0
 rule cc
-  command = g++ $cflags -c $in -o $out
+  command = clang++ $cflags -c $in -o $out
 rule cc_main
-  command = g++ $cflags $in -o $out
+  command = clang++ $cflags $in -o $out
 rule bison
   command = bison $in
 rule flex

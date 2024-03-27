@@ -15,7 +15,7 @@ void CopyTac::print(std::ostream &os) const {
 }
 
 void CopyTac::generateBytecode(BytecodeMethodBlock &block) {
-    block.store(result);
+    block.push(rhsOp).store(result);
 }
 
 void ArrayCopyTac::print(std::ostream &os) const {
@@ -35,6 +35,8 @@ void NewArrayTac::print(std::ostream &os) const {
     os << result << " := new int, " << rhs << "\n";
 }
 
+void JumpTac::print(std::ostream &os) const { os << "goto " << result << "\n"; }
+
 void CondJumpTac::print(std::ostream &os) const {
     os << "iffalse " << lhs << " goto " << rhs << "\n";
 }
@@ -42,10 +44,14 @@ void CondJumpTac::print(std::ostream &os) const {
 void MethodCallTac::print(std::ostream &os) const {
     os << result << " := call " << lhs << ", " << rhs << "\n";
 }
-
-void JumpTac::print(std::ostream &os) const { os << "goto " << result << "\n"; }
+void MethodCallTac::generateBytecode(BytecodeMethodBlock &block) {
+    block.call(lhs + "." + op);
+}
 
 void ParamTac::print(std::ostream &os) const { os << "param " << rhs << "\n"; }
+void ParamTac::generateBytecode(BytecodeMethodBlock &block) {
+    block.push(rhsOp);
+}
 
 void ReturnTac::print(std::ostream &os) const {
     os << "return " << rhs << "\n";
@@ -55,9 +61,7 @@ void ReturnTac::generateBytecode(BytecodeMethodBlock &block) {
 }
 
 void PrintTac::print(std::ostream &os) const { os << "print " << rhs << "\n"; }
-void PrintTac::generateBytecode(BytecodeMethodBlock &block) {
-    block.push(rhs).write();
-}
+void PrintTac::generateBytecode(BytecodeMethodBlock &block) { block.write(); }
 
 void NotTac::generateBytecode(BytecodeMethodBlock &block) {
     block.push(rhsOp).l_not().store(result);

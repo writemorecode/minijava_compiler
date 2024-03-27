@@ -14,7 +14,7 @@ class BytecodeMethodBlock {
 
   public:
     BytecodeMethodBlock(const std::string &name_) : name(name_){};
-    std::string getName() const { return name; }
+    [[nodiscard]] const std::string &getName() const { return name; }
     void print(std::ostream &os) const;
     void addBytecodeInstruction(BytecodeInstruction *instr);
 
@@ -26,12 +26,21 @@ class BytecodeMethodBlock {
     BytecodeMethodBlock &multiply();
     BytecodeMethodBlock &divide();
     BytecodeMethodBlock &less_than();
+    BytecodeMethodBlock &greater_than();
+    BytecodeMethodBlock &equal_to();
     BytecodeMethodBlock &l_and();
     BytecodeMethodBlock &l_or();
     BytecodeMethodBlock &l_not();
     BytecodeMethodBlock &ret();
 
     BytecodeMethodBlock &write();
+
+    BytecodeMethodBlock &call(const std::string &method);
+
+    BytecodeMethodBlock &jump(const std::string &location);
+    BytecodeMethodBlock &cjump(const std::string &location);
+
+    BytecodeMethodBlock &stop();
 };
 
 #endif

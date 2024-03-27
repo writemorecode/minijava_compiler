@@ -5,6 +5,7 @@
 
 #include "BBlock.hpp"
 #include "BytecodeProgram.hpp"
+#include "SymbolTable.hpp"
 
 class CFG {
   private:
@@ -28,7 +29,7 @@ class CFG {
     [[nodiscard]] BBlock *addMethodBlock();
     [[nodiscard]] BBlock *addMethodBlock(const std::string &name);
 
-    void generateBytecode(BytecodeProgram &program);
+    void generateBytecode(BytecodeProgram &program, SymbolTable &st);
 };
 
 #endif

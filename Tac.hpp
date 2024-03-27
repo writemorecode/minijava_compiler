@@ -110,26 +110,30 @@ class CondJumpTac : public Tac {
     CondJumpTac(const Operand &label, const Operand &cond)
         : Tac("", cond, "", label){};
     void print(std::ostream &os) const override;
+    // void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class MethodCallTac : public Tac {
   public:
-    MethodCallTac(const std::string &result, const Operand &methodName,
-                  const Operand &argCount)
-        : Tac(result, methodName, "", argCount){};
+    MethodCallTac(const std::string &result, const std::string &objectName,
+                  const Operand &methodName, const Operand &argCount)
+        : Tac(result, methodName, objectName, argCount){};
     void print(std::ostream &os) const override;
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class JumpTac : public Tac {
   public:
     JumpTac(const std::string &_label) : Tac(_label){};
     void print(std::ostream &os) const override;
+    // void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class ParamTac : public Tac {
   public:
     ParamTac(const Operand &param) : Tac(param){};
     void print(std::ostream &os) const override;
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class ReturnTac : public Tac {

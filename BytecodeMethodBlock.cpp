@@ -1,10 +1,11 @@
 #include "BytecodeMethodBlock.hpp"
 #include "BytecodeInstruction.hpp"
-#include <memory>
+#include <iostream>
 
 using Operand = std::variant<std::string, int>;
 
 void BytecodeMethodBlock::print(std::ostream &os) const {
+    os << name << ":\n";
     for (const auto &instruction : instructions) {
         instruction->print(os);
     }
@@ -71,5 +72,26 @@ BytecodeMethodBlock &BytecodeMethodBlock::ret() {
 }
 BytecodeMethodBlock &BytecodeMethodBlock::write() {
     addBytecodeInstruction(new StackParameterInstruction(Opcode::PRINT));
+    return *this;
+}
+BytecodeMethodBlock &BytecodeMethodBlock::call(const std::string &method) {
+    addBytecodeInstruction(
+        new StringParameterInstruction(Opcode::CALL, method));
+    return *this;
+}
+
+BytecodeMethodBlock &BytecodeMethodBlock::jump(const std::string &location) {
+    addBytecodeInstruction(
+        new StringParameterInstruction(Opcode::JMP, location));
+    return *this;
+}
+BytecodeMethodBlock &BytecodeMethodBlock::cjump(const std::string &location) {
+    addBytecodeInstruction(
+        new StringParameterInstruction(Opcode::CJMP, location));
+    return *this;
+}
+
+BytecodeMethodBlock &BytecodeMethodBlock::stop() {
+    addBytecodeInstruction(new StackParameterInstruction(Opcode::STOP));
     return *this;
 }

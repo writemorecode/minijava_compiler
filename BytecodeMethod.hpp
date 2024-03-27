@@ -10,7 +10,11 @@ class BytecodeMethod {
 
   public:
     BytecodeMethod() = default;
-    BytecodeMethodBlock &addMethodBlock(const std::string &name);
+    [[nodiscard]] BytecodeMethodBlock &
+    addBytecodeMethodBlock(const std::string &name);
+
+    [[nodiscard]] BytecodeMethodBlock &
+    getBytecodeMethodBlock(const std::string &name);
 
     BytecodeMethodBlock &getFirstBlock();
 

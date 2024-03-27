@@ -75,6 +75,6 @@ Operand MethodCallNode::generateIR(CFG &graph, SymbolTable &st) {
 
     const auto &methodName = id->value;
     const auto argCount = std::to_string(exprList->children.size() + 1);
-    graph.addInstruction(new MethodCallTac(name, methodName, argCount));
+    graph.addInstruction(new MethodCallTac(name, methodName, caller, argCount));
     return name;
 }
