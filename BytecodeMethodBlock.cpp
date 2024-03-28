@@ -12,7 +12,8 @@ void BytecodeMethodBlock::print(std::ostream &os) const {
 }
 
 void BytecodeMethodBlock::addBytecodeInstruction(BytecodeInstruction *instr) {
-    instructions.emplace_back(instr);
+    auto &foo = instructions.emplace_back(instr);
+    foo->setCounter(counter++);
 }
 
 BytecodeMethodBlock &BytecodeMethodBlock::push(const Operand &operand) {

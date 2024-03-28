@@ -32,13 +32,17 @@ const std::vector<std::string> mnemonics{
     "IFFALSE GOTO", "INVOKEVIRTUAL", "IRETURN", "PRINT", "STOP"};
 
 class BytecodeInstruction {
-  protected:
     Opcode opcode;
+    unsigned int counter = 0;
 
   public:
     BytecodeInstruction(Opcode opcode_) : opcode(opcode_){};
     virtual ~BytecodeInstruction() = default;
     virtual void print(std::ostream &os) const = 0;
+
+    Opcode getOpcode() const { return opcode; }
+    unsigned int getCounter() const { return counter; }
+    void setCounter(unsigned int count) { counter = count; }
 };
 
 class StackParameterInstruction : public BytecodeInstruction {
