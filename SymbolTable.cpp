@@ -66,20 +66,19 @@ const Method *SymbolTable::getMethodFromQualifiedName(const std::string &name) {
         const auto &second = str.substr(index + 1);
         return std::make_pair(first, second);
     };
-
     const auto &[className, methodName] = splitStringOnPeriod(name);
 
     auto *classLookup = lookupClass(className);
     if (classLookup == nullptr) {
-        return nullptr;
+        std::cerr << "Could not find class " << className << " in scope ";
+        std::cerr << getCurrentScopeName() << "\n";
     }
-
     enterScope("Class: " + className, classLookup);
     const auto *methodLookup = lookupMethod(methodName);
-    exitScope();
     if (methodLookup == nullptr) {
-        return nullptr;
+        std::cerr << "Could not find method " << methodName << " in class "
+                  << className << "\n";
     }
-
+    exitScope();
     return methodLookup;
 }

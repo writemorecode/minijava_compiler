@@ -44,12 +44,8 @@ void CFG::generateBytecode(BytecodeProgram &program, SymbolTable &st) {
         const auto &name = basicBlock->getName();
         auto &method = program.addBytecodeMethod(name);
 
-        const auto *methodEntry = st.getMethodFromQualifiedName(name);
-        if (methodEntry == nullptr) {
-            std::cerr << "Qualified name '" << name << "' not found in ST!\n";
-            return;
-        }
-        const auto &params = methodEntry->getParameters();
+        const auto *methodLookup = st.getMethodFromQualifiedName(name);
+        const auto &params = methodLookup->getParameters();
         auto &bytecodeBlock = method.addBytecodeMethodBlock(name);
         for (auto it = params.rbegin(); it != params.rend(); ++it) {
             const auto &paramID = (*it)->getID();
@@ -59,6 +55,7 @@ void CFG::generateBytecode(BytecodeProgram &program, SymbolTable &st) {
         basicBlock->generateBytecode(method, st);
     }
     const auto &mainName = methodBlocks.front()->getName();
-    auto &mainBlock = program.getBytecodeMethod(mainName).getFirstBlock();
+    auto &mainMethod = program.getBytecodeMethod(mainName);
+    auto &mainBlock = mainMethod.getBytecodeMethodBlock(mainName);
     mainBlock.stop();
 }

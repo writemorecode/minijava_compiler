@@ -36,9 +36,15 @@ void NewArrayTac::print(std::ostream &os) const {
 }
 
 void JumpTac::print(std::ostream &os) const { os << "goto " << result << "\n"; }
+void JumpTac::generateBytecode(BytecodeMethodBlock &block) {
+    block.jump(result);
+}
 
 void CondJumpTac::print(std::ostream &os) const {
     os << "iffalse " << lhs << " goto " << rhs << "\n";
+}
+void CondJumpTac::generateBytecode(BytecodeMethodBlock &block) {
+    block.cjump(rhs);
 }
 
 void MethodCallTac::print(std::ostream &os) const {

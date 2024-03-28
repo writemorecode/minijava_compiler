@@ -7,9 +7,11 @@
 
 class BytecodeMethod {
     std::vector<BytecodeMethodBlock> blocks;
+    std::string name;
 
   public:
-    BytecodeMethod() = default;
+    BytecodeMethod(const std::string &name_) : name(name_){};
+
     [[nodiscard]] BytecodeMethodBlock &
     addBytecodeMethodBlock(const std::string &name);
 

@@ -3,9 +3,8 @@
 #include <iostream>
 
 BytecodeMethod &BytecodeProgram::addBytecodeMethod(const std::string &name) {
-    const auto &[it, failed] =
-        methods.insert(std::make_pair(name, BytecodeMethod()));
-    return it->second;
+    const auto &it = methods.emplace(name, name);
+    return it.first->second;
 }
 
 BytecodeMethod &BytecodeProgram::getBytecodeMethod(const std::string &name) {

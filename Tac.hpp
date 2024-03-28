@@ -110,7 +110,7 @@ class CondJumpTac : public Tac {
     CondJumpTac(const Operand &label, const Operand &cond)
         : Tac("", cond, "", label){};
     void print(std::ostream &os) const override;
-    // void generateBytecode(BytecodeMethodBlock &block) override;
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class MethodCallTac : public Tac {
@@ -126,7 +126,7 @@ class JumpTac : public Tac {
   public:
     JumpTac(const std::string &_label) : Tac(_label){};
     void print(std::ostream &os) const override;
-    // void generateBytecode(BytecodeMethodBlock &block) override;
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class ParamTac : public Tac {

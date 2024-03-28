@@ -1,7 +1,5 @@
 #include "BBlock.hpp"
-#include "BytecodeInstruction.hpp"
 #include "SymbolTable.hpp"
-#include <algorithm>
 #include <iomanip>
 #include <iostream>
 
@@ -41,12 +39,10 @@ void BBlock::generateBytecode(BytecodeMethod &method, SymbolTable &st) {
     }
 
     if (hasTrueBlock() && !hasFalseBlock()) {
-        methodBlock.jump(trueExit->name);
         if (!trueExit->isGenerated()) {
             trueExit->generateBytecode(method, st);
         }
     } else if (hasTrueBlock() && hasFalseBlock()) {
-        methodBlock.cjump(falseExit->name);
         if (!trueExit->isGenerated()) {
             trueExit->generateBytecode(method, st);
         }

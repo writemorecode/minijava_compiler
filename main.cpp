@@ -104,10 +104,10 @@ int main(int argc, char **argv) {
     std::fstream stGraph("st.dot", std::ios::out);
     st.printTable(stGraph);
 
-    st.resetTable();
     BytecodeProgram program;
+    st.resetTable();
     graph.generateBytecode(program, st);
-    program.print(std::cout);
+    // program.print(std::cout);
 
     return errCodes::SUCCESS;
 }

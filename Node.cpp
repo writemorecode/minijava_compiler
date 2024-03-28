@@ -1,8 +1,6 @@
 #include "Node.h"
 #include "SymbolTable.hpp"
 
-#include <algorithm>
-
 bool Node::buildTable(SymbolTable &st) const {
     bool valid = true;
     for (const auto &child : children) {

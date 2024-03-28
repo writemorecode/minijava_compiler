@@ -11,7 +11,6 @@
 class BytecodeMethodBlock {
     std::vector<std::unique_ptr<BytecodeInstruction>> instructions;
     std::string name;
-    unsigned int counter = 0;
 
   public:
     BytecodeMethodBlock(const std::string &name_) : name(name_){};
