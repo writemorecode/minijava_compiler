@@ -86,12 +86,12 @@ Goal: MainClass END {
 }
 
 MainClass: PUBLIC CLASS Identifier L_CURLY PUBLIC STATIC VOID MAIN L_PAREN STRING L_SQUARE R_SQUARE Identifier R_PAREN L_CURLY StatementList R_CURLY  R_CURLY {
-	$$ = new MainClassNode($3, $13, $16, yylineno);
+	$$ = new MainClassNode($3, $13, $16, $3->lineno);
 };
 
 /* A class is declared using the "class" keyword, followed by an identifier and a class body. */
 ClassDeclaration: CLASS Identifier ClassBody {
-	$$ = new ClassNode($2, $3, yylineno);
+	$$ = new ClassNode($2, $3, $2->lineno);
 };
 
 /*
@@ -269,10 +269,10 @@ VarDeclaration: Type Identifier SEMI {
 
 
 MethodDeclaration: PUBLIC Type Identifier L_PAREN R_PAREN L_CURLY MethodBody R_CURLY {
-	$$ = new MethodWithoutParametersNode($2, $3, $7, yylineno);
+	$$ = new MethodWithoutParametersNode($2, $3, $7, $2->lineno);
 };
 | PUBLIC Type Identifier L_PAREN MethodParameterList R_PAREN L_CURLY MethodBody R_CURLY {
-	$$ = new MethodNode($2, $3, $5, $8, yylineno);
+	$$ = new MethodNode($2, $3, $5, $8, $2->lineno);
 };
 
 /* A MethodBodyItem can be either a variable declaration or a method declaration, that is located inside of a method body.  */
