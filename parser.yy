@@ -86,12 +86,12 @@ Goal: MainClass END {
 }
 
 MainClass: PUBLIC CLASS Identifier L_CURLY PUBLIC STATIC VOID MAIN L_PAREN STRING L_SQUARE R_SQUARE Identifier R_PAREN L_CURLY StatementList R_CURLY  R_CURLY {
-	$$ = new MainClassNode($3, $13, $16, yylineno);
+	$$ = new MainClassNode($3, $13, $16, $3->lineno);
 };
 
 /* A class is declared using the "class" keyword, followed by an identifier and a class body. */
 ClassDeclaration: CLASS Identifier ClassBody {
-	$$ = new ClassNode($2, $3, yylineno);
+	$$ = new ClassNode($2, $3, $2->lineno);
 };
 
 /*
