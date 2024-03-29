@@ -75,7 +75,7 @@ const Method *SymbolTable::getMethodFromQualifiedName(const std::string &name) {
     }
 
     enterScope("Class: " + className, classLookup);
-    const auto *methodLookup = lookupMethod(methodName);
+    const auto *methodLookup = classLookup->lookupMethod(methodName);
     exitScope();
     if (methodLookup == nullptr) {
         return nullptr;
