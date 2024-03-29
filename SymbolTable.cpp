@@ -74,11 +74,11 @@ const Method *SymbolTable::getMethodFromQualifiedName(const std::string &name) {
         std::cerr << getCurrentScopeName() << "\n";
     }
     enterScope("Class: " + className, classLookup);
-    const auto *methodLookup = lookupMethod(methodName);
+    const auto *methodLookup = classLookup->lookupMethod(methodName);
+    exitScope();
     if (methodLookup == nullptr) {
         std::cerr << "Could not find method " << methodName << " in class "
                   << className << "\n";
     }
-    exitScope();
     return methodLookup;
 }

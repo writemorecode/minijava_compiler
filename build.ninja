@@ -1,4 +1,4 @@
-cflags = -Wall -Wpedantic -Wno-unused-private-field -std=c++17 -ggdb3 -O0 -fsanitize=address
+cflags = -Wall -Wpedantic -Wno-unused-private-field -std=c++20 -ggdb3
 rule cc
   command = clang++ $cflags -c $in -o $out
 rule cc_main

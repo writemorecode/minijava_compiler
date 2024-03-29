@@ -1,5 +1,5 @@
 CXX := g++
-CXXFLAGS := -g -Wall -Wextra -Wpedantic -std=c++17
+CXXFLAGS := -g -Wall -Wextra -Wpedantic -std=c++20
 
 NODES := $(wildcard *Node.cpp)
 NODES_OBJ := $(NODES:.cpp=.o)
