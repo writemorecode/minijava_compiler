@@ -45,7 +45,7 @@ void CFG::generateBytecode(BytecodeProgram &program, SymbolTable &st) {
         const auto &name = basicBlock->getName();
         auto &method = program.addBytecodeMethod(name);
 
-        if (!name.ends_with("main")) {
+        if (!name.ends_with(".main")) {
             const auto *methodEntry = st.getMethodFromQualifiedName(name);
             if (methodEntry == nullptr) {
                 std::cerr << "Qualified name '" << name
