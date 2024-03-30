@@ -15,6 +15,8 @@ class BytecodeProgram {
     [[nodiscard]] BytecodeMethod &getBytecodeMethod(const std::string &name);
 
     void print(std::ostream &os) const;
+
+    void serialize(std::ofstream &os) const;
 };
 
 #endif

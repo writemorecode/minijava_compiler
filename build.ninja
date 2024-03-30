@@ -54,3 +54,5 @@ build TypeNode.o: cc TypeNode.cpp
 build Variable.o: cc Variable.cpp
 build VariableNode.o: cc VariableNode.cpp
 build compiler: cc_main lex.yy.o parser.tab.o main.cpp ArithmeticExpressionNode.o ArithmeticTac.o ArrayAccessNode.o ArrayLengthNode.o BBlock.o BooleanExpressionNode.o BooleanNode.o BooleanTac.o BytecodeInstruction.o BytecodeMethod.o BytecodeMethodBlock.o BytecodeProgram.o CFG.o Class.o ClassAllocationNode.o ClassNode.o ControlStatementNode.o ExpressionNode.o IdentifierNode.o IntegerArrayAllocationNode.o IntegerNode.o LogicalExpressionNode.o LogicalTac.o MainClassNode.o Method.o MethodBodyNode.o MethodCallNode.o MethodCallWithoutArgumentsNode.o MethodNode.o MethodParameterNode.o MethodWithoutParametersNode.o Node.o NotNode.o Record.o Scope.o StatementNode.o SymbolTable.o Tac.o ThisNode.o TypeNode.o Variable.o VariableNode.o 
+
+build vm: cc_main vm.cpp

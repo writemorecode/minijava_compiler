@@ -1,5 +1,6 @@
 #include "BytecodeProgram.hpp"
 
+#include <fstream>
 #include <iostream>
 
 BytecodeMethod &BytecodeProgram::addBytecodeMethod(const std::string &name) {
@@ -19,5 +20,18 @@ BytecodeMethod &BytecodeProgram::getBytecodeMethod(const std::string &name) {
 void BytecodeProgram::print(std::ostream &os) const {
     for (const auto &method : methods) {
         method.second.print(os);
+    }
+}
+
+void BytecodeProgram::serialize(std::ofstream &os) const {
+    const size_t methodCount = methods.size();
+    os.write(reinterpret_cast<const char *>(&methodCount), sizeof(methodCount));
+
+    for (const auto &method : methods) {
+        const auto &name = method.first;
+        const size_t nameLength = name.size();
+        os.write(reinterpret_cast<const char *>(&nameLength),
+                 sizeof(nameLength));
+        os.write(name.data(), nameLength);
     }
 }

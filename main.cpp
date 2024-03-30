@@ -109,5 +109,8 @@ int main(int argc, char **argv) {
     graph.generateBytecode(program, st);
     program.print(std::cout);
 
+    std::ofstream bytecodeProgram("prog.bc", std::ios::binary);
+    program.serialize(bytecodeProgram);
+
     return errCodes::SUCCESS;
 }
