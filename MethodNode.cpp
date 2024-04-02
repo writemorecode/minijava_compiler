@@ -2,13 +2,14 @@
 
 bool MethodNode::buildTable(SymbolTable &st) const {
     bool valid = true;
-    if (st.lookupMethod(id->value)) {
-        std::cerr << "Error: (line " << lineno << ") Method '" << id->value
+    if (st.lookupMethod(methodName)) {
+        std::cerr << "Error: (line " << lineno << ") Method '" << methodName
                   << "' already declared.\n";
         valid = false;
     }
-    st.addMethod(type->value, id->value);
-    auto *currentMethod = st.lookupMethod(id->value);
+
+    st.addMethod(methodType, methodName);
+    auto *currentMethod = st.lookupMethod(methodName);
     auto *currentClass = dynamic_cast<Class *>(st.getCurrentRecord());
     currentClass->addMethod(currentMethod);
 
@@ -21,7 +22,7 @@ bool MethodNode::buildTable(SymbolTable &st) const {
 }
 
 std::string MethodNode::checkTypes(SymbolTable &st) const {
-    st.enterMethodScope(id->value);
+    st.enterMethodScope(methodName);
     const auto signatureReturnType = type->checkTypes(st);
     const auto bodyReturnType = body->checkTypes(st);
     st.exitScope();
@@ -30,19 +31,19 @@ std::string MethodNode::checkTypes(SymbolTable &st) const {
         std::cerr << "Error: ";
         std::cerr << "(line " << lineno << ") ";
         std::cerr << "Return type '" << signatureReturnType << "' ";
-        std::cerr << "in method '" << id->value << "' ";
+        std::cerr << "in method '" << methodName << "' ";
         std::cerr << "does not match returned type '";
         std::cerr << bodyReturnType << "'.\n";
         return "";
     }
 
-    return type->value;
+    return methodType;
 }
 
 Operand MethodNode::generateIR(CFG &graph, SymbolTable &st) {
     auto *currentClass = dynamic_cast<Class *>(st.getCurrentRecord());
-    st.enterMethodScope(id->value);
-    const auto methodBlockName = currentClass->getID() + "." + id->value;
+    st.enterMethodScope(methodName);
+    const auto methodBlockName = currentClass->getID() + "." + methodName;
     graph.setCurrentBlock(graph.addMethodBlock(methodBlockName));
     body->generateIR(graph, st);
     st.exitScope();
