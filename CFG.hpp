@@ -27,7 +27,8 @@ class CFG {
 
     [[nodiscard]] BBlock *newBlock();
     [[nodiscard]] BBlock *addMethodBlock();
-    [[nodiscard]] BBlock *addMethodBlock(const std::string &name);
+    [[nodiscard]] BBlock *addMethodRootBlock(const std::string &className,
+                                             const std::string &methodName);
 
     void generateBytecode(BytecodeProgram &program, SymbolTable &st);
 };

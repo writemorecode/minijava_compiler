@@ -107,7 +107,8 @@ int main(int argc, char **argv) {
     BytecodeProgram program;
     st.resetTable();
     graph.generateBytecode(program, st);
-    program.print(std::cout);
+    std::fstream prettyBytecode("bytecode.txt", std::ios::out);
+    program.print(prettyBytecode);
 
     std::ofstream bytecodeProgram("prog.bc", std::ios::binary);
     program.serialize(bytecodeProgram);

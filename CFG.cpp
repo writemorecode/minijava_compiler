@@ -34,8 +34,9 @@ BBlock *CFG::addMethodBlock() {
     return ptr;
 }
 
-BBlock *CFG::addMethodBlock(const std::string &name) {
-    auto *ptr = new BBlock(name);
+BBlock *CFG::addMethodRootBlock(const std::string &className,
+                                const std::string &methodName) {
+    auto *ptr = new BBlock(className, methodName);
     methodBlocks.push_back(ptr);
     return ptr;
 }

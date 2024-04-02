@@ -10,6 +10,7 @@
 
 class BBlock {
   private:
+    std::string className, methodName;
     std::string name;
     std::vector<std::unique_ptr<Tac>> instructions;
     BBlock *trueExit = nullptr;
@@ -18,9 +19,14 @@ class BBlock {
     bool generated = false;
 
   public:
+    BBlock(const std::string &className_, const std::string &methodName_)
+        : className(className_), methodName(methodName_),
+          name(className + "." + methodName){};
     BBlock(const std::string &name_) : name(name_){};
 
     [[nodiscard]] const auto &getName() const { return name; }
+    [[nodiscard]] const auto &getClassName() const { return className; }
+    [[nodiscard]] const auto &getMethodName() const { return methodName; }
 
     void setTrueBlock(BBlock *ptr) { trueExit = ptr; }
     void setFalseBlock(BBlock *ptr) { falseExit = ptr; }

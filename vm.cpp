@@ -1,13 +1,21 @@
-#include <cstdint>
 #include <cstdlib>
 #include <fstream>
-#include <iomanip>
 #include <ios>
 #include <iostream>
-#include <iterator>
-#include <vector>
+#include <string>
 
-constexpr uint64_t MAGIC = 0xBEEFCAFE;
+std::streamsize readIntegerFromStream(std::ifstream &stream) {
+    std::streamsize value = 0;
+    stream.read(reinterpret_cast<char *>(&value), sizeof(value));
+    return value;
+}
+
+std::string readStringFromStream(std::ifstream &stream) {
+    auto length = readIntegerFromStream(stream);
+    std::string string(length, '\0');
+    stream.read(string.data(), length);
+    return string;
+}
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -22,18 +30,14 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    size_t methodCount = 0;
-    programFile.read(reinterpret_cast<char *>(&methodCount),
-                     sizeof(methodCount));
+    size_t methodCount = readIntegerFromStream(programFile);
     if (methodCount == 0) {
         std::cerr << "Error: Program has no methods.";
         return EXIT_FAILURE;
     }
-    for (auto i = 0; i < methodCount; i++) {
-        size_t methodNameLength = 0;
-        programFile.read(reinterpret_cast<char *>(&methodNameLength),
-                         sizeof(methodNameLength));
-        std::string methodName(methodNameLength, '\0');
-        programFile.read(&methodName[0], methodNameLength);
+
+    for (size_t i = 0; i < methodCount; i++) {
+        auto methodName = readStringFromStream(programFile);
+        std::cout << std::quoted(methodName) << "\n";
     }
 }
