@@ -5,11 +5,13 @@
 
 class MainClassNode : public Node {
     Node *id, *arg, *body;
+    std::string mainClassName, mainMethodArgumentName;
 
   public:
-    MainClassNode(Node *id, Node *arg, Node *body, int l)
-        : Node("Main Class", l, {id, arg, body}), id{id}, arg{arg},
-          body{body} {};
+    MainClassNode(Node *id_, Node *arg_, Node *body_, int l)
+        : Node("Main Class", l, {id_, arg_, body_}), id{id_}, arg{arg_},
+          body{body_}, mainClassName{id->value},
+          mainMethodArgumentName{arg->value} {};
 
     bool buildTable(SymbolTable &st) const override;
     std::string checkTypes(SymbolTable &st) const override;
