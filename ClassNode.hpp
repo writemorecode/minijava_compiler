@@ -5,10 +5,12 @@
 
 class ClassNode : public Node {
     Node *id, *body;
+    std::string className;
 
   public:
-    ClassNode(Node *id, Node *body, int l)
-        : Node("Class", l, {id, body}), id{id}, body{body} {};
+    ClassNode(Node *id_, Node *body_, int l)
+        : Node("Class", l, {id_, body_}), id{id_}, body{body_},
+          className{id->value} {};
     bool buildTable(SymbolTable &st) const override;
     std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;

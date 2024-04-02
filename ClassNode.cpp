@@ -2,17 +2,17 @@
 
 bool ClassNode::buildTable(SymbolTable &st) const {
     bool valid = true;
-    if (st.lookupClass(id->value)) {
+    if (st.lookupClass(className)) {
         std::cerr << "Error: ";
         std::cerr << "(line " << lineno << ") ";
-        std::cerr << "Class " << id->value << " already declared.\n";
+        std::cerr << "Class " << className << " already declared.\n";
         valid = false;
     }
 
-    st.addClass(id->value);
-    auto currentClass = st.lookupClass(id->value);
+    st.addClass(className);
+    auto *currentClass = st.lookupClass(className);
     st.enterClassScope(currentClass);
-    st.addVariable(id->value, "this");
+    st.addVariable(className, "this");
     body->buildTable(st);
     st.exitScope();
 
@@ -20,7 +20,7 @@ bool ClassNode::buildTable(SymbolTable &st) const {
 }
 
 std::string ClassNode::checkTypes(SymbolTable &st) const {
-    st.enterClassScope(id->value);
+    st.enterClassScope(className);
     auto type = body->checkTypes(st);
     st.exitScope();
     if (type.empty()) {
@@ -30,7 +30,7 @@ std::string ClassNode::checkTypes(SymbolTable &st) const {
 }
 
 Operand ClassNode::generateIR(CFG &graph, SymbolTable &st) {
-    st.enterClassScope(id->value);
+    st.enterClassScope(className);
     body->generateIR(graph, st);
     st.exitScope();
     return "";
