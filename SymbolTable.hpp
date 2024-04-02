@@ -15,6 +15,13 @@ class SymbolTable {
     SymbolTable();
 
     void enterScope(const std::string &name, Record *record = nullptr);
+    void enterClassScope(Class *scopeClass);
+    void enterClassScope(const std::string &scopeName,
+                         Record *record = nullptr);
+    void enterMethodScope(Method *scopeMethod);
+    void enterMethodScope(const std::string &scopeName,
+                          Record *record = nullptr);
+
     void exitScope();
 
     void addVariable(const std::string &type, const std::string &id);

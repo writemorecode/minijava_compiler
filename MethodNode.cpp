@@ -8,11 +8,11 @@ bool MethodNode::buildTable(SymbolTable &st) const {
         valid = false;
     }
     st.addMethod(type->value, id->value);
-    auto currentMethod = st.lookupMethod(id->value);
-    auto currentClass = dynamic_cast<Class *>(st.getCurrentRecord());
+    auto *currentMethod = st.lookupMethod(id->value);
+    auto *currentClass = dynamic_cast<Class *>(st.getCurrentRecord());
     currentClass->addMethod(currentMethod);
 
-    st.enterScope("Method: " + id->value, currentMethod);
+    st.enterMethodScope(currentMethod);
     bool validParams = params->buildTable(st);
     bool validBody = body->buildTable(st);
     st.exitScope();
@@ -21,7 +21,7 @@ bool MethodNode::buildTable(SymbolTable &st) const {
 }
 
 std::string MethodNode::checkTypes(SymbolTable &st) const {
-    st.enterScope("Method: " + id->value);
+    st.enterMethodScope(id->value);
     const auto signatureReturnType = type->checkTypes(st);
     const auto bodyReturnType = body->checkTypes(st);
     st.exitScope();
@@ -41,7 +41,7 @@ std::string MethodNode::checkTypes(SymbolTable &st) const {
 
 Operand MethodNode::generateIR(CFG &graph, SymbolTable &st) {
     auto *currentClass = dynamic_cast<Class *>(st.getCurrentRecord());
-    st.enterScope("Method: " + id->value);
+    st.enterMethodScope(id->value);
     const auto methodBlockName = currentClass->getID() + "." + id->value;
     graph.setCurrentBlock(graph.addMethodBlock(methodBlockName));
     body->generateIR(graph, st);

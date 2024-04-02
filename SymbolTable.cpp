@@ -11,6 +11,26 @@ void SymbolTable::enterScope(const std::string &name, Record *record) {
     current = current->nextChild(name, record);
 }
 
+void SymbolTable::enterClassScope(Class *scopeClass) {
+    auto name = "Class: " + scopeClass->getID();
+    current = current->nextChild(name, scopeClass);
+}
+void SymbolTable::enterClassScope(const std::string &scopeName,
+                                  Record *record) {
+    auto name = "Class: " + scopeName;
+    current = current->nextChild(name, record);
+}
+
+void SymbolTable::enterMethodScope(Method *scopeMethod) {
+    auto name = "Method: " + scopeMethod->getID();
+    current = current->nextChild(name, scopeMethod);
+}
+void SymbolTable::enterMethodScope(const std::string &scopeName,
+                                   Record *record) {
+    auto name = "Method: " + scopeName;
+    current = current->nextChild(name, record);
+}
+
 void SymbolTable::exitScope() { current = current->getParent(); }
 
 void SymbolTable::addVariable(const std::string &type, const std::string &id) {
@@ -73,7 +93,7 @@ const Method *SymbolTable::getMethodFromQualifiedName(const std::string &name) {
         std::cerr << "Could not find class " << className << " in scope ";
         std::cerr << getCurrentScopeName() << "\n";
     }
-    enterScope("Class: " + className, classLookup);
+    enterClassScope(classLookup);
     const auto *methodLookup = classLookup->lookupMethod(methodName);
     exitScope();
     if (methodLookup == nullptr) {

@@ -7,11 +7,11 @@ bool MethodWithoutParametersNode::buildTable(SymbolTable &st) const {
         return false;
     }
     st.addMethod(type->value, id->value);
-    auto currentMethod = st.lookupMethod(id->value);
-    auto currentClass = dynamic_cast<Class *>(st.getCurrentRecord());
+    auto *currentMethod = st.lookupMethod(id->value);
+    auto *currentClass = dynamic_cast<Class *>(st.getCurrentRecord());
     currentClass->addMethod(currentMethod);
 
-    st.enterScope("Method: " + id->value, currentMethod);
+    st.enterMethodScope(currentMethod);
     body->buildTable(st);
     st.exitScope();
 
@@ -19,12 +19,12 @@ bool MethodWithoutParametersNode::buildTable(SymbolTable &st) const {
 }
 
 std::string MethodWithoutParametersNode::checkTypes(SymbolTable &st) const {
-    st.enterScope("Method: " + id->value);
+    st.enterMethodScope(id->value);
     const auto signatureReturnType = type->checkTypes(st);
     const auto bodyReturnType = body->checkTypes(st);
     st.exitScope();
 
-    if (bodyReturnType == "") {
+    if (bodyReturnType.empty()) {
         return "";
     }
 
@@ -40,7 +40,7 @@ std::string MethodWithoutParametersNode::checkTypes(SymbolTable &st) const {
 
 Operand MethodWithoutParametersNode::generateIR(CFG &graph, SymbolTable &st) {
     auto *currentClass = dynamic_cast<Class *>(st.getCurrentRecord());
-    st.enterScope("Method: " + id->value);
+    st.enterMethodScope(id->value);
     const auto methodBlockName = currentClass->getID() + "." + id->value;
     graph.setCurrentBlock(graph.addMethodBlock(methodBlockName));
     body->generateIR(graph, st);

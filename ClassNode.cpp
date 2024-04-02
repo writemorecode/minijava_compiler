@@ -11,7 +11,7 @@ bool ClassNode::buildTable(SymbolTable &st) const {
 
     st.addClass(id->value);
     auto currentClass = st.lookupClass(id->value);
-    st.enterScope("Class: " + id->value, currentClass);
+    st.enterClassScope(currentClass);
     st.addVariable(id->value, "this");
     body->buildTable(st);
     st.exitScope();
@@ -20,7 +20,7 @@ bool ClassNode::buildTable(SymbolTable &st) const {
 }
 
 std::string ClassNode::checkTypes(SymbolTable &st) const {
-    st.enterScope("Class: " + id->value);
+    st.enterClassScope(id->value);
     auto type = body->checkTypes(st);
     st.exitScope();
     if (type.empty()) {
@@ -30,7 +30,7 @@ std::string ClassNode::checkTypes(SymbolTable &st) const {
 }
 
 Operand ClassNode::generateIR(CFG &graph, SymbolTable &st) {
-    st.enterScope("Class: " + id->value);
+    st.enterClassScope(id->value);
     body->generateIR(graph, st);
     st.exitScope();
     return "";
