@@ -1,5 +1,6 @@
 #include "BytecodeMethod.hpp"
 #include "BytecodeMethodBlock.hpp"
+#include <algorithm>
 #include <iostream>
 
 BytecodeMethodBlock &
