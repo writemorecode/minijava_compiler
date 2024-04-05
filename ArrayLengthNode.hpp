@@ -1,15 +1,14 @@
 #ifndef ARRAYLENGTHNODE_HPP
 #define ARRAYLENGTHNODE_HPP
 
-#include "ExpressionNode.hpp"
 #include "Node.h"
 
-class ArrayLengthNode : public UnaryExpressionNode {
+class ArrayLengthNode : public Node {
     Node *array;
 
   public:
     ArrayLengthNode(Node *array, int l)
-        : UnaryExpressionNode("Array length", array, l), array{array} {};
+        : Node("Array length", l), array{array} {};
     std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };

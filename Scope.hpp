@@ -19,13 +19,17 @@ class Scope {
     std::unordered_map<std::string, Method> methods;
     std::unordered_map<std::string, Class> classes;
 
+    std::string scopeName = "Program";
     Record *record = nullptr;
     Scope *parent = nullptr;
-    std::string scopeName;
 
   public:
-    Scope(Record *record = nullptr, Scope *parent = nullptr,
-          const std::string &name = "Program");
+    Scope() = default;
+    Scope(const std::string &name) : scopeName(name){};
+    Scope(const std::string &name, Record *record_)
+        : scopeName(name), record(record_){};
+    Scope(const std::string &name, Record *record_, Scope *parent_)
+        : scopeName(name), record(record_), parent(parent_){};
 
     Scope *nextChild(const std::string &name, Record *record);
     Scope *getParent();

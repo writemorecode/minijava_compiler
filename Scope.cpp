@@ -6,9 +6,6 @@
 #include "Method.hpp"
 #include "Variable.hpp"
 
-Scope::Scope(Record *record, Scope *parent, const std::string &name)
-    : record{record}, parent{parent}, scopeName{name} {};
-
 Scope *Scope::getParent() { return parent; }
 
 Scope *Scope::nextChild(const std::string &name, Record *record) {
