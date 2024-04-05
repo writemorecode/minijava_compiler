@@ -41,3 +41,6 @@ parser.tab.cc
 .ninja_log
 *.png
 *.svg
+vm
+prog.bc
+bytecode.txt
