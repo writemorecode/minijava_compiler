@@ -3,7 +3,6 @@
 
 #include "BytecodeMethodBlock.hpp"
 #include <iostream>
-#include <stdexcept>
 #include <string>
 #include <variant>
 
@@ -19,7 +18,8 @@ class Tac {
   public:
     virtual void print(std::ostream &os) const;
 
-    virtual void generateBytecode(BytecodeMethodBlock &block) = 0;
+    // TODO: Make pure virtual?
+    virtual void generateBytecode(BytecodeMethodBlock &block){};
 
     Tac(const std::string &result_) : result{result_} {}
     Tac(const std::string &result_, const Operand &lhs_, const std::string &op_,
@@ -96,7 +96,6 @@ class NewTac : public Tac {
   public:
     NewTac(const std::string &result, const Operand &y_) : Tac(result, y_){};
     void print(std::ostream &os) const override;
-    void generateBytecode(BytecodeMethodBlock &block) override{};
 };
 
 class NewArrayTac : public Tac {
