@@ -18,7 +18,7 @@ bool MainClassNode::buildTable(SymbolTable &st) const {
     Method *mainClassMethod = st.lookupMethod("main");
     mainClass->addMethod(mainClassMethod);
 
-    st.enterMethodScope("main");
+    st.enterMethodScope(mainClassMethod);
     st.addVariable("String[]", mainMethodArgumentName);
     st.exitScope();
     st.exitScope();
