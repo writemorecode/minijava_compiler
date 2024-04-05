@@ -47,7 +47,7 @@ class BBlock {
     [[nodiscard]] bool isGenerated() const { return generated; }
     void markGenerated() { generated = true; };
 
-    void generateBytecode(BytecodeMethod &method, SymbolTable &st);
+    void generateBytecode(BytecodeMethod &method);
 };
 
 #endif

@@ -29,7 +29,7 @@ void BBlock::printBlockGraphviz(std::ostream &os) {
 
 void BBlock::addInstruction(Tac *ptr) { instructions.emplace_back(ptr); }
 
-void BBlock::generateBytecode(BytecodeMethod &method, SymbolTable &st) {
+void BBlock::generateBytecode(BytecodeMethod &method) {
     markGenerated();
 
     auto &methodBlock = method.getBytecodeMethodBlock(name);
@@ -40,14 +40,14 @@ void BBlock::generateBytecode(BytecodeMethod &method, SymbolTable &st) {
 
     if (hasTrueBlock() && !hasFalseBlock()) {
         if (!trueExit->isGenerated()) {
-            trueExit->generateBytecode(method, st);
+            trueExit->generateBytecode(method);
         }
     } else if (hasTrueBlock() && hasFalseBlock()) {
         if (!trueExit->isGenerated()) {
-            trueExit->generateBytecode(method, st);
+            trueExit->generateBytecode(method);
         }
         if (!falseExit->isGenerated()) {
-            falseExit->generateBytecode(method, st);
+            falseExit->generateBytecode(method);
         }
     }
 }
