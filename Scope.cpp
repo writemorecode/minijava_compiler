@@ -1,6 +1,6 @@
-#include "Scope.hpp"
-
 #include <iostream>
+
+#include "Scope.hpp"
 
 #include "Class.hpp"
 #include "Method.hpp"
@@ -12,15 +12,14 @@ Scope::Scope(Record *record, Scope *parent, const std::string &name)
 Scope *Scope::getParent() { return parent; }
 
 Scope *Scope::nextChild(const std::string &name, Record *record) {
-    Scope *nextChild = nullptr;
-    if (next == children.size()) {
-        children.push_back(std::make_unique<Scope>(record, this, name));
-        nextChild = children.back().get();
-    } else {
-        nextChild = children[next].get();
+    if (const auto &it = children.find(name); it != children.end()) {
+        return it->second.get();
     }
-    next++;
-    return nextChild;
+    const auto &result =
+        children.insert({name, std::make_unique<Scope>(record, this, name)});
+    const auto &it = result.first;
+    const auto &uptr = it->second;
+    return uptr.get();
 }
 
 void Scope::addVariable(const std::string &type, const std::string &id) {
@@ -72,13 +71,6 @@ Variable *Scope::lookupVariableInScope(const std::string &key) {
     return nullptr;
 }
 
-void Scope::resetScope() {
-    next = 0;
-    for (auto &child : children) {
-        child->resetScope();
-    }
-}
-
 std::string Scope::getName() const { return scopeName; }
 
 Record *Scope::getRecord() const { return record; }
@@ -101,7 +93,7 @@ void Scope::printScope(int &count, std::ostream &os) const {
         os << "\\n";
     }
     os << "\"];\n";
-    for (const auto &child : children) {
+    for (const auto &[_, child] : children) {
         int n = ++count;
         child->printScope(count, os);
         os << "n" << id << " -> n" << n << "\n";

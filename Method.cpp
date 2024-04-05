@@ -1,5 +1,4 @@
 #include "Method.hpp"
-#include <iostream>
 
 void Method::addVariable(Variable *variable) {
     const auto id = variable->getID();

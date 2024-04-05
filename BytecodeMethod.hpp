@@ -7,10 +7,14 @@
 
 class BytecodeMethod {
     std::vector<BytecodeMethodBlock> blocks;
+
     std::string name;
+    std::vector<std::string> variables;
 
   public:
-    BytecodeMethod(const std::string &name_) : name(name_){};
+    BytecodeMethod(const std::string &name_,
+                   std::vector<std::string> variables_)
+        : name(name_), variables(std::move(variables_)){};
 
     [[nodiscard]] BytecodeMethodBlock &
     addBytecodeMethodBlock(const std::string &name);
@@ -21,6 +25,8 @@ class BytecodeMethod {
     BytecodeMethodBlock &getFirstBlock();
 
     void print(std::ostream &os) const;
+
+    [[nodiscard]] const auto &getVariables() const { return variables; }
 };
 
 #endif // BYTECODEMETHOD_HPP

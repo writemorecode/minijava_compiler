@@ -28,6 +28,8 @@ tree:
 	dot -Tpdf tree.dot -o tree.pdf
 st: 
 	dot -Tpdf st.dot -o st.pdf
+cfg: 
+	dot -Tpdf cfg.dot -o cfg.pdf
 
 clean:
 		rm -f parser.tab.* lex.yy.c* compiler stack.hh position.hh location.hh *.dot *.pdf *.o 

@@ -82,7 +82,6 @@ int main(int argc, char **argv) {
         std::cout << "Symbol table construction failed.\n";
     }
 
-    st.resetTable();
     auto rootType = root->checkTypes(st);
     bool typeCheckSuccess = !rootType.empty();
     if (!typeCheckSuccess) {
@@ -96,7 +95,7 @@ int main(int argc, char **argv) {
     generateGraphviz(root);
 
     CFG graph;
-    st.resetTable();
+
     std::fstream controlFlowGraph("cfg.dot", std::ios::out);
     root->generateIR(graph, st);
     graph.printGraphviz(controlFlowGraph);
@@ -105,14 +104,12 @@ int main(int argc, char **argv) {
     st.printTable(stGraph);
 
     BytecodeProgram program;
-    st.resetTable();
     graph.generateBytecode(program, st);
     std::fstream prettyBytecode("bytecode.txt", std::ios::out);
     program.print(prettyBytecode);
 
     std::ofstream bytecodeProgram("prog.bc", std::ios::binary);
-    st.resetTable();
-    program.serialize(st, bytecodeProgram);
+    program.serialize(bytecodeProgram);
 
     return errCodes::SUCCESS;
 }

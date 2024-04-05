@@ -23,7 +23,7 @@ class Method : public Record {
     size_t getParameterCount() const;
 
     const std::vector<Variable *> &getParameters() const;
-    std::vector<std::string> getParameterNames() const;
+    [[nodiscard]] std::vector<std::string> getParameterNames() const;
 };
 
 #endif

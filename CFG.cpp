@@ -1,9 +1,8 @@
-#include "CFG.hpp"
 #include <algorithm>
-#include <cstddef>
-#include <cstdlib>
 #include <iostream>
 #include <string>
+
+#include "CFG.hpp"
 
 std::string CFG::getTemporaryName() {
     auto name = "_t" + std::to_string(temporaryIndex);
@@ -46,19 +45,23 @@ BBlock *CFG::addMethodRootBlock(const std::string &className,
 
 void CFG::generateBytecode(BytecodeProgram &program, SymbolTable &st) {
     for (auto *basicBlock : methodBlocks) {
-        const auto &name = basicBlock->getName();
-        const auto *methodEntry = st.getMethodFromQualifiedName(name);
-        const auto params = methodEntry->getParameterNames();
+        const auto &blockName = basicBlock->getName();
+        const auto *methodScope = st.resolveScope(blockName);
+        const auto *method = dynamic_cast<Method *>(methodScope->getRecord());
 
-        auto &method = program.addBytecodeMethod(name);
-        auto &bytecodeBlock = method.addBytecodeMethodBlock(name);
-        std::for_each(params.rbegin(), params.rend(),
+        const auto methodParameters = method->getParameterNames();
+        auto &bytecodeMethod = program.addBytecodeMethod(
+            blockName, methodScope->getVariableNames());
+        auto &bytecodeBlock = bytecodeMethod.addBytecodeMethodBlock(blockName);
+
+        std::for_each(methodParameters.rbegin(), methodParameters.rend(),
                       [&bytecodeBlock](const auto &param) {
                           bytecodeBlock.store(param);
                       });
-        basicBlock->generateBytecode(method, st);
+
+        basicBlock->generateBytecode(bytecodeMethod);
     }
-    const auto &mainName = methodBlocks.front()->getName();
+    const auto mainName = methodBlocks.front()->getName();
     auto &mainMethod = program.getBytecodeMethod(mainName);
     auto &mainBlock = mainMethod.getBytecodeMethodBlock(mainName);
     mainBlock.stop();

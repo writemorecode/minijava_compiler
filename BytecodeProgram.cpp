@@ -5,8 +5,11 @@
 #include <iostream>
 #include <string>
 
-BytecodeMethod &BytecodeProgram::addBytecodeMethod(const std::string &name) {
-    const auto &it = methods.emplace(name, name);
+BytecodeMethod &
+BytecodeProgram::addBytecodeMethod(const std::string &name,
+                                   std::vector<std::string> variables) {
+    auto it =
+        methods.insert({name, BytecodeMethod{name, std::move(variables)}});
     return it.first->second;
 }
 
@@ -25,7 +28,7 @@ void BytecodeProgram::print(std::ostream &os) const {
     }
 }
 
-void BytecodeProgram::serialize(SymbolTable &st, std::ofstream &os) const {
+void BytecodeProgram::serialize(std::ofstream &os) const {
     auto writeIntegerToStream = [&os](size_t value) {
         os.write(reinterpret_cast<const char *>(&value), sizeof(value));
     };
@@ -42,13 +45,9 @@ void BytecodeProgram::serialize(SymbolTable &st, std::ofstream &os) const {
 
     writeIntegerToStream(methods.size());
 
-    for (const auto &method : methods) {
-        const auto &name = method.first;
+    for (const auto &[name, method] : methods) {
         writeStringToStream(name);
-
-        const auto *methodScope = st.getScopeFromQualifiedName(name);
-        const auto methodVariables = methodScope->dump();
-
+        const auto methodVariables = method.getVariables();
         writeStringVectorToStream(methodVariables);
     }
 }

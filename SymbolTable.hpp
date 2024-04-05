@@ -44,10 +44,8 @@ class SymbolTable {
     Scope *getCurrentScope() const;
 
     void printTable(std::ostream &os) const;
-    void resetTable();
 
-    const Method *getMethodFromQualifiedName(const std::string &name);
-    const Scope *getScopeFromQualifiedName(const std::string &name);
+    const Scope *resolveScope(const std::string &name);
 };
 
 #endif
