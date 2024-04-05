@@ -1,4 +1,8 @@
+#include <filesystem>
 #include <iostream>
+#include <string>
+
+namespace fs = std::filesystem;
 
 #include "BytecodeProgram.hpp"
 #include "CFG.hpp"
@@ -34,11 +38,7 @@ void yy::parser::error(std::string const &err) {
     }
 }
 
-void generateGraphviz(Node *root) {
-    std::ofstream outStream;
-    std::string filename{"tree.dot"};
-    outStream.open(filename);
-
+void generateGraphviz(Node *root, std::ofstream &outStream) {
     int count = 0;
     outStream << "digraph {" << '\n';
     root->printGraphviz(count, outStream);
@@ -52,6 +52,19 @@ void printTree(const Node *root) {
 }
 
 int main(int argc, char **argv) {
+    const std::string outputDirectoryName = "output";
+
+    if (!fs::exists(outputDirectoryName)) {
+        if (!fs::create_directory(outputDirectoryName)) {
+            std::cerr << "Failed to create directory '" << outputDirectoryName
+                      << "'.\n";
+            return 1;
+        }
+    }
+
+    const auto &currentDirectory = std::filesystem::current_path();
+    const auto &outputDirectory = currentDirectory / outputDirectoryName;
+
     // Reads from file if a file name is passed as an argument. Otherwise, reads
     // from stdin.
     if (argc > 1) {
@@ -93,24 +106,32 @@ int main(int argc, char **argv) {
         return errCode;
     }
 
-    generateGraphviz(root);
+    std::ofstream outStream(outputDirectory / "tree.dot");
+    generateGraphviz(root, outStream);
 
     CFG graph;
     st.resetTable();
-    std::fstream controlFlowGraph("cfg.dot", std::ios::out);
+    std::ofstream controlFlowGraph(outputDirectory / "cfg.dot");
+
+    if (!controlFlowGraph.is_open()) {
+        std::cerr << "Failed to open file cfg.dot.\n";
+        return 1;
+    }
+
     root->generateIR(graph, st);
     graph.printGraphviz(controlFlowGraph);
 
-    std::fstream stGraph("st.dot", std::ios::out);
+    std::ofstream stGraph(outputDirectory / "st.dot");
     st.printTable(stGraph);
 
     BytecodeProgram program;
     st.resetTable();
     graph.generateBytecode(program, st);
-    std::fstream prettyBytecode("bytecode.txt", std::ios::out);
+
+    std::ofstream prettyBytecode(outputDirectory / "bytecode.txt");
     program.print(prettyBytecode);
 
-    std::ofstream bytecodeProgram("prog.bc", std::ios::binary);
+    std::ofstream bytecodeProgram(outputDirectory / "prog.bc");
     program.serialize(bytecodeProgram);
 
     return errCodes::SUCCESS;
