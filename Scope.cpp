@@ -107,3 +107,12 @@ void Scope::printScope(int &count, std::ostream &os) const {
         os << "n" << id << " -> n" << n << "\n";
     }
 }
+
+std::vector<std::string> Scope::getVariableNames() const {
+    std::vector<std::string> variableNames;
+    variableNames.reserve(variables.size());
+    for (const auto &variable : variables) {
+        variableNames.push_back(variable.first);
+    }
+    return variableNames;
+}

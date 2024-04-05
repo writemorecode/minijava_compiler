@@ -111,7 +111,8 @@ int main(int argc, char **argv) {
     program.print(prettyBytecode);
 
     std::ofstream bytecodeProgram("prog.bc", std::ios::binary);
-    program.serialize(bytecodeProgram);
+    st.resetTable();
+    program.serialize(st, bytecodeProgram);
 
     return errCodes::SUCCESS;
 }

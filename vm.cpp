@@ -40,5 +40,11 @@ int main(int argc, char **argv) {
     for (size_t i = 0; i < methodCount; i++) {
         auto methodName = readStringFromStream(programFile);
         std::cout << std::quoted(methodName) << "\n";
+
+        size_t variableCount = readIntegerFromStream(programFile);
+        for (size_t i = 0; i < variableCount; i++) {
+            auto variableName = readStringFromStream(programFile);
+            std::cout << "\t" << std::quoted(variableName) << "\n";
+        }
     }
 }

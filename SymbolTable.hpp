@@ -47,6 +47,7 @@ class SymbolTable {
     void resetTable();
 
     const Method *getMethodFromQualifiedName(const std::string &name);
+    const Scope *getScopeFromQualifiedName(const std::string &name);
 };
 
 #endif

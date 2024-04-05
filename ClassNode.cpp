@@ -30,7 +30,8 @@ std::string ClassNode::checkTypes(SymbolTable &st) const {
 }
 
 Operand ClassNode::generateIR(CFG &graph, SymbolTable &st) {
-    st.enterClassScope(className);
+    auto *currentClass = st.lookupClass(className);
+    st.enterClassScope(currentClass);
     body->generateIR(graph, st);
     st.exitScope();
     return "";

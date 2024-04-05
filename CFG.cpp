@@ -1,4 +1,7 @@
 #include "CFG.hpp"
+#include <algorithm>
+#include <cstddef>
+#include <cstdlib>
 #include <iostream>
 #include <string>
 
@@ -44,22 +47,15 @@ BBlock *CFG::addMethodRootBlock(const std::string &className,
 void CFG::generateBytecode(BytecodeProgram &program, SymbolTable &st) {
     for (auto *basicBlock : methodBlocks) {
         const auto &name = basicBlock->getName();
-        auto &method = program.addBytecodeMethod(name);
+        const auto *methodEntry = st.getMethodFromQualifiedName(name);
+        const auto params = methodEntry->getParameterNames();
 
-        if (!name.ends_with(".main")) {
-            const auto *methodEntry = st.getMethodFromQualifiedName(name);
-            if (methodEntry == nullptr) {
-                std::cerr << "Qualified name '" << name
-                          << "' not found in ST!\n";
-                return;
-            }
-            const auto &params = methodEntry->getParameters();
-            auto &bytecodeBlock = method.addBytecodeMethodBlock(name);
-            for (auto it = params.rbegin(); it != params.rend(); ++it) {
-                const auto &paramID = (*it)->getID();
-                bytecodeBlock.store(paramID);
-            }
-        }
+        auto &method = program.addBytecodeMethod(name);
+        auto &bytecodeBlock = method.addBytecodeMethodBlock(name);
+        std::for_each(params.rbegin(), params.rend(),
+                      [&bytecodeBlock](const auto &param) {
+                          bytecodeBlock.store(param);
+                      });
         basicBlock->generateBytecode(method, st);
     }
     const auto &mainName = methodBlocks.front()->getName();

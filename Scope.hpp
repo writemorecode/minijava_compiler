@@ -45,6 +45,8 @@ class Scope {
 
     std::string getName() const;
     Record *getRecord() const;
+
+    std::vector<std::string> getVariableNames() const;
 };
 
 #endif

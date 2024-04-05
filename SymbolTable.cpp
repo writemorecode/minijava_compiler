@@ -1,6 +1,7 @@
 #include "SymbolTable.hpp"
 
 #include <iostream>
+#include <stdexcept>
 
 #include "Scope.hpp"
 
@@ -13,22 +14,22 @@ void SymbolTable::enterScope(const std::string &name, Record *record) {
 
 void SymbolTable::enterClassScope(Class *scopeClass) {
     auto name = "Class: " + scopeClass->getID();
-    current = current->nextChild(name, scopeClass);
+    enterScope(name, scopeClass);
 }
 void SymbolTable::enterClassScope(const std::string &scopeName,
                                   Record *record) {
     auto name = "Class: " + scopeName;
-    current = current->nextChild(name, record);
+    enterScope(name, record);
 }
 
 void SymbolTable::enterMethodScope(Method *scopeMethod) {
     auto name = "Method: " + scopeMethod->getID();
-    current = current->nextChild(name, scopeMethod);
+    enterScope(name, scopeMethod);
 }
 void SymbolTable::enterMethodScope(const std::string &scopeName,
                                    Record *record) {
     auto name = "Method: " + scopeName;
-    current = current->nextChild(name, record);
+    enterScope(name, record);
 }
 
 void SymbolTable::exitScope() { current = current->getParent(); }
@@ -92,13 +93,41 @@ const Method *SymbolTable::getMethodFromQualifiedName(const std::string &name) {
     if (classLookup == nullptr) {
         std::cerr << "Could not find class " << className << " in scope ";
         std::cerr << getCurrentScopeName() << "\n";
+        return nullptr;
     }
     enterClassScope(classLookup);
-    const auto *methodLookup = classLookup->lookupMethod(methodName);
+    auto *methodLookup = classLookup->lookupMethod(methodName);
     exitScope();
-    if (methodLookup == nullptr) {
-        std::cerr << "Could not find method " << methodName << " in class "
-                  << className << "\n";
-    }
     return methodLookup;
+}
+
+const Scope *SymbolTable::getScopeFromQualifiedName(const std::string &name) {
+    auto splitStringOnPeriod = [](const std::string &str) {
+        const auto index = str.find('.');
+        const auto &first = str.substr(0, index);
+        const auto &second = str.substr(index + 1);
+        return std::make_pair(first, second);
+    };
+    const auto &[className, methodName] = splitStringOnPeriod(name);
+
+    auto *classLookup = lookupClass(className);
+    if (classLookup == nullptr) {
+        std::cerr << "Could not find class " << className << " in scope ";
+        std::cerr << getCurrentScopeName() << "\n";
+        return nullptr;
+    }
+
+    enterClassScope(classLookup);
+    auto *methodLookup = classLookup->lookupMethod(methodName);
+    if (methodLookup == nullptr) {
+        std::cerr << "Could not find method " << methodName
+                  << " in class scope ";
+        std::cerr << getCurrentScopeName() << "\n";
+        return nullptr;
+    }
+    enterMethodScope(methodLookup);
+    Scope *scope = getCurrentScope();
+    exitScope();
+    exitScope();
+    return scope;
 }
