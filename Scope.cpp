@@ -6,15 +6,12 @@
 #include "Method.hpp"
 #include "Variable.hpp"
 
-Scope::Scope(Record *record, Scope *parent, const std::string &name)
-    : record{record}, parent{parent}, scopeName{name} {};
-
 Scope *Scope::getParent() { return parent; }
 
 Scope *Scope::nextChild(const std::string &name, Record *record) {
     Scope *nextChild = nullptr;
     if (next == children.size()) {
-        children.push_back(std::make_unique<Scope>(record, this, name));
+        children.push_back(std::make_unique<Scope>(name, record, this));
         nextChild = children.back().get();
     } else {
         nextChild = children[next].get();
