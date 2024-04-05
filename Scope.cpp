@@ -13,7 +13,7 @@ Scope *Scope::nextChild(const std::string &name, Record *record) {
         return it->second.get();
     }
     const auto &result =
-        children.insert({name, std::make_unique<Scope>(record, this, name)});
+        children.insert({name, std::make_unique<Scope>(name, record, this)});
     const auto &it = result.first;
     const auto &uptr = it->second;
     return uptr.get();

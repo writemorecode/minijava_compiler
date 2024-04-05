@@ -109,7 +109,6 @@ int main(int argc, char **argv) {
     generateGraphviz(root, outStream);
 
     CFG graph;
-    st.resetTable();
     std::ofstream controlFlowGraph(outputDirectory / "cfg.dot");
 
     if (!controlFlowGraph.is_open()) {
