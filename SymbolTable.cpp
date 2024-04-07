@@ -78,7 +78,7 @@ Variable *SymbolTable::lookupVariableInScope(const std::string &key) {
 
 Record *SymbolTable::getCurrentRecord() const { return current->getRecord(); }
 
-const Scope *SymbolTable::resolveScope(const std::string &name) {
+Scope *SymbolTable::resolveScope(const std::string &name) {
     auto splitStringOnPeriod = [](const std::string &str) {
         const auto index = str.find('.');
         const auto &first = str.substr(0, index);

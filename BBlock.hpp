@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "BytecodeMethod.hpp"
-#include "SymbolTable.hpp"
 #include "Tac.hpp"
 
 class BBlock {

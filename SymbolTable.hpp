@@ -31,21 +31,21 @@ class SymbolTable {
     void addIntegerVariable(const std::string &id);
     void addBooleanVariable(const std::string &id);
 
-    Variable *lookupVariable(const std::string &id);
-    Method *lookupMethod(const std::string &id);
-    Class *lookupClass(const std::string &id);
+    [[nodiscard]] Variable *lookupVariable(const std::string &id);
+    [[nodiscard]] Method *lookupMethod(const std::string &id);
+    [[nodiscard]] Class *lookupClass(const std::string &id);
 
-    Variable *lookupVariableInScope(const std::string &key);
+    [[nodiscard]] Variable *lookupVariableInScope(const std::string &key);
 
-    Record *getCurrentRecord() const;
+    [[nodiscard]] Record *getCurrentRecord() const;
 
     std::string getCurrentScopeName() const;
-    Scope *getParentScope() const;
-    Scope *getCurrentScope() const;
+    [[nodiscard]] Scope *getParentScope() const;
+    [[nodiscard]] Scope *getCurrentScope() const;
 
     void printTable(std::ostream &os) const;
 
-    const Scope *resolveScope(const std::string &name);
+    [[nodiscard]] Scope *resolveScope(const std::string &name);
 };
 
 #endif
