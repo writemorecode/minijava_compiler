@@ -18,8 +18,8 @@ class Tac {
   public:
     virtual void print(std::ostream &os) const;
 
-    // TODO: Make pure virtual?
-    virtual void generateBytecode(BytecodeMethodBlock &block){};
+    virtual void
+    generateBytecode([[maybe_unused]] BytecodeMethodBlock &block){};
 
     Tac(const std::string &result_) : result{result_} {}
     Tac(const std::string &result_, const Operand &lhs_, const std::string &op_,
@@ -54,28 +54,6 @@ class Tac {
     virtual ~Tac() = default;
 };
 
-class UnaryExpressionTac : public Tac {
-  public:
-    UnaryExpressionTac(const std::string &result_, const std::string &op_,
-                       const Operand &z_)
-        : Tac(result_, "", op_, z_){};
-    void print(std::ostream &os) const override;
-};
-
-class NotTac : public UnaryExpressionTac {
-  public:
-    NotTac(const std::string &result_, const Operand &z_)
-        : UnaryExpressionTac(result_, "!", z_){};
-    void generateBytecode(BytecodeMethodBlock &block) override;
-};
-
-class CopyTac : public Tac {
-  public:
-    CopyTac(const Operand &y_, const std::string &result_) : Tac(result_, y_){};
-    void print(std::ostream &os) const override;
-    void generateBytecode(BytecodeMethodBlock &block) override;
-};
-
 class ArrayCopyTac : public Tac {
   public:
     ArrayCopyTac(const std::string &result_, const Operand &index_,
@@ -83,7 +61,6 @@ class ArrayCopyTac : public Tac {
         : Tac(result_, index_, ":=", z_){};
     void print(std::ostream &os) const override;
 };
-
 class ArrayAccessTac : public Tac {
   public:
     ArrayAccessTac(const std::string &result_, const Operand &y_,
@@ -91,7 +68,12 @@ class ArrayAccessTac : public Tac {
         : Tac(result_, y_, "", z_){};
     void print(std::ostream &os) const override;
 };
-
+class ArrayLengthTac : public Tac {
+  public:
+    ArrayLengthTac(const std::string &result, const Operand &y_)
+        : Tac(result, y_){};
+    void print(std::ostream &os) const override;
+};
 class NewTac : public Tac {
   public:
     NewTac(const std::string &result, const Operand &y_) : Tac(result, y_){};
@@ -103,6 +85,20 @@ class NewArrayTac : public Tac {
     NewArrayTac(const std::string &result, const Operand &length_)
         : Tac(result, length_){};
     void print(std::ostream &os) const override;
+};
+
+class NotTac : public Tac {
+  public:
+    NotTac(const std::string &result_, const Operand &z_) : Tac(result_, z_){};
+    void generateBytecode(BytecodeMethodBlock &block) override;
+    void print(std::ostream &os) const override;
+};
+
+class CopyTac : public Tac {
+  public:
+    CopyTac(const Operand &y_, const std::string &result_) : Tac(result_, y_){};
+    void print(std::ostream &os) const override;
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class CondJumpTac : public Tac {

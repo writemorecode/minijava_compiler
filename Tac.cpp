@@ -6,8 +6,8 @@ void Tac::print(std::ostream &os) const {
     os << result << " := " << lhs << " " << op << " " << rhs << "\n";
 }
 
-void UnaryExpressionTac::print(std::ostream &os) const {
-    os << result << " := " << op << " " << rhs << "\n";
+void NotTac::print(std::ostream &os) const {
+    os << result << " := ! " << rhs << "\n";
 }
 
 void CopyTac::print(std::ostream &os) const {
@@ -25,6 +25,10 @@ void ArrayCopyTac::print(std::ostream &os) const {
 
 void ArrayAccessTac::print(std::ostream &os) const {
     os << result << " := " << lhs << "[" << rhs << "]\n";
+}
+
+void ArrayLengthTac::print(std::ostream &os) const {
+    os << result << " := length " << rhs << "\n";
 }
 
 void NewTac::print(std::ostream &os) const {
