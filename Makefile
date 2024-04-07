@@ -25,11 +25,11 @@ lex.yy.o: lex.yy.c
 		$(CXX) $(CXXFLAGS) $^ -c -o $@
 
 tree: 
-	dot -Tpdf tree.dot -o tree.pdf
+	dot -Tpdf output/tree.dot -o tree.pdf
 st: 
-	dot -Tpdf st.dot -o st.pdf
+	dot -Tpdf output/st.dot -o st.pdf
 cfg: 
-	dot -Tpdf cfg.dot -o cfg.pdf
+	dot -Tpdf output/cfg.dot -o cfg.pdf
 
 clean:
 		rm -f parser.tab.* lex.yy.c* compiler stack.hh position.hh location.hh *.dot *.pdf *.o 
