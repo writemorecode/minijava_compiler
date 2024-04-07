@@ -33,6 +33,9 @@ class Node {
 
     void print(int depth) const;
     void printGraphviz(int &count, std::ostream &outStream);
+
+    Node(const Node &other) = delete;
+    const Node &operator=(const Node &other) = delete;
 };
 
 #endif
