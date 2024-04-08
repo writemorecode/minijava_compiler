@@ -1,5 +1,6 @@
 #include "BytecodeProgram.hpp"
-#include "SymbolTable.hpp"
+
+#include "serialize.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -29,25 +30,10 @@ void BytecodeProgram::print(std::ostream &os) const {
 }
 
 void BytecodeProgram::serialize(std::ofstream &os) const {
-    auto writeIntegerToStream = [&os](size_t value) {
-        os.write(reinterpret_cast<const char *>(&value), sizeof(value));
-    };
-    auto writeStringToStream = [&](const std::string &str) {
-        writeIntegerToStream(str.size());
-        os << str;
-    };
-    auto writeStringVectorToStream = [&](const std::vector<std::string> &vec) {
-        writeIntegerToStream(vec.size());
-        for (const auto &str : vec) {
-            writeStringToStream(str);
-        }
-    };
-
-    writeIntegerToStream(methods.size());
+    writeInteger(os, methods.size());
 
     for (const auto &[name, method] : methods) {
-        writeStringToStream(name);
-        const auto methodVariables = method.getVariables();
-        writeStringVectorToStream(methodVariables);
+        writeString(os, name);
+        writeStringVector(os, method.getVariables());
     }
 }

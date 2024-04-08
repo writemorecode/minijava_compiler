@@ -5,18 +5,7 @@
 #include <iostream>
 #include <string>
 
-std::streamsize readIntegerFromStream(std::ifstream &stream) {
-    std::streamsize value = 0;
-    stream.read(reinterpret_cast<char *>(&value), sizeof(value));
-    return value;
-}
-
-std::string readStringFromStream(std::ifstream &stream) {
-    auto length = readIntegerFromStream(stream);
-    std::string string(length, '\0');
-    stream.read(string.data(), length);
-    return string;
-}
+#include "serialize.hpp"
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -31,20 +20,19 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    size_t methodCount = readIntegerFromStream(programFile);
+    size_t methodCount = readInteger(programFile);
     if (methodCount == 0) {
         std::cerr << "Error: Program has no methods.";
         return EXIT_FAILURE;
     }
 
     for (size_t i = 0; i < methodCount; i++) {
-        auto methodName = readStringFromStream(programFile);
+        auto methodName = readString(programFile);
         std::cout << std::quoted(methodName) << "\n";
 
-        size_t variableCount = readIntegerFromStream(programFile);
-        for (size_t i = 0; i < variableCount; i++) {
-            auto variableName = readStringFromStream(programFile);
-            std::cout << "\t" << std::quoted(variableName) << "\n";
+        const auto variables = readStringVector(programFile);
+        for (const auto &var : variables) {
+            std::cout << "\t" << std::quoted(var) << "\n";
         }
     }
 }
