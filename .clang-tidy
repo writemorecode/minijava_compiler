@@ -1,2 +1,2 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*,-modernize-use-trailing-return-type,-cppcoreguidelines-owning-memory,-readability-identifier-length,-modernize-pass-by-value'
+Checks:          'hicpp-*,bugprone-*,google-*,misc-*,clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*,-modernize-use-trailing-return-type,-cppcoreguidelines-owning-memory,-readability-identifier-length,-modernize-pass-by-value'
