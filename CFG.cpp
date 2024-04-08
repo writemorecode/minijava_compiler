@@ -45,11 +45,14 @@ BBlock *CFG::addMethodRootBlock(const std::string &className,
 
 void CFG::generateBytecode(BytecodeProgram &program, SymbolTable &st) {
     for (auto *basicBlock : methodBlocks) {
-        const auto &blockName = basicBlock->getName();
-        const auto *methodScope = st.resolveScope(blockName);
+        const auto &className = basicBlock->getClassName();
+        const auto &methodName = basicBlock->getMethodName();
+
+        const auto *methodScope = st.resolveScope(className, methodName);
         const auto *method = dynamic_cast<Method *>(methodScope->getRecord());
 
         const auto methodParameters = method->getParameterNames();
+        const auto &blockName = basicBlock->getName();
         auto &bytecodeMethod = program.addBytecodeMethod(
             blockName, methodScope->getVariableNames());
         auto &bytecodeBlock = bytecodeMethod.addBytecodeMethodBlock(blockName);

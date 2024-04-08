@@ -45,7 +45,8 @@ class SymbolTable {
 
     void printTable(std::ostream &os) const;
 
-    [[nodiscard]] Scope *resolveScope(const std::string &name);
+    [[nodiscard]] Scope *resolveScope(const std::string &className,
+                                      const std::string &methodName);
 };
 
 #endif
