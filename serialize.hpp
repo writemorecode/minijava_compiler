@@ -5,6 +5,31 @@
 #include <string>
 #include <vector>
 
+class Serializer {
+  private:
+    std::ofstream os;
+
+  public:
+    explicit Serializer(std::ofstream &stream) : os(std::move(stream)) {}
+
+    void writeInteger(size_t value);
+    void writeString(const std::string &str);
+    void writeStringVector(const std::vector<std::string> &vec);
+};
+
+class Deserializer {
+  private:
+    std::ifstream is;
+
+  public:
+    explicit Deserializer(std::ifstream &stream) : is(std::move(stream)) {}
+
+    std::streamsize readInteger();
+    std::string readString();
+    std::vector<std::string> readStringVector();
+};
+
+/*
 void writeInteger(std::ofstream &os, size_t value) {
     os.write(reinterpret_cast<const char *>(&value), sizeof(value));
 }
@@ -43,5 +68,7 @@ std::vector<std::string> readStringVector(std::ifstream &is) {
     }
     return vec;
 }
+
+*/
 
 #endif

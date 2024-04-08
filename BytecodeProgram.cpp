@@ -30,10 +30,11 @@ void BytecodeProgram::print(std::ostream &os) const {
 }
 
 void BytecodeProgram::serialize(std::ofstream &os) const {
-    writeInteger(os, methods.size());
+    Serializer serializer(os);
+    serializer.writeInteger(methods.size());
 
     for (const auto &[name, method] : methods) {
-        writeString(os, name);
-        writeStringVector(os, method.getVariables());
+        serializer.writeString(name);
+        serializer.writeStringVector(method.getVariables());
     }
 }

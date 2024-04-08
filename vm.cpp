@@ -20,17 +20,19 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    size_t methodCount = readInteger(programFile);
+    Deserializer reader(programFile);
+
+    size_t methodCount = reader.readInteger();
     if (methodCount == 0) {
         std::cerr << "Error: Program has no methods.";
         return EXIT_FAILURE;
     }
 
     for (size_t i = 0; i < methodCount; i++) {
-        auto methodName = readString(programFile);
+        auto methodName = reader.readString();
         std::cout << std::quoted(methodName) << "\n";
 
-        const auto variables = readStringVector(programFile);
+        const auto variables = reader.readStringVector();
         for (const auto &var : variables) {
             std::cout << "\t" << std::quoted(var) << "\n";
         }
