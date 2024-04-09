@@ -15,6 +15,14 @@ class Tac {
     Operand rhsOp;
     std::string lhs, rhs;
 
+  private:
+    static std::string to_string(const Operand &op) {
+        if (const auto *ptr = std::get_if<int>(&op)) {
+            return std::to_string(*ptr);
+        }
+        return std::get<std::string>(op);
+    }
+
   public:
     virtual void print(std::ostream &os) const;
 
@@ -25,32 +33,14 @@ class Tac {
     Tac(const std::string &result_, const Operand &lhs_, const std::string &op_,
         const Operand &rhs_)
         : result(result_), lhsOp(lhs_), op(op_), rhsOp(rhs_) {
-        if (const int *ptr = std::get_if<int>(&lhsOp)) {
-            lhs = std::to_string(*ptr);
-        } else {
-            lhs = std::get<std::string>(lhsOp);
-        }
-        if (const int *ptr = std::get_if<int>(&rhsOp)) {
-            rhs = std::to_string(*ptr);
-        } else {
-            rhs = std::get<std::string>(rhsOp);
-        }
+        lhs = to_string(lhsOp);
+        rhs = to_string(rhsOp);
     }
     Tac(const std::string &result_, const Operand &rhs_)
         : result{result_}, rhsOp{rhs_} {
-        if (const int *ptr = std::get_if<int>(&rhsOp)) {
-            rhs = std::to_string(*ptr);
-        } else {
-            rhs = std::get<std::string>(rhsOp);
-        }
+        rhs = to_string(rhsOp);
     }
-    Tac(const Operand &rhs_) : rhsOp{rhs_} {
-        if (const int *ptr = std::get_if<int>(&rhsOp)) {
-            rhs = std::to_string(*ptr);
-        } else {
-            rhs = std::get<std::string>(rhsOp);
-        }
-    }
+    Tac(const Operand &rhs_) : rhsOp{rhs_} { rhs = to_string(rhsOp); }
     virtual ~Tac() = default;
 };
 
