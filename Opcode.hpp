@@ -1,7 +1,9 @@
 #ifndef OPCODE_HPP
 #define OPCODE_HPP
-
-enum Opcode {
+#include <cstdint>
+#include <string>
+#include <vector>
+enum Opcode : int8_t {
     LOAD = 0,
     CONST = 1,
     STORE = 2,
@@ -23,4 +25,8 @@ enum Opcode {
     STOP = 18
 };
 
+const std::vector<std::string> mnemonics{
+    "ILOAD",        "ICONST",        "ISTORE",  "IADD",  "ISUB", "IMUL", "IDIV",
+    "ILT",          "IGT",           "IEQ",     "IAND",  "IOR",  "INOT", "GOTO",
+    "IFFALSE GOTO", "INVOKEVIRTUAL", "IRETURN", "PRINT", "STOP"};
 #endif

@@ -5,11 +5,7 @@
 #include <vector>
 
 #include "Opcode.hpp"
-
-const std::vector<std::string> mnemonics{
-    "ILOAD",        "ICONST",        "ISTORE",  "IADD",  "ISUB", "IMUL", "IDIV",
-    "ILT",          "IGT",           "IEQ",     "IAND",  "IOR",  "INOT", "GOTO",
-    "IFFALSE GOTO", "INVOKEVIRTUAL", "IRETURN", "PRINT", "STOP"};
+#include "serialize.hpp"
 
 class BytecodeInstruction {
   protected:
@@ -22,6 +18,8 @@ class BytecodeInstruction {
     virtual ~BytecodeInstruction() = default;
     virtual void print(std::ostream &os) const = 0;
 
+    virtual void serialize(Serializer &serializer) const = 0;
+
     Opcode getOpcode() const { return opcode; }
 };
 
@@ -29,19 +27,22 @@ class StackParameterInstruction : public BytecodeInstruction {
     // An instruction which pops two parameters from the stack and pushes
     // one result back to the stack
   public:
-    StackParameterInstruction(Opcode opcode_) : BytecodeInstruction(opcode_){};
+    explicit StackParameterInstruction(Opcode opcode_)
+        : BytecodeInstruction(opcode_){};
     void print(std::ostream &os) const override;
+    void serialize(Serializer &serializer) const override;
 };
 
 class IntegerParameterInstruction : public BytecodeInstruction {
     // An instruction which takes one integer parameter
     // and pushes one result back to the stack
-    int param;
+    size_t param;
 
   public:
-    IntegerParameterInstruction(Opcode opcode_, int param_)
+    IntegerParameterInstruction(Opcode opcode_, size_t param_)
         : BytecodeInstruction(opcode_), param(param_){};
     void print(std::ostream &os) const override;
+    void serialize(Serializer &serializer) const override;
 };
 
 class StringParameterInstruction : public BytecodeInstruction {
@@ -53,6 +54,8 @@ class StringParameterInstruction : public BytecodeInstruction {
     StringParameterInstruction(Opcode opcode_, const std::string &param_)
         : BytecodeInstruction(opcode_), param(param_){};
     void print(std::ostream &os) const override;
+
+    void serialize(Serializer &serializer) const override;
 };
 
 #endif

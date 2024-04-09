@@ -22,3 +22,11 @@ void BytecodeMethod::print(std::ostream &os) const {
         block.print(os);
     }
 }
+
+void BytecodeMethod::serialize(Serializer &serializer) const {
+    serializer.writeString(name);
+    serializer.writeStringVector(variables);
+    for (const auto &block : blocks) {
+        block.serialize(serializer);
+    }
+}

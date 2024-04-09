@@ -7,7 +7,8 @@ class NotNode : public Node {
     Node *expr;
 
   public:
-    NotNode(Node *expr, int l) : Node("Negated expression", l), expr{expr} {};
+    NotNode(Node *expr, int l)
+        : Node("Negated expression", l, {expr}), expr{expr} {};
     std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };

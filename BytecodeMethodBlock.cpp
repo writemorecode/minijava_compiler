@@ -1,5 +1,6 @@
 #include "BytecodeMethodBlock.hpp"
 #include "BytecodeInstruction.hpp"
+#include "serialize.hpp"
 #include <iostream>
 
 using Operand = std::variant<std::string, int>;
@@ -53,6 +54,10 @@ BytecodeMethodBlock &BytecodeMethodBlock::less_than() {
     addBytecodeInstruction(new StackParameterInstruction(Opcode::LT));
     return *this;
 }
+BytecodeMethodBlock &BytecodeMethodBlock::greater_than() {
+    addBytecodeInstruction(new StackParameterInstruction(Opcode::GT));
+    return *this;
+}
 
 BytecodeMethodBlock &BytecodeMethodBlock::l_and() {
     addBytecodeInstruction(new StackParameterInstruction(Opcode::AND));
@@ -64,6 +69,10 @@ BytecodeMethodBlock &BytecodeMethodBlock::l_or() {
 }
 BytecodeMethodBlock &BytecodeMethodBlock::l_not() {
     addBytecodeInstruction(new StackParameterInstruction(Opcode::NOT));
+    return *this;
+}
+BytecodeMethodBlock &BytecodeMethodBlock::equal_to() {
+    addBytecodeInstruction(new StackParameterInstruction(Opcode::EQ));
     return *this;
 }
 BytecodeMethodBlock &BytecodeMethodBlock::ret() {
@@ -94,4 +103,11 @@ BytecodeMethodBlock &BytecodeMethodBlock::cjump(const std::string &location) {
 BytecodeMethodBlock &BytecodeMethodBlock::stop() {
     addBytecodeInstruction(new StackParameterInstruction(Opcode::STOP));
     return *this;
+}
+
+void BytecodeMethodBlock::serialize(Serializer &serializer) const {
+    serializer.writeInteger(instructions.size());
+    for (const auto &instruction : instructions) {
+        instruction->serialize(serializer);
+    }
 }

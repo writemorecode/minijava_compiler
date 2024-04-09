@@ -34,7 +34,6 @@ void BytecodeProgram::serialize(std::ofstream &os) const {
     serializer.writeInteger(methods.size());
 
     for (const auto &[name, method] : methods) {
-        serializer.writeString(name);
-        serializer.writeStringVector(method.getVariables());
+        method.serialize(serializer);
     }
 }

@@ -3,6 +3,9 @@
 void Serializer::writeInteger(size_t value) {
     os.write(reinterpret_cast<const char *>(&value), sizeof(value));
 }
+void Serializer::writeOpcode(Opcode value) {
+    os.write(reinterpret_cast<const char *>(&value), sizeof(value));
+}
 void Serializer::writeString(const std::string &str) {
     writeInteger(str.size());
     os << str;
@@ -14,8 +17,8 @@ void Serializer::writeStringVector(const std::vector<std::string> &vec) {
     }
 }
 
-std::streamsize Deserializer::readInteger() {
-    std::streamsize value = 0;
+size_t Deserializer::readInteger() {
+    size_t value = 0;
     is.read(reinterpret_cast<char *>(&value), sizeof(value));
     return value;
 }
@@ -33,4 +36,10 @@ std::vector<std::string> Deserializer::readStringVector() {
         vec.emplace_back(readString());
     }
     return vec;
+}
+
+Opcode Deserializer::readOpcode() {
+    Opcode value = Opcode::ADD;
+    is.read(reinterpret_cast<char *>(&value), sizeof(value));
+    return value;
 }

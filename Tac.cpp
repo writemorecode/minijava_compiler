@@ -71,7 +71,9 @@ void ReturnTac::generateBytecode(BytecodeMethodBlock &block) {
 }
 
 void PrintTac::print(std::ostream &os) const { os << "print " << rhs << "\n"; }
-void PrintTac::generateBytecode(BytecodeMethodBlock &block) { block.write(); }
+void PrintTac::generateBytecode(BytecodeMethodBlock &block) {
+    block.push(rhs).write();
+}
 
 void NotTac::generateBytecode(BytecodeMethodBlock &block) {
     block.push(rhsOp).l_not().store(result);

@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "BytecodeInstruction.hpp"
+#include "serialize.hpp"
 
 class BytecodeMethodBlock {
     std::vector<std::unique_ptr<BytecodeInstruction>> instructions;
@@ -43,6 +44,8 @@ class BytecodeMethodBlock {
     BytecodeMethodBlock &cjump(const std::string &location);
 
     BytecodeMethodBlock &stop();
+
+    void serialize(Serializer &serializer) const;
 };
 
 #endif

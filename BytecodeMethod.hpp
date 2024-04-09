@@ -2,6 +2,7 @@
 #define BYTECODEMETHOD_HPP
 
 #include "BytecodeMethodBlock.hpp"
+#include "serialize.hpp"
 #include <string>
 #include <vector>
 
@@ -27,6 +28,8 @@ class BytecodeMethod {
     void print(std::ostream &os) const;
 
     [[nodiscard]] const auto &getVariables() const { return variables; }
+
+    void serialize(Serializer &serializer) const;
 };
 
 #endif // BYTECODEMETHOD_HPP
