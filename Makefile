@@ -34,6 +34,9 @@ st:
 cfg: 
 	dot -Tpdf output/cfg.dot -o cfg.pdf
 
+fmt:
+	clang-format -i *.cpp *.hpp
+
 clean:
 		rm -f parser.tab.* lex.yy.c* compiler vm stack.hh position.hh location.hh *.dot *.pdf *.o 
 		rm -rf compiler.dSYM
