@@ -13,6 +13,8 @@ class BytecodeMethodBlock {
     std::string name;
 
   public:
+    bool operator==(const std::string &rhsName) { return name == rhsName; };
+
     BytecodeMethodBlock(const std::string &name_) : name(name_){};
     [[nodiscard]] const std::string &getName() const { return name; }
     void print(std::ostream &os) const;

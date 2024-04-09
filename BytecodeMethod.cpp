@@ -10,9 +10,7 @@ BytecodeMethod::addBytecodeMethodBlock(const std::string &name) {
 
 [[nodiscard]] BytecodeMethodBlock &
 BytecodeMethod::getBytecodeMethodBlock(const std::string &name) {
-    const auto &it = std::find_if(
-        blocks.begin(), blocks.end(),
-        [&name](const BytecodeMethodBlock &b) { return b.getName() == name; });
+    const auto &it = std::find(blocks.begin(), blocks.end(), name);
     if (it == blocks.end()) {
         return addBytecodeMethodBlock(name);
     }
