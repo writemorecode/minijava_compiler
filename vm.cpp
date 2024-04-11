@@ -130,7 +130,7 @@ void runProgram(Deserializer &reader, VM &vm) {
         }
         case Opcode::LOAD: {
             auto strParam = reader.readString();
-            vm.push(vm.getVariable(strParam));
+            vm.push(strParam);
             break;
         }
         case Opcode::STORE: {
