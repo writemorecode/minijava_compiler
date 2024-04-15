@@ -1,9 +1,12 @@
 #include "BytecodeProgram.hpp"
 
+#include "BytecodeMethod.hpp"
 #include "serialize.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <string>
 
 BytecodeMethod &
@@ -30,9 +33,15 @@ void BytecodeProgram::print(std::ostream &os) const {
 
 void BytecodeProgram::serialize(std::ofstream &os) const {
     Serializer serializer(os);
-    serializer.writeInteger(methods.size());
 
-    for (const auto &method : methods) {
-        method.serialize(serializer);
-    }
+    auto it = methods.begin();
+    it->serialize(serializer);
+    serializer.writeInteger(methods.size() - 1);
+    std::for_each(std::next(it), methods.end(),
+                  [&serializer](const BytecodeMethod &method) {
+                      method.serialize(serializer);
+                  });
+    // for (const auto &method : methods) {
+    //     method.serialize(serializer);
+    // }
 }
