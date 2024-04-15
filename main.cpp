@@ -28,12 +28,12 @@ int errCode = errCodes::SUCCESS;
 
 // Handling Syntax Errors
 void yy::parser::error(std::string const &err) {
-    if (!lexical_errors) {
-        std::cerr << "Syntax errors found! See the logs below:" << std::endl;
+    if (lexical_errors == 0) {
+        std::cerr << "Syntax errors found! See the logs below:\n";
         std::cerr << "\t@error at line " << yylineno
-                  << ". Cannot generate a syntax for this input:" << err.c_str()
-                  << std::endl;
-        std::cerr << "End of syntax errors!" << std::endl;
+                  << ". Cannot generate a syntax for this input:" << err
+                  << "\n";
+        std::cerr << "End of syntax errors!\n";
         errCode = errCodes::SYNTAX_ERROR;
     }
 }
