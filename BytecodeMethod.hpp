@@ -17,6 +17,10 @@ class BytecodeMethod {
                    std::vector<std::string> variables_)
         : name(name_), variables(std::move(variables_)){};
 
+    bool operator==(const std::string &otherName) const {
+        return name == otherName;
+    }
+
     [[nodiscard]] BytecodeMethodBlock &
     addBytecodeMethodBlock(const std::string &name);
 

@@ -9,23 +9,22 @@
 BytecodeMethod &
 BytecodeProgram::addBytecodeMethod(const std::string &name,
                                    std::vector<std::string> variables) {
-    auto it =
-        methods.insert({name, BytecodeMethod{name, std::move(variables)}});
-    return it.first->second;
+    methods.push_back(BytecodeMethod(name, std::move(variables)));
+    return methods.back();
 }
 
 BytecodeMethod &BytecodeProgram::getBytecodeMethod(const std::string &name) {
-    const auto &it = methods.find(name);
+    const auto &it = std::find(methods.begin(), methods.end(), name);
     if (it == methods.end()) {
         std::cerr << "Error: Failed to find key " << name
                   << " in BytecodeProgram::methods table\n";
     }
-    return it->second;
+    return *it;
 }
 
 void BytecodeProgram::print(std::ostream &os) const {
     for (const auto &method : methods) {
-        method.second.print(os);
+        method.print(os);
     }
 }
 
@@ -33,7 +32,7 @@ void BytecodeProgram::serialize(std::ofstream &os) const {
     Serializer serializer(os);
     serializer.writeInteger(methods.size());
 
-    for (const auto &[name, method] : methods) {
+    for (const auto &method : methods) {
         method.serialize(serializer);
     }
 }

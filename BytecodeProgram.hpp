@@ -2,12 +2,12 @@
 #define BYTECODE_HPP
 
 #include <string>
-#include <unordered_map>
+#include <vector>
 
 #include "BytecodeMethod.hpp"
 
 class BytecodeProgram {
-    std::unordered_map<std::string, BytecodeMethod> methods;
+    std::vector<BytecodeMethod> methods;
 
   public:
     [[nodiscard]] BytecodeMethod &
