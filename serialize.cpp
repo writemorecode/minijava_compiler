@@ -32,7 +32,7 @@ std::vector<std::string> Deserializer::readStringVector() {
     const auto length = readInteger();
     std::vector<std::string> vec;
     vec.reserve(length);
-    for (auto i = 0; i < length; i++) {
+    for (size_t i = 0; i < length; i++) {
         vec.emplace_back(readString());
     }
     return vec;
