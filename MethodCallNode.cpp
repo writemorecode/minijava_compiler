@@ -63,8 +63,6 @@ Operand MethodCallNode::generateIR(CFG &graph, SymbolTable &st) {
     auto const *method = callingClass->lookupMethod(id->value);
     const auto &methodType = method->getType();
 
-    const auto &callerName = object->generateIR(graph, st);
-    graph.addInstruction(new ParamTac(callerName));
     for (const auto &arg : exprList->children) {
         const auto &argName = arg->generateIR(graph, st);
         graph.addInstruction(new ParamTac(argName));

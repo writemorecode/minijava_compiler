@@ -55,7 +55,7 @@ void MethodCallTac::print(std::ostream &os) const {
     os << result << " := call " << lhs << ", " << rhs << "\n";
 }
 void MethodCallTac::generateBytecode(BytecodeMethodBlock &block) {
-    block.call(lhs + "." + op);
+    block.call(lhs + "." + op).store(result);
 }
 
 void ParamTac::print(std::ostream &os) const { os << "param " << rhs << "\n"; }
@@ -72,7 +72,7 @@ void ReturnTac::generateBytecode(BytecodeMethodBlock &block) {
 
 void PrintTac::print(std::ostream &os) const { os << "print " << rhs << "\n"; }
 void PrintTac::generateBytecode(BytecodeMethodBlock &block) {
-    block.push(rhs).write();
+    block.push(rhsOp).write();
 }
 
 void NotTac::generateBytecode(BytecodeMethodBlock &block) {

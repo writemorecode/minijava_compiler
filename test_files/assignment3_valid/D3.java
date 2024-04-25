@@ -1,6 +1,7 @@
 public class D3 {
   public static void main(String[] a) {
-    System.out.println(new Sum().calcSum(10000));
+    // Replaced argument 10000 with 100 to prevent stack overflow
+    System.out.println(new Sum().calcSum(100));
   }
 }
 

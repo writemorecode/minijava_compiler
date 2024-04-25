@@ -1,7 +1,5 @@
 #include <cstdlib>
-#include <exception>
 #include <fstream>
-#include <iomanip>
 #include <ios>
 #include <iostream>
 #include <memory>
@@ -20,39 +18,68 @@ struct Instruction {
         : op(op_), argNumber(argNum_), argString(argStr_){};
 };
 
+struct Block {
+    std::vector<Instruction> instructions;
+    void print() const {
+        for (const auto &instr : instructions) {
+            std::cout << "\t\t" << mnemonics[instr.op] << "\t";
+            if (instr.argString.empty()) {
+                std::cout << instr.argNumber << "\n";
+            } else {
+                std::cout << instr.argString << "\n";
+            }
+        }
+    };
+};
+
 struct Method {
     std::vector<std::string> variables;
-    std::vector<Instruction> instructions;
+    std::unordered_map<std::string, Block> blocks;
+
+    void print() const {
+        for (const auto &[name, block] : blocks) {
+            std::cout << "\tblock " << name << "\n";
+            block.print();
+        }
+    };
 };
 
 class Activation {
     size_t pc = 0;
+    Method method;
     std::unordered_map<std::string, size_t> variables;
-    std::vector<Instruction> instructions;
+    std::string currentBlock;
 
   public:
-    explicit Activation(const Method &method)
-        : instructions{method.instructions} {
+    explicit Activation(const Method &method_, const std::string &currentBlock_)
+        : method(method_), currentBlock(currentBlock_) {
         for (const auto &name : method.variables) {
-            variables.emplace(name, 0);
+            variables[name] = 0;
         }
     };
-
-    const auto &step() { return instructions[pc++]; }
-    void addInstruction(const auto &instr) { instructions.push_back(instr); }
+    auto getPC() const { return pc; }
+    auto getCurrentBlockName() const { return currentBlock; }
+    const auto &step() {
+        const auto &block = method.blocks[currentBlock];
+        return block.instructions[pc++];
+    }
     void setVariable(const std::string &name, size_t value) {
         variables[name] = value;
     }
-    void addVariable(const std::string &name) { variables.emplace(name, 0); }
-    size_t getVariable(const std::string &name) const {
+    [[nodiscard]] size_t getVariable(const std::string &name) const {
         if (const auto &it = variables.find(name); it != variables.end()) {
             return it->second;
         }
         // FIXME: Find a way to remove this exception
-        throw std::invalid_argument("variable not found");
+        throw std::invalid_argument("variable " + name + " not found");
+    }
+    void setCurrentBlock(const std::string &blockName) {
+        currentBlock = blockName;
+        pc = 0;
     }
 };
 class Program {
+    std::string mainMethodName;
     Method mainMethod;
     std::unordered_map<std::string, Method> methods;
 
@@ -61,12 +88,29 @@ class Program {
     [[nodiscard]] std::shared_ptr<Activation>
     getMethodActivation(const std::string &name) const {
         const auto &it = methods.find(name);
-        return std::make_shared<Activation>(it->second);
+        if (it == methods.end()) {
+            std::cerr << "no such method " << name << "\n";
+            return nullptr;
+        }
+        return std::make_shared<Activation>(it->second, it->first);
     }
-    Program(const Method &mainMethod_,
+    Program(const std::string &mainMethodName_, const Method &mainMethod_,
             const std::unordered_map<std::string, Method> &methods_)
-        : mainMethod(mainMethod_), methods(methods_){};
+        : mainMethodName(mainMethodName_), mainMethod(mainMethod_),
+          methods(methods_){};
+
+    void print() const;
+    std::string getMainMethodName() const { return mainMethodName; }
 };
+
+void Program::print() const {
+    std::cout << "method " << mainMethodName << "\n";
+    mainMethod.print();
+    for (const auto &[name, method] : methods) {
+        std::cout << "method " << name << "\n";
+        method.print();
+    }
+}
 
 class VM {
     std::stack<size_t> dataStack;
@@ -75,12 +119,12 @@ class VM {
 
     Program program;
 
-    Instruction step() { return currentActivation->step(); }
-    void addInstruction(const auto &instr) {
-        currentActivation->addInstruction(instr);
-    }
-    void addVariable(const std::string &name) {
-        currentActivation->addVariable(name);
+    Instruction step() {
+        if (currentActivation == nullptr) {
+            std::cerr << "current activation is null!\n";
+            std::exit(1);
+        }
+        return currentActivation->step();
     }
     void setVariableValue(const std::string &name, size_t value) {
         currentActivation->setVariable(name, value);
@@ -109,36 +153,62 @@ class VM {
 
   public:
     explicit VM(const Program &program_) : program{program_} {
-        currentActivation = std::make_shared<Activation>(program_.getMain());
+        currentActivation = std::make_shared<Activation>(
+            program_.getMain(), program.getMainMethodName());
     };
     void run();
+
+    void printstack() {
+        std::cout << "stack top: ";
+        if (!dataStack.empty()) {
+            std::cout << dataStack.top() << '\n';
+        }
+    }
 };
 
 void VM::run() {
     while (true) {
         const auto instruction = step();
         const auto op = instruction.op;
+
         switch (op) {
         case Opcode::STOP: {
-            std::cout << "Reached end of program.\n";
+            // std::cout << "Reached end of program.\n";
             return;
         }
         case Opcode::RET: {
             currentActivation.swap(activations.top());
             activations.pop();
-            std::cout << "Returning from method.\n";
+            // std::cout << "Returning from method.\n";
             break;
         }
         case Opcode::CALL: {
             activations.push(currentActivation);
             currentActivation =
                 program.getMethodActivation(instruction.argString);
-            std::cout << "Calling method " << instruction.argString << "\n";
+            if (currentActivation == nullptr) {
+                std::cerr << "error: no activation found for method "
+                          << instruction.argString << "\n";
+                return;
+            }
+            // std::cout << "Calling method " << instruction.argString << "\n";
+            break;
+        }
+        case Opcode::JMP: {
+            currentActivation->setCurrentBlock(instruction.argString);
+            break;
+        }
+        case Opcode::CJMP: {
+            const auto conditionValue = pop();
+            if (conditionValue == 0) {
+                currentActivation->setCurrentBlock(instruction.argString);
+            }
+
             break;
         }
         case Opcode::PRINT: {
             const auto value = pop();
-            std::cout << "Print: " << value << "\n";
+            std::cout << value << "\n";
             break;
         }
         case Opcode::ADD: {
@@ -213,8 +283,7 @@ void VM::run() {
             break;
         }
         default: {
-            std::cerr << "Invalid instruction: ";
-            std::cerr << mnemonics[op] << " " << instruction.argString << "\n";
+            std::cerr << "Invalid opcode: " << op << "\n";
             return;
         }
         };
@@ -246,34 +315,46 @@ void VM::run() {
     return {op, argNumber, argString};
 }
 
-[[nodiscard]] Method readMethod(Deserializer &reader) {
-    Method method;
-    const auto variableNames = reader.readStringVector();
-    for (const auto &name : variableNames) {
-        method.variables.push_back(name);
-    }
+[[nodiscard]] Block readBlock(Deserializer &reader) {
     const auto instructionCount = reader.readInteger();
-    std::cout << "Instruction count: " << instructionCount << "\n";
-    method.instructions.reserve(instructionCount);
+    // std::cout << "Instruction count: " << instructionCount << "\n";
+    std::vector<Instruction> instructions;
+    instructions.reserve(instructionCount);
     for (size_t i = 0; i < instructionCount; i++) {
-        method.instructions.emplace_back(readInstruction(reader));
+        instructions.emplace_back(readInstruction(reader));
     }
-    return method;
+    return {instructions};
+}
+
+[[nodiscard]] Method readMethod(Deserializer &reader) {
+    const auto variableNames = reader.readStringVector();
+
+    const auto blockCount = reader.readInteger();
+    // std::cout << "Block count: " << blockCount << "\n";
+    std::unordered_map<std::string, Block> blocks;
+    for (size_t i = 0; i < blockCount; i++) {
+        const auto blockName = reader.readString();
+        // std::cout << "Block: " << blockName << "\n";
+        blocks.emplace(blockName, readBlock(reader));
+    }
+
+    return {variableNames, blocks};
 }
 
 [[nodiscard]] Program readProgram(Deserializer &reader) {
     const auto mainMethodName = reader.readString();
-    std::cout << "Method: " << std::quoted(mainMethodName) << "\n";
+    // std::cout << "Method: " << std::quoted(mainMethodName) << "\n";
     const auto mainMethod = readMethod(reader);
 
     std::unordered_map<std::string, Method> methods;
     const auto methodCount = reader.readInteger();
     for (size_t i = 0; i < methodCount; i++) {
         const auto methodName = reader.readString();
+        // std::cout << "Method: " << std::quoted(methodName) << "\n";
         const auto method = readMethod(reader);
         methods.emplace(methodName, method);
     }
-    return {mainMethod, methods};
+    return {mainMethodName, mainMethod, methods};
 }
 
 int main(int argc, char **argv) {

@@ -34,14 +34,13 @@ void BytecodeProgram::print(std::ostream &os) const {
 void BytecodeProgram::serialize(std::ofstream &os) const {
     Serializer serializer(os);
 
-    auto it = methods.begin();
-    it->serialize(serializer);
+    const auto &mainMethod = methods.front();
+    mainMethod.serialize(serializer);
+
     serializer.writeInteger(methods.size() - 1);
-    std::for_each(std::next(it), methods.end(),
+
+    std::for_each(std::next(methods.cbegin()), methods.cend(),
                   [&serializer](const BytecodeMethod &method) {
                       method.serialize(serializer);
                   });
-    // for (const auto &method : methods) {
-    //     method.serialize(serializer);
-    // }
 }

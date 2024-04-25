@@ -39,11 +39,9 @@ Operand MethodCallWithoutArgumentsNode::generateIR(CFG &graph,
     auto const *method = callingClass->lookupMethod(id->value);
     const auto &methodType = method->getType();
 
-    const auto &callerName = object->generateIR(graph, st);
     const auto &name = graph.getTemporaryName();
     st.addVariable(methodType, name);
     const auto &methodName = id->value;
-    graph.addInstruction(new ParamTac(callerName));
     graph.addInstruction(new MethodCallTac(name, methodName, caller, "1"));
     return name;
 }

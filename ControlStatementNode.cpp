@@ -17,9 +17,11 @@ Operand IfNode::generateIR(CFG &graph, SymbolTable &st) {
     auto *trueBlock = graph.newBlock();
     auto *joinBlock = graph.newBlock();
     const auto &joinLabel = joinBlock->getName();
+    const auto &trueLabel = trueBlock->getName();
 
     const auto &condName = cond->generateIR(graph, st);
     graph.addInstruction(new CondJumpTac(joinLabel, condName));
+    graph.addInstruction(new JumpTac(trueLabel));
 
     auto *currentBlock = graph.getCurrentBlock();
     currentBlock->setTrueBlock(trueBlock);
@@ -47,6 +49,7 @@ Operand IfElseNode::generateIR(CFG &graph, SymbolTable &st) {
 
     const auto &condName = cond->generateIR(graph, st);
     graph.addInstruction(new CondJumpTac(falseLabel, condName));
+    graph.addInstruction(new JumpTac(trueBlock->getName()));
 
     auto *currentBlock = graph.getCurrentBlock();
     currentBlock->setTrueBlock(trueBlock);
@@ -82,6 +85,7 @@ Operand WhileNode::generateIR(CFG &graph, SymbolTable &st) {
     graph.setCurrentBlock(headerBlock);
     const auto &condName = cond->generateIR(graph, st);
     graph.addInstruction(new CondJumpTac(joinBlock->getName(), condName));
+    graph.addInstruction(new JumpTac(bodyBlock->getName()));
 
     graph.setCurrentBlock(bodyBlock);
     currentBlock->setTrueBlock(headerBlock);
