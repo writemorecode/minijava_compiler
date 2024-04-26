@@ -10,6 +10,8 @@ TACS_OBJ := $(TACS:.cpp=.o)
 BYTECODES := $(wildcard Bytecode*.cpp)
 BYTECODES_OBJ := $(BYTECODES:.cpp=.o)
 
+all: vm compiler
+
 %.o: %.cpp %.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 

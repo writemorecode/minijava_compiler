@@ -3,6 +3,7 @@
 #include <ios>
 #include <iostream>
 #include <memory>
+#include <stack>
 #include <stdexcept>
 #include <unordered_map>
 #include <vector>
@@ -363,7 +364,7 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    std::string_view filename{argv[1]};
+    std::string filename{argv[1]};
     std::ifstream programFile(filename, std::ios::binary);
     if (programFile.eof() || programFile.eof()) {
         std::cerr << "Error: Unable to open file " << filename << ".\n";
