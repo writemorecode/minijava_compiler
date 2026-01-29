@@ -10,6 +10,8 @@ TACS_OBJ := $(TACS:.cpp=.o)
 BYTECODES := $(wildcard Bytecode*.cpp)
 BYTECODES_OBJ := $(BYTECODES:.cpp=.o)
 
+BISON := /opt/homebrew/opt/bison/bin/bison
+
 all: vm compiler
 
 %.o: %.cpp %.hpp
@@ -20,7 +22,7 @@ compiler: lex.yy.o parser.tab.o main.cpp $(NODES_OBJ) $(TACS_OBJ) $(BYTECODES_OB
 parser.tab.o: parser.tab.cc
 		$(CXX) $(CXXFLAGS) $^ -c -o $@
 parser.tab.cc: parser.yy
-		bison parser.yy
+		$(BISON) parser.yy
 lex.yy.c: lexer.flex parser.tab.cc
 		flex lexer.flex
 lex.yy.o: lex.yy.c
