@@ -7,7 +7,6 @@ OBJ_DIR := $(BUILD_DIR)/obj
 BIN_DIR := $(BUILD_DIR)/bin
 GEN_DIR := $(BUILD_DIR)/gen
 
-BISON := /opt/homebrew/opt/bison/bin/bison
 FLEX := flex
 
 SOURCES := $(shell find $(SRC_DIR) -name '*.cpp')
@@ -53,7 +52,7 @@ $(OBJ_DIR)/lex.yy.o: $(LEX_SRC)
 
 $(PARSER_SRC) $(PARSER_HDR): $(SRC_DIR)/parsing/parser.yy
 	@mkdir -p $(GEN_DIR)
-	$(BISON) -d -o $(PARSER_SRC) $<
+	bison -d -o $(PARSER_SRC) $<
 
 $(LEX_SRC): $(SRC_DIR)/lexing/lexer.flex $(PARSER_HDR)
 	@mkdir -p $(GEN_DIR)
