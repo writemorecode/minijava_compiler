@@ -33,7 +33,7 @@
 
 *.dSYM
 *.hh
-compiler
+/compiler
 *.pdf
 *.dot
 lex.yy.c
@@ -41,6 +41,7 @@ parser.tab.cc
 .ninja_log
 *.png
 *.svg
-vm
+/vm
 prog.bc
 bytecode.txt
+build/

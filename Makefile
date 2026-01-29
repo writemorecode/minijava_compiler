@@ -1,33 +1,62 @@
 CXX := g++
-CXXFLAGS := -g -Wall -Wextra -Wpedantic -std=c++20
+CXXFLAGS := -g -Wall -Wextra -Wpedantic -std=c++20 -Isrc -Ibuild/gen
 
-NODES := $(wildcard *Node.cpp)
-NODES_OBJ := $(NODES:.cpp=.o)
+SRC_DIR := src
+BUILD_DIR := build
+OBJ_DIR := $(BUILD_DIR)/obj
+BIN_DIR := $(BUILD_DIR)/bin
+GEN_DIR := $(BUILD_DIR)/gen
 
-TACS := $(wildcard *Tac.cpp)
-TACS_OBJ := $(TACS:.cpp=.o)
+FLEX := flex
 
-BYTECODES := $(wildcard Bytecode*.cpp)
-BYTECODES_OBJ := $(BYTECODES:.cpp=.o)
+SOURCES := $(shell find $(SRC_DIR) -name '*.cpp')
+VM_SOURCE := $(SRC_DIR)/vm/vm.cpp
+COMPILER_SOURCES := $(filter-out $(VM_SOURCE),$(SOURCES))
+
+COMPILER_OBJECTS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(COMPILER_SOURCES))
+VM_OBJECTS := $(OBJ_DIR)/vm/vm.o $(OBJ_DIR)/util/serialize.o
+
+PARSER_SRC := $(GEN_DIR)/parser.tab.cc
+PARSER_HDR := $(GEN_DIR)/parser.tab.hh
+LEX_SRC := $(GEN_DIR)/lex.yy.c
+GEN_OBJECTS := $(OBJ_DIR)/parser.tab.o $(OBJ_DIR)/lex.yy.o
+
+FORMAT_SOURCES := $(shell find $(SRC_DIR) -name '*.cpp' -o -name '*.hpp' -o -name '*.h')
 
 all: vm compiler
 
-%.o: %.cpp %.hpp
+compiler: $(BIN_DIR)/compiler
+vm: $(BIN_DIR)/vm
+
+$(BIN_DIR)/compiler: $(COMPILER_OBJECTS) $(GEN_OBJECTS)
+	@mkdir -p $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+$(BIN_DIR)/vm: $(VM_OBJECTS)
+	@mkdir -p $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 
-compiler: lex.yy.o parser.tab.o main.cpp $(NODES_OBJ) $(TACS_OBJ) $(BYTECODES_OBJ) SymbolTable.o Scope.o Record.o Variable.o Method.o Class.o Tac.o BBlock.o CFG.o serialize.o
-		$(CXX) $(CXXFLAGS) $^ -o $@
-parser.tab.o: parser.tab.cc
-		$(CXX) $(CXXFLAGS) $^ -c -o $@
-parser.tab.cc: parser.yy
-		bison parser.yy
-lex.yy.c: lexer.flex parser.tab.cc
-		flex lexer.flex
-lex.yy.o: lex.yy.c
-		$(CXX) $(CXXFLAGS) $^ -c -o $@
+$(COMPILER_OBJECTS): $(PARSER_HDR)
 
-vm: vm.cpp serialize.o
-		$(CXX) $(CXXFLAGS) $^ -o $@
+$(OBJ_DIR)/parser.tab.o: $(PARSER_SRC)
+	@mkdir -p $(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+
+$(OBJ_DIR)/lex.yy.o: $(LEX_SRC)
+	@mkdir -p $(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+
+$(PARSER_SRC) $(PARSER_HDR): $(SRC_DIR)/parsing/parser.yy
+	@mkdir -p $(GEN_DIR)
+	bison -d -o $(PARSER_SRC) $<
+
+$(LEX_SRC): $(SRC_DIR)/lexing/lexer.flex $(PARSER_HDR)
+	@mkdir -p $(GEN_DIR)
+	$(FLEX) -o $(LEX_SRC) $<
 
 tree: 
 	dot -Tpdf output/tree.dot -o tree.pdf
@@ -37,9 +66,8 @@ cfg:
 	dot -Tpdf output/cfg.dot -o cfg.pdf
 
 fmt:
-	clang-format -i *.cpp *.hpp
+	clang-format -i $(FORMAT_SOURCES)
 
 clean:
-		rm -f parser.tab.* lex.yy.c* compiler vm stack.hh position.hh location.hh *.dot *.pdf *.o 
-		rm -rf compiler.dSYM
-	
+	rm -rf $(BUILD_DIR)
+	rm -f *.dot *.pdf
