@@ -136,14 +136,20 @@ Token Lexer::lex_one_() {
         return Token{TokenKind::Eof, {}, {}, {}};
     }
 
+    auto slice = [&](SourceLocation start,
+                     SourceLocation end) -> std::string_view {
+        if (source_.empty()) {
+            return {};
+        }
+        if (end.offset < start.offset || end.offset > source_.size()) {
+            return {};
+        }
+        return source_.substr(start.offset, end.offset - start.offset);
+    };
+
     auto make_token = [&](TokenKind kind, SourceLocation start,
                           SourceLocation end, TokenValue value = {}) {
-        std::string_view lexeme{};
-        if (!source_.empty() && end.offset >= start.offset &&
-            end.offset <= source_.size()) {
-            lexeme = source_.substr(start.offset, end.offset - start.offset);
-        }
-        return Token{kind, lexeme, {start, end}, value};
+        return Token{kind, slice(start, end), {start, end}, value};
     };
 
     auto skip_trivia = [&]() {
@@ -275,11 +281,7 @@ Token Lexer::lex_one_() {
             chars_->get();
         }
         const SourceLocation end = chars_->location();
-        std::string_view lexeme{};
-        if (!source_.empty() && end.offset >= start.offset &&
-            end.offset <= source_.size()) {
-            lexeme = source_.substr(start.offset, end.offset - start.offset);
-        }
+        const std::string_view lexeme = slice(start, end);
         Token token{keyword_kind(lexeme), lexeme, {start, end}, {}};
         return token;
     }
