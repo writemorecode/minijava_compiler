@@ -19,8 +19,8 @@ class Lexer {
   public:
     using Diagnostics = DiagnosticSink;
 
-    Lexer(std::unique_ptr<CharStream> chars, Diagnostics *diag = nullptr,
-          LexerOptions opts = {});
+    Lexer(std::unique_ptr<CharStream> chars, std::string_view source,
+          Diagnostics *diag = nullptr, LexerOptions opts = {});
 
     Token next();
     Token peek(std::size_t n = 0);
@@ -32,7 +32,7 @@ class Lexer {
     iterator begin();
     sentinel end();
 
-    void reset(std::unique_ptr<CharStream> chars);
+    void reset(std::unique_ptr<CharStream> chars, std::string_view source);
     const LexerOptions &options() const { return opts_; }
 
   private:
@@ -40,6 +40,7 @@ class Lexer {
     void fill_lookahead_(std::size_t n);
 
     std::unique_ptr<CharStream> chars_;
+    std::string_view source_{};
     Diagnostics *diag_ = nullptr;
     LexerOptions opts_{};
     std::vector<Token> la_{};

@@ -1,10 +1,32 @@
 #include "lexing/Lexer.hpp"
 
+#include <cctype>
+
 namespace lexing {
 
-Lexer::Lexer(std::unique_ptr<CharStream> chars, Diagnostics *diag,
-             LexerOptions opts)
-    : chars_(std::move(chars)), diag_(diag), opts_(opts) {}
+namespace {
+
+bool is_alpha(char ch) {
+    return std::isalpha(static_cast<unsigned char>(ch)) != 0;
+}
+
+bool is_digit(char ch) {
+    return std::isdigit(static_cast<unsigned char>(ch)) != 0;
+}
+
+bool is_ident_start(char ch) {
+    return is_alpha(ch);
+}
+
+bool is_ident_continue(char ch) {
+    return is_alpha(ch) || is_digit(ch) || ch == '_';
+}
+
+} // namespace
+
+Lexer::Lexer(std::unique_ptr<CharStream> chars, std::string_view source,
+             Diagnostics *diag, LexerOptions opts)
+    : chars_(std::move(chars)), source_(source), diag_(diag), opts_(opts) {}
 
 Token Lexer::next() {
     if (!la_.empty()) {
@@ -32,8 +54,9 @@ Lexer::sentinel Lexer::end() {
     return {};
 }
 
-void Lexer::reset(std::unique_ptr<CharStream> chars) {
+void Lexer::reset(std::unique_ptr<CharStream> chars, std::string_view source) {
     chars_ = std::move(chars);
+    source_ = source;
     la_.clear();
 }
 
