@@ -1,6 +1,7 @@
 #include "lexing/Lexer.hpp"
 
 #include <cctype>
+#include <string_view>
 
 namespace lexing {
 
@@ -20,6 +21,15 @@ bool is_ident_start(char ch) {
 
 bool is_ident_continue(char ch) {
     return is_alpha(ch) || is_digit(ch) || ch == '_';
+}
+
+bool starts_with(CharStream *chars, std::string_view text) {
+    for (std::size_t i = 0; i < text.size(); ++i) {
+        if (chars->peek(i) != text[i]) {
+            return false;
+        }
+    }
+    return true;
 }
 
 } // namespace
@@ -67,7 +77,160 @@ void Lexer::fill_lookahead_(std::size_t n) {
 }
 
 Token Lexer::lex_one_() {
-    return Token{TokenKind::Eof, {}, {}, {}};
+    if (!chars_) {
+        return Token{TokenKind::Eof, {}, {}, {}};
+    }
+
+    auto make_token = [&](TokenKind kind, SourceLocation start,
+                          SourceLocation end, TokenValue value = {}) {
+        std::string_view lexeme{};
+        if (!source_.empty() && end.offset >= start.offset &&
+            end.offset <= source_.size()) {
+            lexeme = source_.substr(start.offset, end.offset - start.offset);
+        }
+        return Token{kind, lexeme, {start, end}, value};
+    };
+
+    auto skip_trivia = [&]() {
+        while (!chars_->eof()) {
+            const char ch = chars_->peek();
+            if (ch == ' ' || ch == '\t' || ch == '\n') {
+                chars_->get();
+                continue;
+            }
+            if (ch == '/' && chars_->peek(1) == '/') {
+                chars_->get();
+                chars_->get();
+                while (!chars_->eof() && chars_->peek() != '\n') {
+                    chars_->get();
+                }
+                continue;
+            }
+            break;
+        }
+    };
+
+    skip_trivia();
+
+    if (chars_->eof()) {
+        const SourceLocation loc = chars_->location();
+        return make_token(TokenKind::Eof, loc, loc);
+    }
+
+    const SourceLocation start = chars_->location();
+
+    if (starts_with(chars_.get(), "System.out.println")) {
+        constexpr std::string_view text = "System.out.println";
+        for (char ch : text) {
+            (void)ch;
+            chars_->get();
+        }
+        return make_token(TokenKind::KwPrintln, start, chars_->location());
+    }
+
+    if (starts_with(chars_.get(), "&&")) {
+        chars_->get();
+        chars_->get();
+        return make_token(TokenKind::AndAnd, start, chars_->location());
+    }
+    if (starts_with(chars_.get(), "||")) {
+        chars_->get();
+        chars_->get();
+        return make_token(TokenKind::OrOr, start, chars_->location());
+    }
+    if (starts_with(chars_.get(), "==")) {
+        chars_->get();
+        chars_->get();
+        return make_token(TokenKind::EqEq, start, chars_->location());
+    }
+
+    const char ch = chars_->peek();
+    switch (ch) {
+    case '+':
+        chars_->get();
+        return make_token(TokenKind::Plus, start, chars_->location());
+    case '-':
+        chars_->get();
+        return make_token(TokenKind::Minus, start, chars_->location());
+    case '*':
+        chars_->get();
+        return make_token(TokenKind::Star, start, chars_->location());
+    case '/':
+        chars_->get();
+        return make_token(TokenKind::Slash, start, chars_->location());
+    case '(':
+        chars_->get();
+        return make_token(TokenKind::LParen, start, chars_->location());
+    case ')':
+        chars_->get();
+        return make_token(TokenKind::RParen, start, chars_->location());
+    case '{':
+        chars_->get();
+        return make_token(TokenKind::LCurly, start, chars_->location());
+    case '}':
+        chars_->get();
+        return make_token(TokenKind::RCurly, start, chars_->location());
+    case '[':
+        chars_->get();
+        return make_token(TokenKind::LSquare, start, chars_->location());
+    case ']':
+        chars_->get();
+        return make_token(TokenKind::RSquare, start, chars_->location());
+    case ';':
+        chars_->get();
+        return make_token(TokenKind::Semi, start, chars_->location());
+    case '<':
+        chars_->get();
+        return make_token(TokenKind::Lt, start, chars_->location());
+    case '>':
+        chars_->get();
+        return make_token(TokenKind::Gt, start, chars_->location());
+    case '!':
+        chars_->get();
+        return make_token(TokenKind::Bang, start, chars_->location());
+    case '.':
+        chars_->get();
+        return make_token(TokenKind::Dot, start, chars_->location());
+    case '=':
+        chars_->get();
+        return make_token(TokenKind::Assign, start, chars_->location());
+    case ',':
+        chars_->get();
+        return make_token(TokenKind::Comma, start, chars_->location());
+    default:
+        break;
+    }
+
+    if (is_digit(ch)) {
+        std::int64_t value = 0;
+        if (ch == '0') {
+            chars_->get();
+        } else {
+            while (!chars_->eof() && is_digit(chars_->peek())) {
+                const char digit = chars_->get();
+                value = value * 10 + (digit - '0');
+            }
+        }
+        const SourceLocation end = chars_->location();
+        return make_token(TokenKind::IntLiteral, start, end, value);
+    }
+
+    if (is_ident_start(ch)) {
+        while (!chars_->eof() && is_ident_continue(chars_->peek())) {
+            chars_->get();
+        }
+        const SourceLocation end = chars_->location();
+        std::string_view lexeme{};
+        if (!source_.empty() && end.offset >= start.offset &&
+            end.offset <= source_.size()) {
+            lexeme = source_.substr(start.offset, end.offset - start.offset);
+        }
+        Token token{TokenKind::Identifier, lexeme, {start, end}, {}};
+        return token;
+    }
+
+    chars_->get();
+    return make_token(TokenKind::Invalid, start, chars_->location());
 }
 
 Lexer::iterator::iterator(Lexer *lx) : lx_(lx) {
