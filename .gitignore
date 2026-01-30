@@ -45,3 +45,5 @@ parser.tab.cc
 prog.bc
 bytecode.txt
 build/
+compile_commands.json
+.cache
