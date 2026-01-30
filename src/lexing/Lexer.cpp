@@ -1,6 +1,7 @@
 #include "lexing/Lexer.hpp"
 
 #include <cctype>
+#include <string>
 #include <string_view>
 
 namespace lexing {
@@ -287,7 +288,15 @@ Token Lexer::lex_one_() {
     }
 
     chars_->get();
-    return make_token(TokenKind::Invalid, start, chars_->location());
+    const SourceLocation end = chars_->location();
+    Token token = make_token(TokenKind::Invalid, start, end);
+    if (diag_ != nullptr) {
+        std::string message = "    Line " + std::to_string(start.line) +
+                              ": lexical ('" + std::string(token.lexeme) +
+                              "' symbol is not recognized by the grammar)\n";
+        diag_->emit({Severity::Error, message, {start, end}});
+    }
+    return token;
 }
 
 Lexer::iterator::iterator(Lexer *lx) : lx_(lx) {
