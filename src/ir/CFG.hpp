@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "ir/BBlock.hpp"
 #include "bytecode/BytecodeProgram.hpp"
+#include "ir/BBlock.hpp"
 #include "semantic/SymbolTable.hpp"
 
 class CFG {

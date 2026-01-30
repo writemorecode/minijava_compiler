@@ -26,8 +26,8 @@ class Tac {
   public:
     virtual void print(std::ostream &os) const;
 
-    virtual void
-    generateBytecode([[maybe_unused]] BytecodeMethodBlock &block){};
+    virtual void generateBytecode([[maybe_unused]] BytecodeMethodBlock &block) {
+    };
 
     Tac(const std::string &result_) : result{result_} {}
     Tac(const std::string &result_, const Operand &lhs_, const std::string &op_,
@@ -48,45 +48,46 @@ class ArrayCopyTac : public Tac {
   public:
     ArrayCopyTac(const std::string &result_, const Operand &index_,
                  const Operand &z_)
-        : Tac(result_, index_, ":=", z_){};
+        : Tac(result_, index_, ":=", z_) {};
     void print(std::ostream &os) const override;
 };
 class ArrayAccessTac : public Tac {
   public:
     ArrayAccessTac(const std::string &result_, const Operand &y_,
                    const Operand &z_)
-        : Tac(result_, y_, "", z_){};
+        : Tac(result_, y_, "", z_) {};
     void print(std::ostream &os) const override;
 };
 class ArrayLengthTac : public Tac {
   public:
     ArrayLengthTac(const std::string &result, const Operand &y_)
-        : Tac(result, y_){};
+        : Tac(result, y_) {};
     void print(std::ostream &os) const override;
 };
 class NewTac : public Tac {
   public:
-    NewTac(const std::string &result, const Operand &y_) : Tac(result, y_){};
+    NewTac(const std::string &result, const Operand &y_) : Tac(result, y_) {};
     void print(std::ostream &os) const override;
 };
 
 class NewArrayTac : public Tac {
   public:
     NewArrayTac(const std::string &result, const Operand &length_)
-        : Tac(result, length_){};
+        : Tac(result, length_) {};
     void print(std::ostream &os) const override;
 };
 
 class NotTac : public Tac {
   public:
-    NotTac(const std::string &result_, const Operand &z_) : Tac(result_, z_){};
+    NotTac(const std::string &result_, const Operand &z_) : Tac(result_, z_) {};
     void generateBytecode(BytecodeMethodBlock &block) override;
     void print(std::ostream &os) const override;
 };
 
 class CopyTac : public Tac {
   public:
-    CopyTac(const Operand &y_, const std::string &result_) : Tac(result_, y_){};
+    CopyTac(const Operand &y_, const std::string &result_)
+        : Tac(result_, y_) {};
     void print(std::ostream &os) const override;
     void generateBytecode(BytecodeMethodBlock &block) override;
 };
@@ -94,7 +95,7 @@ class CopyTac : public Tac {
 class CondJumpTac : public Tac {
   public:
     CondJumpTac(const Operand &label, const Operand &cond)
-        : Tac("", cond, "", label){};
+        : Tac("", cond, "", label) {};
     void print(std::ostream &os) const override;
     void generateBytecode(BytecodeMethodBlock &block) override;
 };
@@ -103,35 +104,35 @@ class MethodCallTac : public Tac {
   public:
     MethodCallTac(const std::string &result, const std::string &objectName,
                   const Operand &methodName, const Operand &argCount)
-        : Tac(result, methodName, objectName, argCount){};
+        : Tac(result, methodName, objectName, argCount) {};
     void print(std::ostream &os) const override;
     void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class JumpTac : public Tac {
   public:
-    JumpTac(const std::string &_label) : Tac(_label){};
+    JumpTac(const std::string &_label) : Tac(_label) {};
     void print(std::ostream &os) const override;
     void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class ParamTac : public Tac {
   public:
-    ParamTac(const Operand &param) : Tac(param){};
+    ParamTac(const Operand &param) : Tac(param) {};
     void print(std::ostream &os) const override;
     void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class ReturnTac : public Tac {
   public:
-    ReturnTac(const Operand &name) : Tac(name){};
+    ReturnTac(const Operand &name) : Tac(name) {};
     void print(std::ostream &os) const override;
     void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class PrintTac : public Tac {
   public:
-    PrintTac(const Operand &value) : Tac(value){};
+    PrintTac(const Operand &value) : Tac(value) {};
     void print(std::ostream &os) const override;
     void generateBytecode(BytecodeMethodBlock &block) override;
 };

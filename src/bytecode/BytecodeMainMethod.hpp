@@ -9,7 +9,7 @@ class BytecodeMainMethod {
     BytecodeMethodBlock block;
 
   public:
-    BytecodeMainMethod(const std::string &name_) : name(name_), block(name){};
+    BytecodeMainMethod(const std::string &name_) : name(name_), block(name) {};
 
     BytecodeMethodBlock &getBlock() { return block; }
 

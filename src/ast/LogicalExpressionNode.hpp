@@ -17,14 +17,14 @@ class LogicalExpressionNode : public Node {
 class LessThanNode : public LogicalExpressionNode {
   public:
     LessThanNode(Node *left, Node *right, int l)
-        : LogicalExpressionNode("Less-than", left, right, l){};
+        : LogicalExpressionNode("Less-than", left, right, l) {};
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class GreaterThanNode : public LogicalExpressionNode {
   public:
     GreaterThanNode(Node *left, Node *right, int l)
-        : LogicalExpressionNode("Greater-than", left, right, l){};
+        : LogicalExpressionNode("Greater-than", left, right, l) {};
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 

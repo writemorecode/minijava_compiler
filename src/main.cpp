@@ -4,9 +4,9 @@
 
 namespace fs = std::filesystem;
 
+#include "ast/Node.h"
 #include "bytecode/BytecodeProgram.hpp"
 #include "ir/CFG.hpp"
-#include "ast/Node.h"
 #include "parser.tab.hh"
 
 extern Node *root;

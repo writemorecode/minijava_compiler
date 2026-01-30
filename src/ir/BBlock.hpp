@@ -20,8 +20,8 @@ class BBlock {
   public:
     BBlock(const std::string &className_, const std::string &methodName_)
         : className(className_), methodName(methodName_),
-          name(className + "." + methodName){};
-    BBlock(const std::string &name_) : name(name_){};
+          name(className + "." + methodName) {};
+    BBlock(const std::string &name_) : name(name_) {};
 
     [[nodiscard]] const auto &getName() const { return name; }
     [[nodiscard]] const auto &getClassName() const { return className; }

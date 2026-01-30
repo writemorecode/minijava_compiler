@@ -16,14 +16,14 @@ class BooleanExpressionNode : public Node {
 class AndNode : public BooleanExpressionNode {
   public:
     AndNode(Node *left, Node *right, int l)
-        : BooleanExpressionNode("AND", left, right, l){};
+        : BooleanExpressionNode("AND", left, right, l) {};
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class OrNode : public BooleanExpressionNode {
   public:
     OrNode(Node *left, Node *right, int l)
-        : BooleanExpressionNode("OR", left, right, l){};
+        : BooleanExpressionNode("OR", left, right, l) {};
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 

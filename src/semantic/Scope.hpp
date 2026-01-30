@@ -25,11 +25,11 @@ class Scope {
 
   public:
     Scope() = default;
-    Scope(const std::string &name) : scopeName(name){};
+    Scope(const std::string &name) : scopeName(name) {};
     Scope(const std::string &name, Record *record_)
-        : scopeName(name), record(record_){};
+        : scopeName(name), record(record_) {};
     Scope(const std::string &name, Record *record_, Scope *parent_)
-        : scopeName(name), record(record_), parent(parent_){};
+        : scopeName(name), record(record_), parent(parent_) {};
 
     [[nodiscard]] Scope *nextChild(const std::string &name, Record *record);
     [[nodiscard]] Scope *getParent();
