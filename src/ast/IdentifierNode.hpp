@@ -1,8 +1,8 @@
 #ifndef IDENTIFIER_NODE_H
 #define IDENTIFIER_NODE_H
 
-#include "ir/BBlock.hpp"
 #include "ast/Node.h"
+#include "ir/BBlock.hpp"
 
 class IdentifierNode : public Node {
     std::string value;

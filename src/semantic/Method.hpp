@@ -13,7 +13,8 @@ class Method : public Record {
     std::vector<Variable *> parameters;
 
   public:
-    Method(const std::string &type, const std::string &id) : Record(id, type){};
+    Method(const std::string &type, const std::string &id)
+        : Record(id, type) {};
 
     std::string getRecord() const override;
 

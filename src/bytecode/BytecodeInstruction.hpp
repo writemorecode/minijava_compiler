@@ -14,7 +14,7 @@ class BytecodeInstruction {
 
   public:
     BytecodeInstruction(Opcode opcode_)
-        : opcode(opcode_), mnemonic(mnemonics[opcode]){};
+        : opcode(opcode_), mnemonic(mnemonics[opcode]) {};
     virtual ~BytecodeInstruction() = default;
     virtual void print(std::ostream &os) const = 0;
 
@@ -28,7 +28,7 @@ class StackParameterInstruction : public BytecodeInstruction {
     // one result back to the stack
   public:
     explicit StackParameterInstruction(Opcode opcode_)
-        : BytecodeInstruction(opcode_){};
+        : BytecodeInstruction(opcode_) {};
     void print(std::ostream &os) const override;
     void serialize(Serializer &serializer) const override;
 };
@@ -40,7 +40,7 @@ class IntegerParameterInstruction : public BytecodeInstruction {
 
   public:
     IntegerParameterInstruction(Opcode opcode_, size_t param_)
-        : BytecodeInstruction(opcode_), param(param_){};
+        : BytecodeInstruction(opcode_), param(param_) {};
     void print(std::ostream &os) const override;
     void serialize(Serializer &serializer) const override;
 };
@@ -52,7 +52,7 @@ class StringParameterInstruction : public BytecodeInstruction {
 
   public:
     StringParameterInstruction(Opcode opcode_, const std::string &param_)
-        : BytecodeInstruction(opcode_), param(param_){};
+        : BytecodeInstruction(opcode_), param(param_) {};
     void print(std::ostream &os) const override;
 
     void serialize(Serializer &serializer) const override;

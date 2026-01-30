@@ -15,7 +15,7 @@ class BytecodeMethod {
   public:
     BytecodeMethod(const std::string &name_,
                    std::vector<std::string> variables_)
-        : name(name_), variables(std::move(variables_)){};
+        : name(name_), variables(std::move(variables_)) {};
 
     bool operator==(const std::string &otherName) const {
         return name == otherName;

@@ -19,7 +19,7 @@ class PlusNode : public ArithmeticExpressionNode {
 
   public:
     PlusNode(Node *left, Node *right, int l)
-        : ArithmeticExpressionNode("Plus", left, right, l){};
+        : ArithmeticExpressionNode("Plus", left, right, l) {};
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
@@ -27,7 +27,7 @@ class MinusNode : public ArithmeticExpressionNode {
 
   public:
     MinusNode(Node *left, Node *right, int l)
-        : ArithmeticExpressionNode("Minus", left, right, l){};
+        : ArithmeticExpressionNode("Minus", left, right, l) {};
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
@@ -35,7 +35,7 @@ class MultiplicationNode : public ArithmeticExpressionNode {
 
   public:
     MultiplicationNode(Node *left, Node *right, int l)
-        : ArithmeticExpressionNode("Multiplication", left, right, l){};
+        : ArithmeticExpressionNode("Multiplication", left, right, l) {};
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
@@ -43,7 +43,7 @@ class DivisionNode : public ArithmeticExpressionNode {
 
   public:
     DivisionNode(Node *left, Node *right, int l)
-        : ArithmeticExpressionNode("Division", left, right, l){};
+        : ArithmeticExpressionNode("Division", left, right, l) {};
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 

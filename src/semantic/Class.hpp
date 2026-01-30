@@ -18,7 +18,7 @@ class Class : public Record {
     std::unordered_map<std::string, Method *> methods;
 
   public:
-    Class(const std::string &id) : Record(id, id){};
+    Class(const std::string &id) : Record(id, id) {};
 
     void addVariable(Variable *variable);
     void addMethod(Method *method);

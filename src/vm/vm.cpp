@@ -16,7 +16,7 @@ struct Instruction {
     size_t argNumber;
     std::string argString;
     Instruction(Opcode op_, size_t argNum_, const std::string &argStr_)
-        : op(op_), argNumber(argNum_), argString(argStr_){};
+        : op(op_), argNumber(argNum_), argString(argStr_) {};
 };
 
 struct Block {
@@ -98,7 +98,7 @@ class Program {
     Program(const std::string &mainMethodName_, const Method &mainMethod_,
             const std::unordered_map<std::string, Method> &methods_)
         : mainMethodName(mainMethodName_), mainMethod(mainMethod_),
-          methods(methods_){};
+          methods(methods_) {};
 
     void print() const;
     std::string getMainMethodName() const { return mainMethodName; }
