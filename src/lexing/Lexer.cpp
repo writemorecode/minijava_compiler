@@ -32,6 +32,61 @@ bool starts_with(CharStream *chars, std::string_view text) {
     return true;
 }
 
+TokenKind keyword_kind(std::string_view lexeme) {
+    if (lexeme == "public") {
+        return TokenKind::KwPublic;
+    }
+    if (lexeme == "static") {
+        return TokenKind::KwStatic;
+    }
+    if (lexeme == "void") {
+        return TokenKind::KwVoid;
+    }
+    if (lexeme == "main") {
+        return TokenKind::KwMain;
+    }
+    if (lexeme == "String") {
+        return TokenKind::KwString;
+    }
+    if (lexeme == "int") {
+        return TokenKind::KwInt;
+    }
+    if (lexeme == "boolean") {
+        return TokenKind::KwBoolean;
+    }
+    if (lexeme == "if") {
+        return TokenKind::KwIf;
+    }
+    if (lexeme == "else") {
+        return TokenKind::KwElse;
+    }
+    if (lexeme == "while") {
+        return TokenKind::KwWhile;
+    }
+    if (lexeme == "length") {
+        return TokenKind::KwLength;
+    }
+    if (lexeme == "true") {
+        return TokenKind::KwTrue;
+    }
+    if (lexeme == "false") {
+        return TokenKind::KwFalse;
+    }
+    if (lexeme == "this") {
+        return TokenKind::KwThis;
+    }
+    if (lexeme == "new") {
+        return TokenKind::KwNew;
+    }
+    if (lexeme == "return") {
+        return TokenKind::KwReturn;
+    }
+    if (lexeme == "class") {
+        return TokenKind::KwClass;
+    }
+    return TokenKind::Identifier;
+}
+
 } // namespace
 
 Lexer::Lexer(std::unique_ptr<CharStream> chars, std::string_view source,
@@ -225,7 +280,7 @@ Token Lexer::lex_one_() {
             end.offset <= source_.size()) {
             lexeme = source_.substr(start.offset, end.offset - start.offset);
         }
-        Token token{TokenKind::Identifier, lexeme, {start, end}, {}};
+        Token token{keyword_kind(lexeme), lexeme, {start, end}, {}};
         return token;
     }
 
