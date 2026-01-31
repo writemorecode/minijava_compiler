@@ -1,4 +1,4 @@
-# Lexer/Parser Refactor Spec (Flex/Bison -> C++20)
+# Lexer/Parser Refactor Spec (Flex/Bison -> C++23)
 
 ## Context
 The project currently uses Flex (`src/lexing/lexer.flex`) and Bison (`src/parsing/parser.yy`) to produce a MiniJava lexer and parser. The goal is to replace both with pure C++ (no generated code), while keeping language behavior, AST construction, and tests stable.
@@ -9,7 +9,7 @@ This spec is an initial blueprint and is informed by:
 - existing grammar and AST actions (`src/parsing/parser.yy`)
 
 ## Goals
-- Pure C++20 lexer and parser, no Flex/Bison dependency.
+- Pure C++23 lexer and parser, no Flex/Bison dependency.
 - Streaming lexer with token-iterator style API (peek/next + iterator).
 - Recursive descent parser for statements, declarations, and module structure.
 - Pratt parser for expressions (same operator precedence/associativity as current grammar).
@@ -143,11 +143,11 @@ Error handling:
 Parser owns a `Lexer` instance (by value, as in `lexer_parser_api.hpp`) and provides explicit `Result<T>` return types (no exceptions).
 
 #### Result type
-Since the project is C++20 (no `std::expected`), introduce a small `Expected<T, E>` in `src/util/Expected.hpp` or equivalent.
+Since the project is C++23, use `std::expected` from `<expected>` instead of a custom `Expected` type.
 
 ```cpp
 struct ParseError { std::string message; SourceSpan span; };
-template <class T> using Result = Expected<T, ParseError>;
+template <class T> using Result = std::expected<T, ParseError>;
 ```
 
 #### Entry points
@@ -231,7 +231,7 @@ Line numbers should be drawn from the first relevant token in each construct (ma
 - `src/lexing/CharStream.hpp` / `CharStream.cpp`
 - `src/lexing/Lexer.hpp` / `Lexer.cpp`
 - `src/parsing/Parser.hpp` / `Parser.cpp`
-- `src/util/Expected.hpp` (if needed for C++20)
+- `std::expected` from `<expected>`
 
 ## Decisions Locked In
 1. **Unary minus behavior**: fix the current incorrect behavior and implement proper unary `-` in the Pratt parser (no more `IdentifierNode("-$2", ...)`).

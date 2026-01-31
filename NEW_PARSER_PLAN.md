@@ -1,7 +1,7 @@
 # New Parser Implementation Plan
 
 ## Scope
-Replace the current Bison parser with a pure C++20 parser that:
+Replace the current Bison parser with a pure C++23 parser that:
 - Consumes the new streaming lexer (`src/lexing/Lexer.hpp`).
 - Uses Pratt parsing for expressions and recursive descent for all other constructs.
 - Produces the same AST node types and line numbers as the existing grammar actions.
@@ -20,12 +20,12 @@ This plan assumes the lexer has already been implemented and integrated behind a
 
 ### 1) Introduce Result/Expected utility
 **Goal:** A no-exceptions error carrier for parsing routines.
-- Add `src/util/Expected.hpp` with a small `Expected<T, E>` or `Result<T>` helper.
-- Ensure it supports: `ok(value)`, `err(error)`, `has_value()`, `value()`, `error()`.
-- Keep it header-only and C++20-friendly.
+- Use `std::expected` from `<expected>` for a `Result<T>` helper.
+- Ensure it supports: `has_value()`, `value()`, `error()`.
+- Keep it header-only and C++23-friendly.
 
 Deliverables:
-- `src/util/Expected.hpp`
+- `<expected>`
 
 ### 2) Define Parser interface + core types
 **Goal:** Provide a clean, testable API similar in style to Rust.

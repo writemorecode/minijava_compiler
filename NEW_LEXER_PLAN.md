@@ -4,7 +4,7 @@
 This plan covers implementing the new pure C++ lexer only (streaming token iterator), aligned with `LEXER_PARSER_REFACTOR_SPEC.md` and the existing Flex rules in `src/lexing/lexer.flex`. Parser work is out of scope except for API integration points noted where necessary.
 
 ## Key Constraints
-- C++20, no exceptions.
+- C++23, no exceptions.
 - Tokens store `std::string_view` into the original program source buffer; the buffer must outlive all tokens.
 - Error messages must match current output exactly (Flex/Bison behavior).
 - Lexer is streaming (peek/next + input iterator).

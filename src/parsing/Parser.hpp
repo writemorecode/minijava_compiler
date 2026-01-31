@@ -1,13 +1,12 @@
 #pragma once
 
 #include <deque>
+#include <expected>
 #include <string>
 
 #include "ast/Node.h"
 #include "lexing/Lexer.hpp"
 #include "lexing/Token.hpp"
-#include "util/Expected.hpp"
-
 namespace parsing {
 
 struct ParseError {
@@ -15,7 +14,7 @@ struct ParseError {
     lexing::SourceSpan span{};
 };
 
-template <typename T> using Result = util::Expected<T, ParseError>;
+template <typename T> using Result = std::expected<T, ParseError>;
 
 class Parser {
   public:
