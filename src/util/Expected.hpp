@@ -6,11 +6,14 @@
 
 namespace util {
 
-template <typename T, typename E>
-class Expected {
+template <typename T, typename E> class Expected {
   public:
-    static Expected ok(T value) { return Expected(std::in_place_index<0>, std::move(value)); }
-    static Expected err(E error) { return Expected(std::in_place_index<1>, std::move(error)); }
+    static Expected ok(T value) {
+        return Expected(std::in_place_index<0>, std::move(value));
+    }
+    static Expected err(E error) {
+        return Expected(std::in_place_index<1>, std::move(error));
+    }
 
     Expected(const Expected &other) {
         if (other.has_value_) {
@@ -21,8 +24,9 @@ class Expected {
         has_value_ = other.has_value_;
     }
 
-    Expected(Expected &&other) noexcept(std::is_nothrow_move_constructible_v<T> &&
-                                        std::is_nothrow_move_constructible_v<E>) {
+    Expected(Expected &&other) noexcept(
+        std::is_nothrow_move_constructible_v<T> &&
+        std::is_nothrow_move_constructible_v<E>) {
         if (other.has_value_) {
             new (&storage_.value) T(std::move(other.storage_.value));
         } else {
@@ -45,8 +49,9 @@ class Expected {
         return *this;
     }
 
-    Expected &operator=(Expected &&other) noexcept(std::is_nothrow_move_constructible_v<T> &&
-                                                   std::is_nothrow_move_constructible_v<E>) {
+    Expected &operator=(Expected &&other) noexcept(
+        std::is_nothrow_move_constructible_v<T> &&
+        std::is_nothrow_move_constructible_v<E>) {
         if (this == &other) {
             return *this;
         }
@@ -103,13 +108,11 @@ class Expected {
     bool has_value_ = false;
 };
 
-template <typename T, typename E>
-Expected<T, E> ok(T value) {
+template <typename T, typename E> Expected<T, E> ok(T value) {
     return Expected<T, E>::ok(std::move(value));
 }
 
-template <typename T, typename E>
-Expected<T, E> err(E error) {
+template <typename T, typename E> Expected<T, E> err(E error) {
     return Expected<T, E>::err(std::move(error));
 }
 

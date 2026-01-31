@@ -10,8 +10,8 @@ namespace fs = std::filesystem;
 #include "ast/Node.h"
 #include "bytecode/BytecodeProgram.hpp"
 #include "ir/CFG.hpp"
-#include "lexing/Lexer.hpp"
 #include "lexing/LegacyDiagnostics.hpp"
+#include "lexing/Lexer.hpp"
 #include "lexing/SourceBuffer.hpp"
 #include "lexing/StringViewStream.hpp"
 #include "parsing/Parser.hpp"
@@ -32,8 +32,7 @@ int errCode = errCodes::SUCCESS;
 
 class ConditionalDiagnosticSink final : public lexing::DiagnosticSink {
   public:
-    explicit ConditionalDiagnosticSink(int *gate,
-                                       std::ostream &out = std::cerr)
+    explicit ConditionalDiagnosticSink(int *gate, std::ostream &out = std::cerr)
         : gate_(gate), out_(&out) {}
 
     void emit(lexing::Diagnostic d) override {
@@ -238,8 +237,7 @@ int main(int argc, char **argv) {
     }
 
     if (lex_only) {
-        auto stream =
-            std::make_unique<lexing::StringViewStream>(buffer.view());
+        auto stream = std::make_unique<lexing::StringViewStream>(buffer.view());
         lexing::LegacyDiagnosticSink diag(&lexical_errors);
         lexing::Lexer lexer(std::move(stream), buffer.view(), &diag);
 

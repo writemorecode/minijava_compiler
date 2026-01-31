@@ -14,6 +14,9 @@
 #include "ast/ClassNode.hpp"
 #include "ast/ControlStatementNode.hpp"
 #include "ast/IdentifierNode.hpp"
+#include "ast/IntegerArrayAllocationNode.hpp"
+#include "ast/IntegerNode.hpp"
+#include "ast/LogicalExpressionNode.hpp"
 #include "ast/MainClassNode.hpp"
 #include "ast/MethodBodyNode.hpp"
 #include "ast/MethodCallNode.hpp"
@@ -21,9 +24,6 @@
 #include "ast/MethodNode.hpp"
 #include "ast/MethodParameterNode.hpp"
 #include "ast/MethodWithoutParametersNode.hpp"
-#include "ast/IntegerArrayAllocationNode.hpp"
-#include "ast/IntegerNode.hpp"
-#include "ast/LogicalExpressionNode.hpp"
 #include "ast/NotNode.hpp"
 #include "ast/StatementNode.hpp"
 #include "ast/ThisNode.hpp"
@@ -195,13 +195,9 @@ bool is_type_start(lexing::TokenKind kind) {
 Parser::Parser(lexing::Lexer lexer, lexing::DiagnosticSink *sink)
     : lexer_(std::move(lexer)), sink_(sink) {}
 
-bool Parser::has_errors() const {
-    return error_count_ > 0;
-}
+bool Parser::has_errors() const { return error_count_ > 0; }
 
-int Parser::error_count() const {
-    return error_count_;
-}
+int Parser::error_count() const { return error_count_; }
 
 const lexing::Token &Parser::peek(std::size_t n) {
     while (buffer_.size() <= n) {
@@ -233,7 +229,7 @@ bool Parser::match(lexing::TokenKind kind) {
 }
 
 Result<lexing::Token> Parser::expect(lexing::TokenKind kind,
-                                    std::string_view expected_label) {
+                                     std::string_view expected_label) {
     if (peek().kind == kind) {
         return Result<lexing::Token>::ok(consume());
     }
@@ -297,13 +293,11 @@ Result<Node *> Parser::parse_goal() {
 }
 
 Result<Node *> Parser::parse_main_class() {
-    Result<lexing::Token> pub =
-        expect(lexing::TokenKind::KwPublic, "PUBLIC");
+    Result<lexing::Token> pub = expect(lexing::TokenKind::KwPublic, "PUBLIC");
     if (!pub.has_value()) {
         return Result<Node *>::err(pub.error());
     }
-    Result<lexing::Token> cls =
-        expect(lexing::TokenKind::KwClass, "CLASS");
+    Result<lexing::Token> cls = expect(lexing::TokenKind::KwClass, "CLASS");
     if (!cls.has_value()) {
         return Result<Node *>::err(cls.error());
     }
@@ -316,43 +310,35 @@ Result<Node *> Parser::parse_main_class() {
     if (!open_class.has_value()) {
         return Result<Node *>::err(open_class.error());
     }
-    Result<lexing::Token> pub2 =
-        expect(lexing::TokenKind::KwPublic, "PUBLIC");
+    Result<lexing::Token> pub2 = expect(lexing::TokenKind::KwPublic, "PUBLIC");
     if (!pub2.has_value()) {
         return Result<Node *>::err(pub2.error());
     }
-    Result<lexing::Token> stat =
-        expect(lexing::TokenKind::KwStatic, "STATIC");
+    Result<lexing::Token> stat = expect(lexing::TokenKind::KwStatic, "STATIC");
     if (!stat.has_value()) {
         return Result<Node *>::err(stat.error());
     }
-    Result<lexing::Token> v =
-        expect(lexing::TokenKind::KwVoid, "VOID");
+    Result<lexing::Token> v = expect(lexing::TokenKind::KwVoid, "VOID");
     if (!v.has_value()) {
         return Result<Node *>::err(v.error());
     }
-    Result<lexing::Token> main =
-        expect(lexing::TokenKind::KwMain, "MAIN");
+    Result<lexing::Token> main = expect(lexing::TokenKind::KwMain, "MAIN");
     if (!main.has_value()) {
         return Result<Node *>::err(main.error());
     }
-    Result<lexing::Token> lp =
-        expect(lexing::TokenKind::LParen, "L_PAREN");
+    Result<lexing::Token> lp = expect(lexing::TokenKind::LParen, "L_PAREN");
     if (!lp.has_value()) {
         return Result<Node *>::err(lp.error());
     }
-    Result<lexing::Token> str =
-        expect(lexing::TokenKind::KwString, "STRING");
+    Result<lexing::Token> str = expect(lexing::TokenKind::KwString, "STRING");
     if (!str.has_value()) {
         return Result<Node *>::err(str.error());
     }
-    Result<lexing::Token> ls =
-        expect(lexing::TokenKind::LSquare, "L_SQUARE");
+    Result<lexing::Token> ls = expect(lexing::TokenKind::LSquare, "L_SQUARE");
     if (!ls.has_value()) {
         return Result<Node *>::err(ls.error());
     }
-    Result<lexing::Token> rs =
-        expect(lexing::TokenKind::RSquare, "R_SQUARE");
+    Result<lexing::Token> rs = expect(lexing::TokenKind::RSquare, "R_SQUARE");
     if (!rs.has_value()) {
         return Result<Node *>::err(rs.error());
     }
@@ -360,8 +346,7 @@ Result<Node *> Parser::parse_main_class() {
     if (!arg.has_value()) {
         return arg;
     }
-    Result<lexing::Token> rp =
-        expect(lexing::TokenKind::RParen, "R_PAREN");
+    Result<lexing::Token> rp = expect(lexing::TokenKind::RParen, "R_PAREN");
     if (!rp.has_value()) {
         return Result<Node *>::err(rp.error());
     }
@@ -410,8 +395,7 @@ Result<Node *> Parser::parse_class_decl_list() {
 }
 
 Result<Node *> Parser::parse_class_decl() {
-    Result<lexing::Token> cls =
-        expect(lexing::TokenKind::KwClass, "CLASS");
+    Result<lexing::Token> cls = expect(lexing::TokenKind::KwClass, "CLASS");
     if (!cls.has_value()) {
         return Result<Node *>::err(cls.error());
     }
@@ -429,8 +413,7 @@ Result<Node *> Parser::parse_class_decl() {
 }
 
 Result<Node *> Parser::parse_class_body() {
-    Result<lexing::Token> open =
-        expect(lexing::TokenKind::LCurly, "L_CURLY");
+    Result<lexing::Token> open = expect(lexing::TokenKind::LCurly, "L_CURLY");
     if (!open.has_value()) {
         return Result<Node *>::err(open.error());
     }
@@ -459,8 +442,7 @@ Result<Node *> Parser::parse_class_body() {
         method_list = methods.value();
     }
 
-    Result<lexing::Token> close =
-        expect(lexing::TokenKind::RCurly, "R_CURLY");
+    Result<lexing::Token> close = expect(lexing::TokenKind::RCurly, "R_CURLY");
     if (!close.has_value()) {
         return Result<Node *>::err(close.error());
     }
@@ -529,8 +511,7 @@ Result<Node *> Parser::parse_var_decl() {
     if (!id.has_value()) {
         return id;
     }
-    Result<lexing::Token> semi =
-        expect(lexing::TokenKind::Semi, "SEMI");
+    Result<lexing::Token> semi = expect(lexing::TokenKind::Semi, "SEMI");
     if (!semi.has_value()) {
         return Result<Node *>::err(semi.error());
     }
@@ -540,8 +521,7 @@ Result<Node *> Parser::parse_var_decl() {
 }
 
 Result<Node *> Parser::parse_method_decl() {
-    Result<lexing::Token> pub =
-        expect(lexing::TokenKind::KwPublic, "PUBLIC");
+    Result<lexing::Token> pub = expect(lexing::TokenKind::KwPublic, "PUBLIC");
     if (!pub.has_value()) {
         return Result<Node *>::err(pub.error());
     }
@@ -553,8 +533,7 @@ Result<Node *> Parser::parse_method_decl() {
     if (!id.has_value()) {
         return id;
     }
-    Result<lexing::Token> open =
-        expect(lexing::TokenKind::LParen, "L_PAREN");
+    Result<lexing::Token> open = expect(lexing::TokenKind::LParen, "L_PAREN");
     if (!open.has_value()) {
         return Result<Node *>::err(open.error());
     }
@@ -596,8 +575,7 @@ Result<Node *> Parser::parse_method_decl() {
     if (!body.has_value()) {
         return body;
     }
-    Result<lexing::Token> close =
-        expect(lexing::TokenKind::RCurly, "R_CURLY");
+    Result<lexing::Token> close = expect(lexing::TokenKind::RCurly, "R_CURLY");
     if (!close.has_value()) {
         return Result<Node *>::err(close.error());
     }
@@ -617,8 +595,8 @@ Result<Node *> Parser::parse_method_parameter() {
         return id;
     }
 
-    return Result<Node *>::ok(
-        new MethodParameterNode(type.value(), id.value(), type.value()->lineno));
+    return Result<Node *>::ok(new MethodParameterNode(type.value(), id.value(),
+                                                      type.value()->lineno));
 }
 
 Result<Node *> Parser::parse_method_parameter_list() {
@@ -648,22 +626,20 @@ Result<Node *> Parser::parse_method_body() {
         if (!expr.has_value()) {
             return expr;
         }
-        Result<lexing::Token> semi =
-            expect(lexing::TokenKind::Semi, "SEMI");
+        Result<lexing::Token> semi = expect(lexing::TokenKind::Semi, "SEMI");
         if (!semi.has_value()) {
             return Result<Node *>::err(semi.error());
         }
         int line = static_cast<int>(ret.span.begin.line);
-        return Result<Node *>::ok(new ReturnOnlyMethodBodyNode(expr.value(),
-                                                               line));
+        return Result<Node *>::ok(
+            new ReturnOnlyMethodBodyNode(expr.value(), line));
     }
 
     Result<Node *> items = parse_method_body_item_list();
     if (!items.has_value()) {
         return items;
     }
-    Result<lexing::Token> ret =
-        expect(lexing::TokenKind::KwReturn, "RETURN");
+    Result<lexing::Token> ret = expect(lexing::TokenKind::KwReturn, "RETURN");
     if (!ret.has_value()) {
         return Result<Node *>::err(ret.error());
     }
@@ -756,8 +732,7 @@ Result<Node *> Parser::parse_statement() {
     }
 
     if (match(lexing::TokenKind::KwIf)) {
-        Result<lexing::Token> lp =
-            expect(lexing::TokenKind::LParen, "L_PAREN");
+        Result<lexing::Token> lp = expect(lexing::TokenKind::LParen, "L_PAREN");
         if (!lp.has_value()) {
             return Result<Node *>::err(lp.error());
         }
@@ -765,8 +740,7 @@ Result<Node *> Parser::parse_statement() {
         if (!cond.has_value()) {
             return cond;
         }
-        Result<lexing::Token> rp =
-            expect(lexing::TokenKind::RParen, "R_PAREN");
+        Result<lexing::Token> rp = expect(lexing::TokenKind::RParen, "R_PAREN");
         if (!rp.has_value()) {
             return Result<Node *>::err(rp.error());
         }
@@ -779,17 +753,15 @@ Result<Node *> Parser::parse_statement() {
             if (!else_stmt.has_value()) {
                 return else_stmt;
             }
-            return Result<Node *>::ok(
-                new IfElseNode(cond.value(), then_stmt.value(),
-                               else_stmt.value(), line));
+            return Result<Node *>::ok(new IfElseNode(
+                cond.value(), then_stmt.value(), else_stmt.value(), line));
         }
         return Result<Node *>::ok(
             new IfNode(cond.value(), then_stmt.value(), line));
     }
 
     if (match(lexing::TokenKind::KwWhile)) {
-        Result<lexing::Token> lp =
-            expect(lexing::TokenKind::LParen, "L_PAREN");
+        Result<lexing::Token> lp = expect(lexing::TokenKind::LParen, "L_PAREN");
         if (!lp.has_value()) {
             return Result<Node *>::err(lp.error());
         }
@@ -797,8 +769,7 @@ Result<Node *> Parser::parse_statement() {
         if (!cond.has_value()) {
             return cond;
         }
-        Result<lexing::Token> rp =
-            expect(lexing::TokenKind::RParen, "R_PAREN");
+        Result<lexing::Token> rp = expect(lexing::TokenKind::RParen, "R_PAREN");
         if (!rp.has_value()) {
             return Result<Node *>::err(rp.error());
         }
@@ -811,8 +782,7 @@ Result<Node *> Parser::parse_statement() {
     }
 
     if (match(lexing::TokenKind::KwPrintln)) {
-        Result<lexing::Token> lp =
-            expect(lexing::TokenKind::LParen, "L_PAREN");
+        Result<lexing::Token> lp = expect(lexing::TokenKind::LParen, "L_PAREN");
         if (!lp.has_value()) {
             return Result<Node *>::err(lp.error());
         }
@@ -820,13 +790,11 @@ Result<Node *> Parser::parse_statement() {
         if (!expr.has_value()) {
             return expr;
         }
-        Result<lexing::Token> rp =
-            expect(lexing::TokenKind::RParen, "R_PAREN");
+        Result<lexing::Token> rp = expect(lexing::TokenKind::RParen, "R_PAREN");
         if (!rp.has_value()) {
             return Result<Node *>::err(rp.error());
         }
-        Result<lexing::Token> semi =
-            expect(lexing::TokenKind::Semi, "SEMI");
+        Result<lexing::Token> semi = expect(lexing::TokenKind::Semi, "SEMI");
         if (!semi.has_value()) {
             return Result<Node *>::err(semi.error());
         }
@@ -947,7 +915,8 @@ Result<Node *> Parser::parse_type() {
     }
 
     if (match(lexing::TokenKind::Identifier)) {
-        return Result<Node *>::ok(new TypeNode(std::string(token.lexeme), line));
+        return Result<Node *>::ok(
+            new TypeNode(std::string(token.lexeme), line));
     }
 
     report_error(token, "type");
@@ -955,8 +924,7 @@ Result<Node *> Parser::parse_type() {
 }
 
 Result<Node *> Parser::parse_identifier() {
-    Result<lexing::Token> id =
-        expect(lexing::TokenKind::Identifier, "ID");
+    Result<lexing::Token> id = expect(lexing::TokenKind::Identifier, "ID");
     if (!id.has_value()) {
         return Result<Node *>::err(id.error());
     }
@@ -1052,8 +1020,7 @@ Result<Node *> Parser::parse_expression(int min_bp) {
             break;
         }
 
-        Result<lexing::Token> id =
-            expect(lexing::TokenKind::Identifier, "ID");
+        Result<lexing::Token> id = expect(lexing::TokenKind::Identifier, "ID");
         if (!id.has_value()) {
             return Result<Node *>::err(id.error());
         }
@@ -1210,8 +1177,8 @@ Result<Node *> Parser::parse_expression(int min_bp) {
 
             Node *identifier =
                 new IdentifierNode(std::string(id.value().lexeme), op_line);
-            lhs = new MethodCallNode(lhs, identifier, expr_list.value(),
-                                     op_line);
+            lhs =
+                new MethodCallNode(lhs, identifier, expr_list.value(), op_line);
             break;
         }
         default:

@@ -15,8 +15,7 @@ struct ParseError {
     lexing::SourceSpan span{};
 };
 
-template <typename T>
-using Result = util::Expected<T, ParseError>;
+template <typename T> using Result = util::Expected<T, ParseError>;
 
 class Parser {
   public:
@@ -32,7 +31,7 @@ class Parser {
     lexing::Token consume();
     bool match(lexing::TokenKind kind);
     Result<lexing::Token> expect(lexing::TokenKind kind,
-                                std::string_view expected_label);
+                                 std::string_view expected_label);
 
     void report_error(const lexing::Token &token,
                       std::string_view expected_label);
