@@ -1,9 +1,13 @@
 #include "parsing/Parser.hpp"
 
 #include <cassert>
+#include <cstddef>
 #include <deque>
+#include <expected>
 #include <optional>
 #include <string>
+#include <string_view>
+#include <utility>
 
 #include "ast/ArithmeticExpressionNode.hpp"
 #include "ast/ArrayAccessNode.hpp"
@@ -24,10 +28,13 @@
 #include "ast/MethodNode.hpp"
 #include "ast/MethodParameterNode.hpp"
 #include "ast/MethodWithoutParametersNode.hpp"
+#include "ast/Node.h"
 #include "ast/NotNode.hpp"
 #include "ast/StatementNode.hpp"
 #include "ast/ThisNode.hpp"
 #include "ast/VariableNode.hpp"
+#include "lexing/Lexer.hpp"
+#include "lexing/Token.hpp"
 #include "semantic/TypeNode.hpp"
 
 namespace parsing {
@@ -143,23 +150,23 @@ std::optional<BindingPower> infix_binding_power(lexing::TokenKind kind) {
     using lexing::TokenKind;
     switch (kind) {
     case TokenKind::OrOr:
-        return BindingPower{BP_OR, BP_OR};
+        return BindingPower{.left = BP_OR, .right = BP_OR};
     case TokenKind::AndAnd:
-        return BindingPower{BP_AND, BP_AND};
+        return BindingPower{.left = BP_AND, .right = BP_AND};
     case TokenKind::Lt:
     case TokenKind::Gt:
     case TokenKind::EqEq:
-        return BindingPower{BP_COMP, BP_COMP + 1};
+        return BindingPower{.left = BP_COMP, .right = BP_COMP + 1};
     case TokenKind::Plus:
     case TokenKind::Minus:
-        return BindingPower{BP_ADD, BP_ADD + 1};
+        return BindingPower{.left = BP_ADD, .right = BP_ADD + 1};
     case TokenKind::Star:
     case TokenKind::Slash:
-        return BindingPower{BP_MUL, BP_MUL + 1};
+        return BindingPower{.left = BP_MUL, .right = BP_MUL + 1};
     case TokenKind::LSquare:
-        return BindingPower{BP_POSTFIX, BP_POSTFIX + 1};
+        return BindingPower{.left = BP_POSTFIX, .right = BP_POSTFIX + 1};
     case TokenKind::Dot:
-        return BindingPower{BP_DOT, BP_DOT + 1};
+        return BindingPower{.left = BP_DOT, .right = BP_DOT + 1};
     default:
         return std::nullopt;
     }
@@ -201,7 +208,7 @@ int Parser::error_count() const { return error_count_; }
 
 const lexing::Token &Parser::peek(std::size_t n) {
     while (buffer_.size() <= n) {
-        lexing::Token token = lexer_.next();
+        lexing::Token const token = lexer_.next();
         if (token.kind == lexing::TokenKind::Invalid) {
             continue;
         }
@@ -234,8 +241,8 @@ Result<lexing::Token> Parser::expect(lexing::TokenKind kind,
         return Result<lexing::Token>(consume());
     }
     report_error(peek(), expected_label);
-    return std::unexpected(
-        ParseError{std::string(expected_label), peek().span});
+    return std::unexpected(ParseError{.message = std::string(expected_label),
+                                      .span = peek().span});
 }
 
 void Parser::report_error(const lexing::Token &token,
@@ -263,7 +270,9 @@ void Parser::report_error(const lexing::Token &token,
     message += "\nEnd of syntax errors!\n";
 
     if (sink_ != nullptr) {
-        sink_->emit({lexing::Severity::Error, message, token.span});
+        sink_->emit({.severity = lexing::Severity::Error,
+                     .message = message,
+                     .span = token.span});
     }
 }
 
@@ -379,7 +388,7 @@ Result<Node *> Parser::parse_class_decl_list() {
     if (!first.has_value()) {
         return first;
     }
-    int line = first.value()->lineno;
+    int const line = first.value()->lineno;
     Node *list = new Node("Class declaration list", "", line);
     list->children.push_back(first.value());
 
@@ -419,7 +428,7 @@ Result<Node *> Parser::parse_class_body() {
     }
 
     if (match(lexing::TokenKind::RCurly)) {
-        int line = static_cast<int>(open.value().span.begin.line);
+        int const line = static_cast<int>(open.value().span.begin.line);
         return Result<Node *>(new Node("Empty class body", "", line));
     }
 
@@ -448,7 +457,7 @@ Result<Node *> Parser::parse_class_body() {
     }
 
     if (var_list != nullptr && method_list != nullptr) {
-        int line = static_cast<int>(close.value().span.begin.line);
+        int const line = static_cast<int>(close.value().span.begin.line);
         Node *body = new Node("Class body", "", line);
         body->children.push_back(var_list);
         body->children.push_back(method_list);
@@ -467,7 +476,7 @@ Result<Node *> Parser::parse_class_var_decl_list() {
     if (!first.has_value()) {
         return first;
     }
-    int line = first.value()->lineno;
+    int const line = first.value()->lineno;
     Node *list = new Node("Variable declaration list", "", line);
     list->children.push_back(first.value());
 
@@ -487,7 +496,7 @@ Result<Node *> Parser::parse_method_decl_list() {
     if (!first.has_value()) {
         return first;
     }
-    int line = first.value()->lineno;
+    int const line = first.value()->lineno;
     Node *list = new Node("Method declaration list", "", line);
     list->children.push_back(first.value());
 
@@ -604,7 +613,7 @@ Result<Node *> Parser::parse_method_parameter_list() {
     if (!first.has_value()) {
         return first;
     }
-    int line = first.value()->lineno;
+    int const line = first.value()->lineno;
     Node *list = new Node("Method parameter list", "", line);
     list->children.push_back(first.value());
 
@@ -621,7 +630,7 @@ Result<Node *> Parser::parse_method_parameter_list() {
 
 Result<Node *> Parser::parse_method_body() {
     if (peek().kind == lexing::TokenKind::KwReturn) {
-        lexing::Token ret = consume();
+        lexing::Token const ret = consume();
         Result<Node *> expr = parse_expression(0);
         if (!expr.has_value()) {
             return expr;
@@ -630,7 +639,7 @@ Result<Node *> Parser::parse_method_body() {
         if (!semi.has_value()) {
             return std::unexpected(semi.error());
         }
-        int line = static_cast<int>(ret.span.begin.line);
+        int const line = static_cast<int>(ret.span.begin.line);
         return Result<Node *>(
             new ReturnOnlyMethodBodyNode(expr.value(), line));
     }
@@ -651,7 +660,7 @@ Result<Node *> Parser::parse_method_body() {
     if (!semi.has_value()) {
         return std::unexpected(semi.error());
     }
-    int line = static_cast<int>(ret.value().span.begin.line);
+    int const line = static_cast<int>(ret.value().span.begin.line);
     return Result<Node *>(
         new MethodBodyNode(items.value(), expr.value(), line));
 }
@@ -674,7 +683,7 @@ Result<Node *> Parser::parse_method_body_item() {
         if (!var.has_value()) {
             return var;
         }
-        int line = var.value()->lineno;
+        int const line = var.value()->lineno;
         Node *wrapper = new Node("Variable declaration", "", line);
         wrapper->children.push_back(var.value());
         return Result<Node *>(wrapper);
@@ -684,7 +693,7 @@ Result<Node *> Parser::parse_method_body_item() {
     if (!stmt.has_value()) {
         return stmt;
     }
-    int line = stmt.value()->lineno;
+    int const line = stmt.value()->lineno;
     Node *wrapper = new Node("Statement", "", line);
     wrapper->children.push_back(stmt.value());
     return Result<Node *>(wrapper);
@@ -695,7 +704,7 @@ Result<Node *> Parser::parse_method_body_item_list() {
     if (!first.has_value()) {
         return first;
     }
-    int line = first.value()->lineno;
+    int const line = first.value()->lineno;
     Node *list = new Node("Method body item list", "", line);
     list->children.push_back(first.value());
 
@@ -847,11 +856,13 @@ Result<Node *> Parser::parse_statement() {
                 id.value(), index.value(), expr.value(), line));
         }
         report_error(peek(), "ASSIGN");
-        return std::unexpected(ParseError{"ASSIGN", peek().span});
+        return std::unexpected(
+            ParseError{.message = "ASSIGN", .span = peek().span});
     }
 
     report_error(token, "statement");
-    return std::unexpected(ParseError{"statement", token.span});
+    return std::unexpected(
+        ParseError{.message = "statement", .span = token.span});
 }
 
 Result<Node *> Parser::parse_statement_list() {
@@ -859,7 +870,7 @@ Result<Node *> Parser::parse_statement_list() {
     if (!first.has_value()) {
         return first;
     }
-    int line = first.value()->lineno;
+    int const line = first.value()->lineno;
     Node *list = new Node("Statement list", "", line);
     list->children.push_back(first.value());
 
@@ -879,7 +890,7 @@ Result<Node *> Parser::parse_expression_list() {
     if (!first.has_value()) {
         return first;
     }
-    int line = first.value()->lineno;
+    int const line = first.value()->lineno;
     Node *list = new Node("Expression list", "", line);
     list->children.push_back(first.value());
 
@@ -920,7 +931,7 @@ Result<Node *> Parser::parse_type() {
     }
 
     report_error(token, "type");
-    return std::unexpected(ParseError{"type", token.span});
+    return std::unexpected(ParseError{.message = "type", .span = token.span});
 }
 
 Result<Node *> Parser::parse_identifier() {
@@ -928,7 +939,7 @@ Result<Node *> Parser::parse_identifier() {
     if (!id.has_value()) {
         return std::unexpected(id.error());
     }
-    int line = static_cast<int>(id.value().span.begin.line);
+    int const line = static_cast<int>(id.value().span.begin.line);
     return Result<Node *>(
         new IdentifierNode(std::string(id.value().lexeme), line));
 }
@@ -939,7 +950,7 @@ Result<Node *> Parser::parse_integer() {
     if (!lit.has_value()) {
         return std::unexpected(lit.error());
     }
-    int line = static_cast<int>(lit.value().span.begin.line);
+    int const line = static_cast<int>(lit.value().span.begin.line);
     return Result<Node *>(
         new IntegerNode(std::string(lit.value().lexeme), line));
 }
@@ -1041,7 +1052,8 @@ Result<Node *> Parser::parse_expression(int min_bp) {
     }
     default:
         report_error(token, "expression");
-        return std::unexpected(ParseError{"expression", token.span});
+        return std::unexpected(
+            ParseError{.message = "expression", .span = token.span});
     }
 
     while (true) {
@@ -1183,7 +1195,8 @@ Result<Node *> Parser::parse_expression(int min_bp) {
         }
         default:
             report_error(op, "expression");
-            return std::unexpected(ParseError{"expression", op.span});
+            return std::unexpected(
+                ParseError{.message = "expression", .span = op.span});
         }
     }
 
