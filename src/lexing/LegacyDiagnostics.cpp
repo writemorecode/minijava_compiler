@@ -1,4 +1,5 @@
 #include "lexing/LegacyDiagnostics.hpp"
+#include "lexing/Token.hpp"
 
 #include <iostream>
 
