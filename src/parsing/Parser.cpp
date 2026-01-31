@@ -642,7 +642,8 @@ Result<Node *> Parser::parse_method_parameter_list() {
 }
 
 Result<Node *> Parser::parse_method_body() {
-    if (match(lexing::TokenKind::KwReturn)) {
+    if (peek().kind == lexing::TokenKind::KwReturn) {
+        lexing::Token ret = consume();
         Result<Node *> expr = parse_expression(0);
         if (!expr.has_value()) {
             return expr;
@@ -652,7 +653,7 @@ Result<Node *> Parser::parse_method_body() {
         if (!semi.has_value()) {
             return Result<Node *>::err(semi.error());
         }
-        int line = static_cast<int>(semi.value().span.begin.line);
+        int line = static_cast<int>(ret.span.begin.line);
         return Result<Node *>::ok(new ReturnOnlyMethodBodyNode(expr.value(),
                                                                line));
     }
