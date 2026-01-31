@@ -1,8 +1,14 @@
 #include "lexing/Lexer.hpp"
+#include "lexing/CharStream.hpp"
+#include "lexing/Token.hpp"
 
 #include <cctype>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
 #include <string>
 #include <string_view>
+#include <utility>
 
 namespace lexing {
 
@@ -126,7 +132,8 @@ void Lexer::fill_lookahead_(std::size_t n) {
 
 Token Lexer::lex_one_() {
     if (!chars_) {
-        return Token{TokenKind::Eof, {}, {}, {}};
+        return Token{
+            .kind = TokenKind::Eof, .lexeme = {}, .span = {}, .value = {}};
     }
 
     auto slice = [&](SourceLocation start,
@@ -142,7 +149,10 @@ Token Lexer::lex_one_() {
 
     auto make_token = [&](TokenKind kind, SourceLocation start,
                           SourceLocation end, TokenValue value = {}) {
-        return Token{kind, slice(start, end), {start, end}, value};
+        return Token{.kind = kind,
+                     .lexeme = slice(start, end),
+                     .span = {.begin = start, .end = end},
+                     .value = value};
     };
 
     auto skip_trivia = [&]() {
@@ -175,7 +185,7 @@ Token Lexer::lex_one_() {
 
     if (starts_with(chars_.get(), "System.out.println")) {
         constexpr std::string_view text = "System.out.println";
-        for (char ch : text) {
+        for (char const ch : text) {
             (void)ch;
             chars_->get();
         }
@@ -262,7 +272,7 @@ Token Lexer::lex_one_() {
         } else {
             while (!chars_->eof() && is_digit(chars_->peek())) {
                 const char digit = chars_->get();
-                value = value * 10 + (digit - '0');
+                value = (value * 10) + (digit - '0');
             }
         }
         const SourceLocation end = chars_->location();
@@ -275,7 +285,10 @@ Token Lexer::lex_one_() {
         }
         const SourceLocation end = chars_->location();
         const std::string_view lexeme = slice(start, end);
-        Token token{keyword_kind(lexeme), lexeme, {start, end}, {}};
+        Token token{.kind = keyword_kind(lexeme),
+                    .lexeme = lexeme,
+                    .span = {.begin = start, .end = end},
+                    .value = {}};
         return token;
     }
 
@@ -283,10 +296,13 @@ Token Lexer::lex_one_() {
     const SourceLocation end = chars_->location();
     Token token = make_token(TokenKind::Invalid, start, end);
     if (diag_ != nullptr) {
-        std::string message = "    Line " + std::to_string(start.line) +
-                              ": lexical ('" + std::string(token.lexeme) +
-                              "' symbol is not recognized by the grammar)\n";
-        diag_->emit({Severity::Error, message, {start, end}});
+        std::string const message =
+            "    Line " + std::to_string(start.line) + ": lexical ('" +
+            std::string(token.lexeme) +
+            "' symbol is not recognized by the grammar)\n";
+        diag_->emit({.severity = Severity::Error,
+                     .message = message,
+                     .span = {.begin = start, .end = end}});
     }
     return token;
 }

@@ -1,4 +1,6 @@
 #include "lexing/StringViewStream.hpp"
+#include <cstddef>
+#include <string_view>
 
 namespace lexing {
 
