@@ -16,9 +16,7 @@ bool is_digit(char ch) {
     return std::isdigit(static_cast<unsigned char>(ch)) != 0;
 }
 
-bool is_ident_start(char ch) {
-    return is_alpha(ch);
-}
+bool is_ident_start(char ch) { return is_alpha(ch); }
 
 bool is_ident_continue(char ch) {
     return is_alpha(ch) || is_digit(ch) || ch == '_';
@@ -108,17 +106,11 @@ Token Lexer::peek(std::size_t n) {
     return la_[n];
 }
 
-bool Lexer::eof() {
-    return peek().kind == TokenKind::Eof;
-}
+bool Lexer::eof() { return peek().kind == TokenKind::Eof; }
 
-Lexer::iterator Lexer::begin() {
-    return iterator(this);
-}
+Lexer::iterator Lexer::begin() { return iterator(this); }
 
-Lexer::sentinel Lexer::end() {
-    return {};
-}
+Lexer::sentinel Lexer::end() { return {}; }
 
 void Lexer::reset(std::unique_ptr<CharStream> chars, std::string_view source) {
     chars_ = std::move(chars);
@@ -299,17 +291,11 @@ Token Lexer::lex_one_() {
     return token;
 }
 
-Lexer::iterator::iterator(Lexer *lx) : lx_(lx) {
-    ensure_loaded_();
-}
+Lexer::iterator::iterator(Lexer *lx) : lx_(lx) { ensure_loaded_(); }
 
-const Token &Lexer::iterator::operator*() const {
-    return *current_;
-}
+const Token &Lexer::iterator::operator*() const { return *current_; }
 
-const Token *Lexer::iterator::operator->() const {
-    return &(*current_);
-}
+const Token *Lexer::iterator::operator->() const { return &(*current_); }
 
 Lexer::iterator &Lexer::iterator::operator++() {
     ensure_loaded_();
@@ -324,9 +310,7 @@ Lexer::iterator &Lexer::iterator::operator++() {
     return *this;
 }
 
-void Lexer::iterator::operator++(int) {
-    ++(*this);
-}
+void Lexer::iterator::operator++(int) { ++(*this); }
 
 bool operator==(const Lexer::iterator &it, Lexer::sentinel) {
     return it.at_end_ || it.lx_ == nullptr;

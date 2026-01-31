@@ -4,9 +4,7 @@ namespace lexing {
 
 StringViewStream::StringViewStream(std::string_view input) : input_(input) {}
 
-bool StringViewStream::eof() const {
-    return index_ >= input_.size();
-}
+bool StringViewStream::eof() const { return index_ >= input_.size(); }
 
 char StringViewStream::peek(std::size_t lookahead) const {
     const std::size_t pos = index_ + lookahead;
@@ -32,8 +30,6 @@ char StringViewStream::get() {
     return ch;
 }
 
-SourceLocation StringViewStream::location() const {
-    return loc_;
-}
+SourceLocation StringViewStream::location() const { return loc_; }
 
 } // namespace lexing
