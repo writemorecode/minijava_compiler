@@ -14,13 +14,10 @@ namespace fs = std::filesystem;
 #include "lexing/LegacyDiagnostics.hpp"
 #include "lexing/SourceBuffer.hpp"
 #include "lexing/StringViewStream.hpp"
-#include "parser.tab.hh"
+#include "parsing/Parser.hpp"
 
-extern Node *root;
-extern FILE *yyin;
-extern int yylineno;
-extern int lexical_errors;
-extern yy::parser::symbol_type yylex();
+Node *root = nullptr;
+int lexical_errors = 0;
 
 enum errCodes {
     SUCCESS = 0,
@@ -32,6 +29,26 @@ enum errCodes {
 };
 
 int errCode = errCodes::SUCCESS;
+
+class ConditionalDiagnosticSink final : public lexing::DiagnosticSink {
+  public:
+    explicit ConditionalDiagnosticSink(int *gate,
+                                       std::ostream &out = std::cerr)
+        : gate_(gate), out_(&out) {}
+
+    void emit(lexing::Diagnostic d) override {
+        if (gate_ != nullptr && *gate_ != 0) {
+            return;
+        }
+        if (out_ != nullptr) {
+            (*out_) << d.message;
+        }
+    }
+
+  private:
+    int *gate_ = nullptr;
+    std::ostream *out_ = nullptr;
+};
 
 void print_legacy_token(const lexing::Token &token) {
     using lexing::TokenKind;
@@ -162,18 +179,6 @@ void print_legacy_token(const lexing::Token &token) {
     }
 }
 
-// Handling Syntax Errors
-void yy::parser::error(std::string const &err) {
-    if (lexical_errors == 0) {
-        std::cerr << "Syntax errors found! See the logs below:\n";
-        std::cerr << "\t@error at line " << yylineno
-                  << ". Cannot generate a syntax for this input:" << err
-                  << "\n";
-        std::cerr << "End of syntax errors!\n";
-        errCode = errCodes::SYNTAX_ERROR;
-    }
-}
-
 void generateGraphviz(Node *root, std::ofstream &outStream) {
     int count = 0;
     outStream << "digraph {" << '\n';
@@ -214,25 +219,25 @@ int main(int argc, char **argv) {
     const auto &currentDirectory = std::filesystem::current_path();
     const auto &outputDirectory = currentDirectory / outputDirectoryName;
 
-    if (lex_only) {
-        lexical_errors = 0;
-        std::string error;
-        lexing::SourceBuffer buffer =
-            lexing::SourceBuffer::from_string(std::string{});
+    lexical_errors = 0;
+    std::string error;
+    lexing::SourceBuffer buffer =
+        lexing::SourceBuffer::from_string(std::string{});
 
-        if (!input_path.empty()) {
-            auto loaded = lexing::SourceBuffer::from_file(input_path, error);
-            if (!loaded.has_value()) {
-                std::cerr << error << "\n";
-                return 1;
-            }
-            buffer = std::move(*loaded);
-        } else {
-            std::string data((std::istreambuf_iterator<char>(std::cin)),
-                             std::istreambuf_iterator<char>());
-            buffer = lexing::SourceBuffer::from_string(std::move(data));
+    if (!input_path.empty()) {
+        auto loaded = lexing::SourceBuffer::from_file(input_path, error);
+        if (!loaded.has_value()) {
+            std::cerr << error << "\n";
+            return 1;
         }
+        buffer = std::move(*loaded);
+    } else {
+        std::string data((std::istreambuf_iterator<char>(std::cin)),
+                         std::istreambuf_iterator<char>());
+        buffer = lexing::SourceBuffer::from_string(std::move(data));
+    }
 
+    if (lex_only) {
         auto stream =
             std::make_unique<lexing::StringViewStream>(buffer.view());
         lexing::LegacyDiagnosticSink diag(&lexical_errors);
@@ -252,27 +257,20 @@ int main(int argc, char **argv) {
         return lexical_errors ? errCodes::LEXICAL_ERROR : errCodes::SUCCESS;
     }
 
-    // Reads from file if a file name is passed as an argument. Otherwise, reads
-    // from stdin.
-    if (!input_path.empty()) {
-        if (!(yyin = fopen(input_path.c_str(), "r"))) {
-            perror(input_path.c_str());
-            return 1;
-        }
-    }
-    if (USE_LEX_ONLY) {
-        yylex();
-        return errCodes::SUCCESS;
-    }
+    auto stream = std::make_unique<lexing::StringViewStream>(buffer.view());
+    lexing::LegacyDiagnosticSink lex_diag(&lexical_errors);
+    lexing::Lexer lexer(std::move(stream), buffer.view(), &lex_diag);
+    ConditionalDiagnosticSink syntax_diag(&lexical_errors);
+    parsing::Parser parser(std::move(lexer), &syntax_diag);
 
-    yy::parser parser;
-    bool parseSuccess = !parser.parse();
-    if (!parseSuccess) {
+    auto parse_result = parser.parse_goal();
+    if (!parse_result.has_value()) {
+        errCode = errCodes::SYNTAX_ERROR;
         return errCodes::SYNTAX_ERROR;
     }
+    root = parse_result.value();
 
-    bool lexSuccess = !lexical_errors;
-    if (!lexSuccess) {
+    if (lexical_errors) {
         return errCodes::LEXICAL_ERROR;
     }
 
