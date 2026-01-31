@@ -19,7 +19,7 @@
 - `make clean` removes `build/` and generated PDFs.
 
 ## Coding Style & Naming Conventions
-- C++20 with 4-space indentation and braces on the same line as control statements.
+- C++23 with 4-space indentation and braces on the same line as control statements.
 - Prefer matching file and type names (e.g., `ClassNode.hpp` / `ClassNode.cpp`).
 - AST node classes use `PascalCase` with a `Node` suffix; headers typically use `.hpp`.
 - Run `make fmt` before submitting changes.
