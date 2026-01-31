@@ -39,11 +39,17 @@ class Parser {
 
     Result<Node *> parse_main_class();
     Result<Node *> parse_class_decl();
+    Result<Node *> parse_class_decl_list();
     Result<Node *> parse_class_body();
+    Result<Node *> parse_class_var_decl_list();
+    Result<Node *> parse_method_decl_list();
     Result<Node *> parse_var_decl();
     Result<Node *> parse_method_decl();
+    Result<Node *> parse_method_parameter();
+    Result<Node *> parse_method_parameter_list();
     Result<Node *> parse_method_body();
     Result<Node *> parse_method_body_item();
+    Result<Node *> parse_method_body_item_list();
     Result<Node *> parse_statement();
     Result<Node *> parse_statement_list();
     Result<Node *> parse_expression_list();
