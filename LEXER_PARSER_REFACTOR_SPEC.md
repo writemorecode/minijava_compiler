@@ -45,7 +45,7 @@ This spec is an initial blueprint and is informed by:
 - Binary: `+ - * / || && < > ==`
 - Postfix: `expr[expr]`, `expr.length`, `expr.id()`, `expr.id(exprlist)`
 - Primary: integer, true/false, identifier, `this`, `new int[expr]`, `new Identifier()`, `(expr)`
-- Prefix: `!` (NOTE: unary minus only exists as `- INT_LITERAL` in grammar, see Open Questions)
+- Prefix: `!` (legacy low precedence), unary `-` (planned behavior fix)
 
 ## Proposed Architecture
 
@@ -166,19 +166,39 @@ Map each nonterminal in `parser.yy` to a function, keeping AST construction equi
 - `VarDeclaration`, `MethodDeclaration`, `MethodBody`, `MethodBodyItemList`
 - `StatementList`, `Statement`, `ExpressionList`, `Type`, `Identifier`, `Integer`
 
+AST wrapper nodes created by the Bison grammar (must be preserved):
+- `Node("Class declaration list", ...)` when multiple class declarations exist.
+- `Node("Variable declaration list", ...)`, `Node("Method declaration list", ...)` for class members.
+- `Node("Statement list", ...)` for statement lists; block statements return the list node directly.
+- `Node("Expression list", ...)` for method call arguments.
+- `Node("Method parameter list", ...)` for method parameters.
+- `Node("Method body item list", ...)`, `Node("Variable declaration", ...)`, `Node("Statement", ...)` inside method bodies.
+- `Node("Empty class body", ...)` and `Node("Class body", ...)` for specific class body forms.
+- `Node("Empty statement", ...)` for `{}` as a statement.
+
+Root behavior:
+- If the program has only a `MainClass`, `root` is the `MainClassNode`.
+- If additional classes exist, `root` is the `Class declaration list` node with `MainClassNode` inserted at the front.
+- `if`/`else` should bind the `else` to the nearest unmatched `if` (same effect as Bison’s `%right "then" ELSE`).
+
 #### Pratt expression parsing
-Maintain precedence/associativity from the Bison grammar:
+Maintain precedence/associativity from the Bison grammar, **including its unusual NOT precedence**:
 
 | Level (low -> high) | Operators / forms | Assoc |
 | --- | --- | --- |
 | 1 | `||` | right (Bison uses `%right OR`) |
 | 2 | `&&` | right |
-| 3 | `<` `>` `==` | left |
+| 3 | `<` `>` `==` `!` | left (NOTE: `NOT` is declared with comparisons in `parser.yy`) |
 | 4 | `+` `-` | left |
 | 5 | `*` `/` | left |
-| 6 | postfix: `expr[expr]`, `expr.length`, `expr.id(...)` | left |
-| 7 | prefix: `!` and unary `-` | right |
+| 6 | postfix: `expr[expr]`, `.length`, `.id(...)` | left |
+| 7 | prefix: unary `-` | right (explicit **behavior fix**) |
 | 8 | primary: literals, identifiers, `this`, `new ...`, `(expr)` | n/a |
+
+Notes:
+- This implies `!a + b` parses as `!(a + b)` with the legacy grammar; keep this for compatibility.
+- Unary `-` is the only intentional behavior change: it becomes a real prefix operator (instead of `- INT_LITERAL` creating an `IdentifierNode`).
+- Bison declares `DOT` higher than `L_PAREN`/`L_SQUARE`; in Pratt this can be represented with a slightly higher binding power for dot-postfix, or by treating all postfix operators as equally highest if no ambiguity is observed in tests.
 
 Implementation detail:
 - Use `nud` for prefix/primary forms.
@@ -197,16 +217,14 @@ Use the same node types created in `parser.yy` actions:
 Line numbers should be drawn from the first relevant token in each construct (matching how Bison passed `yylineno`).
 
 ### Error handling & recovery
-- Parser maintains `error_count` and stops after `max_errors` (default 20).
-- On a parse error, emit a diagnostic with span; then synchronize based on context:
-  - For statements: synchronize at `;` or `}`.
-  - For declarations: synchronize at `}` or `class` keyword.
-- Continue parsing to find additional errors unless `max_errors` reached.
+- The current Bison parser effectively reports **one** syntax error (no error-recovery rules).
+- To keep outputs identical, the new parser should **stop after the first syntax error** and emit the same text.
+- Optional recovery (sync at `;` / `}` / `class`) can be added later behind a flag, but is out of scope for parity.
 
 ### Integration points
 - `src/main.cpp` currently uses `yy::parser` and `yylex()`. It will need to be updated to use the new `Parser` class and to report errors similarly.
 - Replace or remove `lexer.flex` / `parser.yy` and the generated `parser.tab.hh` usage.
-- Update `Makefile` to drop Flex/Bison steps and include new C++ compilation units.
+- Update `CMakeLists.txt` to drop Flex/Bison steps and include new C++ compilation units.
 
 ## Proposed File Layout (initial pass)
 - `src/lexing/Token.hpp` (TokenKind, Token, SourceSpan, diagnostics)
@@ -225,4 +243,5 @@ Line numbers should be drawn from the first relevant token in each construct (ma
 - Same token set and keyword recognition (notably `System.out.println`).
 - Same operator precedence and associativity for expressions.
 - Same AST node types and construction patterns.
+- Same wrapper-node structure and root selection (`MainClass` vs `Class declaration list`).
 - Same error code behavior in `main.cpp` (`LEXICAL_ERROR` vs `SYNTAX_ERROR`).
