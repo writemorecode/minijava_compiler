@@ -11,29 +11,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-include(CTest)
-if(BUILD_TESTING)
-    include(FetchContent)
-    FetchContent_Declare(
-        googletest
-        URL https://github.com/google/googletest/archive/refs/tags/v1.17.0.zip
-        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    )
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(googletest)
-    include(GoogleTest)
-
-    add_executable(minijava_tests
-        ${CMAKE_CURRENT_SOURCE_DIR}/tests/basic_test.cpp
-    )
-    target_link_libraries(minijava_tests PRIVATE GTest::gtest_main)
-    target_include_directories(minijava_tests PRIVATE ${SRC_DIR})
-    target_compile_definitions(minijava_tests PRIVATE
-        TEST_FILES_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/test_files"
-    )
-    gtest_discover_tests(minijava_tests)
-endif()
-
 # Link compile_commands.json to the project root for clang-tidy and tools.
 if(CMAKE_EXPORT_COMPILE_COMMANDS)
     file(CREATE_LINK
@@ -67,6 +44,29 @@ foreach(target minijava_core compiler vm)
         target_compile_options(${target} PRIVATE -g -Wall -Wextra -Wpedantic)
     endif()
 endforeach()
+
+include(CTest)
+if(BUILD_TESTING)
+    include(FetchContent)
+    FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/v1.17.0.zip
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+    include(GoogleTest)
+
+    add_executable(minijava_tests
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/lexer_arithmetic_test.cpp
+    )
+    target_link_libraries(minijava_tests PRIVATE GTest::gtest_main minijava_core)
+    target_include_directories(minijava_tests PRIVATE ${SRC_DIR})
+    target_compile_definitions(minijava_tests PRIVATE
+        TEST_FILES_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/test_files"
+    )
+    gtest_discover_tests(minijava_tests)
+endif()
 
 file(GLOB_RECURSE FORMAT_SOURCES CONFIGURE_DEPENDS
     ${SRC_DIR}/*.cpp
