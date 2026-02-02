@@ -27,6 +27,10 @@ if(BUILD_TESTING)
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/basic_test.cpp
     )
     target_link_libraries(minijava_tests PRIVATE GTest::gtest_main)
+    target_include_directories(minijava_tests PRIVATE ${SRC_DIR})
+    target_compile_definitions(minijava_tests PRIVATE
+        TEST_FILES_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/test_files"
+    )
     gtest_discover_tests(minijava_tests)
 endif()
 
@@ -40,18 +44,24 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
 endif()
 
 file(GLOB_RECURSE ALL_CPP CONFIGURE_DEPENDS ${SRC_DIR}/*.cpp)
-list(REMOVE_ITEM ALL_CPP ${SRC_DIR}/vm/vm.cpp)
+list(REMOVE_ITEM ALL_CPP ${SRC_DIR}/vm/vm.cpp ${SRC_DIR}/main.cpp)
 
-add_executable(compiler
+add_library(minijava_core
     ${ALL_CPP}
 )
+target_include_directories(minijava_core PUBLIC ${SRC_DIR})
+
+add_executable(compiler
+    ${SRC_DIR}/main.cpp
+)
+target_link_libraries(compiler PRIVATE minijava_core)
 
 add_executable(vm
     ${SRC_DIR}/vm/vm.cpp
     ${SRC_DIR}/util/serialize.cpp
 )
 
-foreach(target compiler vm)
+foreach(target minijava_core compiler vm)
     target_include_directories(${target} PRIVATE ${SRC_DIR})
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_compile_options(${target} PRIVATE -g -Wall -Wextra -Wpedantic)
