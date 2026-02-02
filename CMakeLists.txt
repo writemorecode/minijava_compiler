@@ -58,7 +58,7 @@ if(BUILD_TESTING)
     include(GoogleTest)
 
     add_executable(minijava_tests
-        ${CMAKE_CURRENT_SOURCE_DIR}/tests/lexer_arithmetic_test.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/lexer_valid_tests.cpp
     )
     target_link_libraries(minijava_tests PRIVATE GTest::gtest_main minijava_core)
     target_include_directories(minijava_tests PRIVATE ${SRC_DIR})
