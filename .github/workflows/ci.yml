@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install ccache
+        run: sudo apt-get update && sudo apt-get install -y ccache
+
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.ccache
+          key: ${{ runner.os }}-ccache-${{ hashFiles('**/CMakeLists.txt', '**/*.cpp', '**/*.hpp', '**/*.h') }}
+          restore-keys: |
+            ${{ runner.os }}-ccache-
+
+      - name: Configure & Build
+        uses: threeal/cmake-action@v2.1.0
+        with:
+          build-dir: build
+          options: |
+            BUILD_TESTING=ON
+            CMAKE_CXX_COMPILER_LAUNCHER=ccache
+          build-args: |
+            -j 4
+            --target minijava_tests
+
+      - name: Run Tests
+        uses: threeal/ctest-action@v1.0.0
+        with:
+          test-dir: build
