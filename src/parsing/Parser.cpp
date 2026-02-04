@@ -1057,7 +1057,7 @@ Result<Node *> Parser::parse_expression(int min_bp) {
     }
 
     while (true) {
-        const lexing::Token &op = peek();
+        const lexing::Token op = peek();
         auto binding = infix_binding_power(op.kind);
         if (!binding.has_value() || binding->left < min_bp) {
             break;
