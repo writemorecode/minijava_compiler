@@ -7,8 +7,12 @@ class VariableNode : public Node {
     Node *type, *name;
 
   public:
-    VariableNode(Node *type, Node *name, int l)
-        : Node("Variable", l, {type, name}), type{type}, name{name} {};
+    VariableNode(std::unique_ptr<Node> type_, std::unique_ptr<Node> name_,
+                 int l)
+        : Node("Variable", l) {
+        type = append_child(std::move(type_));
+        name = append_child(std::move(name_));
+    }
 
     bool buildTable(SymbolTable &st) const override;
     std::string checkTypes(SymbolTable &st) const override;

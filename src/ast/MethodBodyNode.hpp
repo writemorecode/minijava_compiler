@@ -7,9 +7,12 @@ class MethodBodyNode : public Node {
     Node *body, *returnValue;
 
   public:
-    MethodBodyNode(Node *body, Node *returnValue, int l)
-        : Node("Method body", l, {body, returnValue}), body{body},
-          returnValue{returnValue} {}
+    MethodBodyNode(std::unique_ptr<Node> body_,
+                   std::unique_ptr<Node> returnValue_, int l)
+        : Node("Method body", l) {
+        body = append_child(std::move(body_));
+        returnValue = append_child(std::move(returnValue_));
+    }
     std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
@@ -17,8 +20,10 @@ class ReturnOnlyMethodBodyNode : public Node {
     Node *returnValue;
 
   public:
-    ReturnOnlyMethodBodyNode(Node *returnValue, int l)
-        : Node("Method body", l, {returnValue}), returnValue{returnValue} {}
+    ReturnOnlyMethodBodyNode(std::unique_ptr<Node> returnValue_, int l)
+        : Node("Method body", l) {
+        returnValue = append_child(std::move(returnValue_));
+    }
     std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };

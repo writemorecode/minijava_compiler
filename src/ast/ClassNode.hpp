@@ -8,9 +8,12 @@ class ClassNode : public Node {
     std::string className;
 
   public:
-    ClassNode(Node *id_, Node *body_, int l)
-        : Node("Class", l, {id_, body_}), id{id_}, body{body_},
-          className{id->value} {};
+    ClassNode(std::unique_ptr<Node> id_, std::unique_ptr<Node> body_, int l)
+        : Node("Class", l) {
+        id = append_child(std::move(id_));
+        body = append_child(std::move(body_));
+        className = id->value;
+    }
     bool buildTable(SymbolTable &st) const override;
     std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;

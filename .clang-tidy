@@ -1,4 +1,4 @@
-Checks: 'hicpp-*,bugprone-*,google-*,misc-*,clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*,-modernize-use-trailing-return-type,-cppcoreguidelines-owning-memory,-readability-identifier-length,-modernize-pass-by-value,-misc-no-recursion,-readability-function-cognitive-complexity,-clang-analyzer-cplusplus.NewDeleteLeaks'
+Checks: 'hicpp-*,bugprone-*,google-*,misc-*,clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*,-modernize-use-trailing-return-type,-cppcoreguidelines-owning-memory,-readability-identifier-length,-modernize-pass-by-value,-misc-no-recursion,-readability-function-cognitive-complexity,-clang-analyzer-cplusplus.NewDeleteLeaks,-modernize-return-braced-init-list'
 ExtraArgsBefore:
   - '-isysroot'
   - '/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk'

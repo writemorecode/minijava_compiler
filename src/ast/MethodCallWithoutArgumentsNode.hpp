@@ -6,8 +6,12 @@ class MethodCallWithoutArgumentsNode : public Node {
     Node *object, *id;
 
   public:
-    MethodCallWithoutArgumentsNode(Node *object, Node *id, int l)
-        : Node("Method call", l, {object, id}), object{object}, id{id} {};
+    MethodCallWithoutArgumentsNode(std::unique_ptr<Node> object_,
+                                   std::unique_ptr<Node> id_, int l)
+        : Node("Method call", l) {
+        object = append_child(std::move(object_));
+        id = append_child(std::move(id_));
+    }
     std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };

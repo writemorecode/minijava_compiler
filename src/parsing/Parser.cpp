@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <deque>
 #include <expected>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -276,21 +277,21 @@ void Parser::report_error(const lexing::Token &token,
     }
 }
 
-Result<Node *> Parser::parse_goal() {
-    Result<Node *> main_class = parse_main_class();
+Result<std::unique_ptr<Node>> Parser::parse_goal() {
+    Result<std::unique_ptr<Node>> main_class = parse_main_class();
     if (!main_class.has_value()) {
         return main_class;
     }
 
-    Node *root = main_class.value();
+    auto root = std::move(main_class.value());
 
     if (peek().kind == lexing::TokenKind::KwClass) {
-        Result<Node *> class_list = parse_class_decl_list();
+        Result<std::unique_ptr<Node>> class_list = parse_class_decl_list();
         if (!class_list.has_value()) {
             return class_list;
         }
-        class_list.value()->children.push_front(root);
-        root = class_list.value();
+        class_list.value()->children.push_front(std::move(root));
+        root = std::move(class_list.value());
     }
 
     Result<lexing::Token> end = expect(lexing::TokenKind::Eof, "end of file");
@@ -298,10 +299,10 @@ Result<Node *> Parser::parse_goal() {
         return std::unexpected(end.error());
     }
 
-    return Result<Node *>(root);
+    return Result<std::unique_ptr<Node>>(std::move(root));
 }
 
-Result<Node *> Parser::parse_main_class() {
+Result<std::unique_ptr<Node>> Parser::parse_main_class() {
     Result<lexing::Token> pub = expect(lexing::TokenKind::KwPublic, "PUBLIC");
     if (!pub.has_value()) {
         return std::unexpected(pub.error());
@@ -310,7 +311,7 @@ Result<Node *> Parser::parse_main_class() {
     if (!cls.has_value()) {
         return std::unexpected(cls.error());
     }
-    Result<Node *> name = parse_identifier();
+    Result<std::unique_ptr<Node>> name = parse_identifier();
     if (!name.has_value()) {
         return name;
     }
@@ -351,7 +352,7 @@ Result<Node *> Parser::parse_main_class() {
     if (!rs.has_value()) {
         return std::unexpected(rs.error());
     }
-    Result<Node *> arg = parse_identifier();
+    Result<std::unique_ptr<Node>> arg = parse_identifier();
     if (!arg.has_value()) {
         return arg;
     }
@@ -364,7 +365,7 @@ Result<Node *> Parser::parse_main_class() {
     if (!open_main.has_value()) {
         return std::unexpected(open_main.error());
     }
-    Result<Node *> stmts = parse_statement_list();
+    Result<std::unique_ptr<Node>> stmts = parse_statement_list();
     if (!stmts.has_value()) {
         return stmts;
     }
@@ -379,49 +380,52 @@ Result<Node *> Parser::parse_main_class() {
         return std::unexpected(close_class.error());
     }
 
-    return Result<Node *>(new MainClassNode(
-        name.value(), arg.value(), stmts.value(), name.value()->lineno));
+    const int line = name.value()->lineno;
+    return Result<std::unique_ptr<Node>>(std::make_unique<MainClassNode>(
+        std::move(name.value()), std::move(arg.value()),
+        std::move(stmts.value()), line));
 }
 
-Result<Node *> Parser::parse_class_decl_list() {
-    Result<Node *> first = parse_class_decl();
+Result<std::unique_ptr<Node>> Parser::parse_class_decl_list() {
+    Result<std::unique_ptr<Node>> first = parse_class_decl();
     if (!first.has_value()) {
         return first;
     }
     int const line = first.value()->lineno;
-    Node *list = new Node("Class declaration list", "", line);
-    list->children.push_back(first.value());
+    auto list = std::make_unique<Node>("Class declaration list", "", line);
+    list->children.push_back(std::move(first.value()));
 
     while (peek().kind == lexing::TokenKind::KwClass) {
-        Result<Node *> next = parse_class_decl();
+        Result<std::unique_ptr<Node>> next = parse_class_decl();
         if (!next.has_value()) {
             return next;
         }
-        list->children.push_back(next.value());
+        list->children.push_back(std::move(next.value()));
     }
 
-    return Result<Node *>(list);
+    return Result<std::unique_ptr<Node>>(std::move(list));
 }
 
-Result<Node *> Parser::parse_class_decl() {
+Result<std::unique_ptr<Node>> Parser::parse_class_decl() {
     Result<lexing::Token> cls = expect(lexing::TokenKind::KwClass, "CLASS");
     if (!cls.has_value()) {
         return std::unexpected(cls.error());
     }
-    Result<Node *> id = parse_identifier();
+    Result<std::unique_ptr<Node>> id = parse_identifier();
     if (!id.has_value()) {
         return id;
     }
-    Result<Node *> body = parse_class_body();
+    Result<std::unique_ptr<Node>> body = parse_class_body();
     if (!body.has_value()) {
         return body;
     }
 
-    return Result<Node *>(
-        new ClassNode(id.value(), body.value(), id.value()->lineno));
+    const int line = id.value()->lineno;
+    return Result<std::unique_ptr<Node>>(std::make_unique<ClassNode>(
+        std::move(id.value()), std::move(body.value()), line));
 }
 
-Result<Node *> Parser::parse_class_body() {
+Result<std::unique_ptr<Node>> Parser::parse_class_body() {
     Result<lexing::Token> open = expect(lexing::TokenKind::LCurly, "L_CURLY");
     if (!open.has_value()) {
         return std::unexpected(open.error());
@@ -429,26 +433,27 @@ Result<Node *> Parser::parse_class_body() {
 
     if (match(lexing::TokenKind::RCurly)) {
         int const line = static_cast<int>(open.value().span.begin.line);
-        return Result<Node *>(new Node("Empty class body", "", line));
+        return Result<std::unique_ptr<Node>>(
+            std::make_unique<Node>("Empty class body", "", line));
     }
 
-    Node *var_list = nullptr;
-    Node *method_list = nullptr;
+    std::unique_ptr<Node> var_list;
+    std::unique_ptr<Node> method_list;
 
     if (peek().kind != lexing::TokenKind::KwPublic) {
-        Result<Node *> vars = parse_class_var_decl_list();
+        Result<std::unique_ptr<Node>> vars = parse_class_var_decl_list();
         if (!vars.has_value()) {
             return vars;
         }
-        var_list = vars.value();
+        var_list = std::move(vars.value());
     }
 
     if (peek().kind == lexing::TokenKind::KwPublic) {
-        Result<Node *> methods = parse_method_decl_list();
+        Result<std::unique_ptr<Node>> methods = parse_method_decl_list();
         if (!methods.has_value()) {
             return methods;
         }
-        method_list = methods.value();
+        method_list = std::move(methods.value());
     }
 
     Result<lexing::Token> close = expect(lexing::TokenKind::RCurly, "R_CURLY");
@@ -458,65 +463,65 @@ Result<Node *> Parser::parse_class_body() {
 
     if (var_list != nullptr && method_list != nullptr) {
         int const line = static_cast<int>(close.value().span.begin.line);
-        Node *body = new Node("Class body", "", line);
-        body->children.push_back(var_list);
-        body->children.push_back(method_list);
-        return Result<Node *>(body);
+        auto body = std::make_unique<Node>("Class body", "", line);
+        body->children.push_back(std::move(var_list));
+        body->children.push_back(std::move(method_list));
+        return Result<std::unique_ptr<Node>>(std::move(body));
     }
 
     if (var_list != nullptr) {
-        return Result<Node *>(var_list);
+        return Result<std::unique_ptr<Node>>(std::move(var_list));
     }
 
-    return Result<Node *>(method_list);
+    return Result<std::unique_ptr<Node>>(std::move(method_list));
 }
 
-Result<Node *> Parser::parse_class_var_decl_list() {
-    Result<Node *> first = parse_var_decl();
+Result<std::unique_ptr<Node>> Parser::parse_class_var_decl_list() {
+    Result<std::unique_ptr<Node>> first = parse_var_decl();
     if (!first.has_value()) {
         return first;
     }
     int const line = first.value()->lineno;
-    Node *list = new Node("Variable declaration list", "", line);
-    list->children.push_back(first.value());
+    auto list = std::make_unique<Node>("Variable declaration list", "", line);
+    list->children.push_back(std::move(first.value()));
 
     while (is_type_start(peek().kind)) {
-        Result<Node *> next = parse_var_decl();
+        Result<std::unique_ptr<Node>> next = parse_var_decl();
         if (!next.has_value()) {
             return next;
         }
-        list->children.push_back(next.value());
+        list->children.push_back(std::move(next.value()));
     }
 
-    return Result<Node *>(list);
+    return Result<std::unique_ptr<Node>>(std::move(list));
 }
 
-Result<Node *> Parser::parse_method_decl_list() {
-    Result<Node *> first = parse_method_decl();
+Result<std::unique_ptr<Node>> Parser::parse_method_decl_list() {
+    Result<std::unique_ptr<Node>> first = parse_method_decl();
     if (!first.has_value()) {
         return first;
     }
     int const line = first.value()->lineno;
-    Node *list = new Node("Method declaration list", "", line);
-    list->children.push_back(first.value());
+    auto list = std::make_unique<Node>("Method declaration list", "", line);
+    list->children.push_back(std::move(first.value()));
 
     while (peek().kind == lexing::TokenKind::KwPublic) {
-        Result<Node *> next = parse_method_decl();
+        Result<std::unique_ptr<Node>> next = parse_method_decl();
         if (!next.has_value()) {
             return next;
         }
-        list->children.push_back(next.value());
+        list->children.push_back(std::move(next.value()));
     }
 
-    return Result<Node *>(list);
+    return Result<std::unique_ptr<Node>>(std::move(list));
 }
 
-Result<Node *> Parser::parse_var_decl() {
-    Result<Node *> type = parse_type();
+Result<std::unique_ptr<Node>> Parser::parse_var_decl() {
+    Result<std::unique_ptr<Node>> type = parse_type();
     if (!type.has_value()) {
         return type;
     }
-    Result<Node *> id = parse_identifier();
+    Result<std::unique_ptr<Node>> id = parse_identifier();
     if (!id.has_value()) {
         return id;
     }
@@ -525,20 +530,21 @@ Result<Node *> Parser::parse_var_decl() {
         return std::unexpected(semi.error());
     }
 
-    return Result<Node *>(
-        new VariableNode(type.value(), id.value(), type.value()->lineno));
+    const int line = type.value()->lineno;
+    return Result<std::unique_ptr<Node>>(std::make_unique<VariableNode>(
+        std::move(type.value()), std::move(id.value()), line));
 }
 
-Result<Node *> Parser::parse_method_decl() {
+Result<std::unique_ptr<Node>> Parser::parse_method_decl() {
     Result<lexing::Token> pub = expect(lexing::TokenKind::KwPublic, "PUBLIC");
     if (!pub.has_value()) {
         return std::unexpected(pub.error());
     }
-    Result<Node *> type = parse_type();
+    Result<std::unique_ptr<Node>> type = parse_type();
     if (!type.has_value()) {
         return type;
     }
-    Result<Node *> id = parse_identifier();
+    Result<std::unique_ptr<Node>> id = parse_identifier();
     if (!id.has_value()) {
         return id;
     }
@@ -553,7 +559,7 @@ Result<Node *> Parser::parse_method_decl() {
         if (!open_body.has_value()) {
             return std::unexpected(open_body.error());
         }
-        Result<Node *> body = parse_method_body();
+        Result<std::unique_ptr<Node>> body = parse_method_body();
         if (!body.has_value()) {
             return body;
         }
@@ -562,11 +568,14 @@ Result<Node *> Parser::parse_method_decl() {
         if (!close.has_value()) {
             return std::unexpected(close.error());
         }
-        return Result<Node *>(new MethodWithoutParametersNode(
-            type.value(), id.value(), body.value(), type.value()->lineno));
+        const int line = type.value()->lineno;
+        return Result<std::unique_ptr<Node>>(
+            std::make_unique<MethodWithoutParametersNode>(
+                std::move(type.value()), std::move(id.value()),
+                std::move(body.value()), line));
     }
 
-    Result<Node *> params = parse_method_parameter_list();
+    Result<std::unique_ptr<Node>> params = parse_method_parameter_list();
     if (!params.has_value()) {
         return params;
     }
@@ -580,7 +589,7 @@ Result<Node *> Parser::parse_method_decl() {
     if (!open_body.has_value()) {
         return std::unexpected(open_body.error());
     }
-    Result<Node *> body = parse_method_body();
+    Result<std::unique_ptr<Node>> body = parse_method_body();
     if (!body.has_value()) {
         return body;
     }
@@ -589,49 +598,51 @@ Result<Node *> Parser::parse_method_decl() {
         return std::unexpected(close.error());
     }
 
-    return Result<Node *>(new MethodNode(type.value(), id.value(),
-                                             params.value(), body.value(),
-                                             type.value()->lineno));
+    const int line = type.value()->lineno;
+    return Result<std::unique_ptr<Node>>(std::make_unique<MethodNode>(
+        std::move(type.value()), std::move(id.value()),
+        std::move(params.value()), std::move(body.value()), line));
 }
 
-Result<Node *> Parser::parse_method_parameter() {
-    Result<Node *> type = parse_type();
+Result<std::unique_ptr<Node>> Parser::parse_method_parameter() {
+    Result<std::unique_ptr<Node>> type = parse_type();
     if (!type.has_value()) {
         return type;
     }
-    Result<Node *> id = parse_identifier();
+    Result<std::unique_ptr<Node>> id = parse_identifier();
     if (!id.has_value()) {
         return id;
     }
 
-    return Result<Node *>(new MethodParameterNode(type.value(), id.value(),
-                                                      type.value()->lineno));
+    const int line = type.value()->lineno;
+    return Result<std::unique_ptr<Node>>(std::make_unique<MethodParameterNode>(
+        std::move(type.value()), std::move(id.value()), line));
 }
 
-Result<Node *> Parser::parse_method_parameter_list() {
-    Result<Node *> first = parse_method_parameter();
+Result<std::unique_ptr<Node>> Parser::parse_method_parameter_list() {
+    Result<std::unique_ptr<Node>> first = parse_method_parameter();
     if (!first.has_value()) {
         return first;
     }
     int const line = first.value()->lineno;
-    Node *list = new Node("Method parameter list", "", line);
-    list->children.push_back(first.value());
+    auto list = std::make_unique<Node>("Method parameter list", "", line);
+    list->children.push_back(std::move(first.value()));
 
     while (match(lexing::TokenKind::Comma)) {
-        Result<Node *> next = parse_method_parameter();
+        Result<std::unique_ptr<Node>> next = parse_method_parameter();
         if (!next.has_value()) {
             return next;
         }
-        list->children.push_back(next.value());
+        list->children.push_back(std::move(next.value()));
     }
 
-    return Result<Node *>(list);
+    return Result<std::unique_ptr<Node>>(std::move(list));
 }
 
-Result<Node *> Parser::parse_method_body() {
+Result<std::unique_ptr<Node>> Parser::parse_method_body() {
     if (peek().kind == lexing::TokenKind::KwReturn) {
         lexing::Token const ret = consume();
-        Result<Node *> expr = parse_expression(0);
+        Result<std::unique_ptr<Node>> expr = parse_expression(0);
         if (!expr.has_value()) {
             return expr;
         }
@@ -640,11 +651,12 @@ Result<Node *> Parser::parse_method_body() {
             return std::unexpected(semi.error());
         }
         int const line = static_cast<int>(ret.span.begin.line);
-        return Result<Node *>(
-            new ReturnOnlyMethodBodyNode(expr.value(), line));
+        return Result<std::unique_ptr<Node>>(
+            std::make_unique<ReturnOnlyMethodBodyNode>(std::move(expr.value()),
+                                                       line));
     }
 
-    Result<Node *> items = parse_method_body_item_list();
+    Result<std::unique_ptr<Node>> items = parse_method_body_item_list();
     if (!items.has_value()) {
         return items;
     }
@@ -652,7 +664,7 @@ Result<Node *> Parser::parse_method_body() {
     if (!ret.has_value()) {
         return std::unexpected(ret.error());
     }
-    Result<Node *> expr = parse_expression(0);
+    Result<std::unique_ptr<Node>> expr = parse_expression(0);
     if (!expr.has_value()) {
         return expr;
     }
@@ -661,11 +673,11 @@ Result<Node *> Parser::parse_method_body() {
         return std::unexpected(semi.error());
     }
     int const line = static_cast<int>(ret.value().span.begin.line);
-    return Result<Node *>(
-        new MethodBodyNode(items.value(), expr.value(), line));
+    return Result<std::unique_ptr<Node>>(std::make_unique<MethodBodyNode>(
+        std::move(items.value()), std::move(expr.value()), line));
 }
 
-Result<Node *> Parser::parse_method_body_item() {
+Result<std::unique_ptr<Node>> Parser::parse_method_body_item() {
     auto looks_like_var_decl = [&]() {
         if (peek().kind == lexing::TokenKind::KwInt ||
             peek().kind == lexing::TokenKind::KwBoolean) {
@@ -679,56 +691,57 @@ Result<Node *> Parser::parse_method_body_item() {
     };
 
     if (looks_like_var_decl()) {
-        Result<Node *> var = parse_var_decl();
+        Result<std::unique_ptr<Node>> var = parse_var_decl();
         if (!var.has_value()) {
             return var;
         }
         int const line = var.value()->lineno;
-        Node *wrapper = new Node("Variable declaration", "", line);
-        wrapper->children.push_back(var.value());
-        return Result<Node *>(wrapper);
+        auto wrapper = std::make_unique<Node>("Variable declaration", "", line);
+        wrapper->children.push_back(std::move(var.value()));
+        return Result<std::unique_ptr<Node>>(std::move(wrapper));
     }
 
-    Result<Node *> stmt = parse_statement();
+    Result<std::unique_ptr<Node>> stmt = parse_statement();
     if (!stmt.has_value()) {
         return stmt;
     }
     int const line = stmt.value()->lineno;
-    Node *wrapper = new Node("Statement", "", line);
-    wrapper->children.push_back(stmt.value());
-    return Result<Node *>(wrapper);
+    auto wrapper = std::make_unique<Node>("Statement", "", line);
+    wrapper->children.push_back(std::move(stmt.value()));
+    return Result<std::unique_ptr<Node>>(std::move(wrapper));
 }
 
-Result<Node *> Parser::parse_method_body_item_list() {
-    Result<Node *> first = parse_method_body_item();
+Result<std::unique_ptr<Node>> Parser::parse_method_body_item_list() {
+    Result<std::unique_ptr<Node>> first = parse_method_body_item();
     if (!first.has_value()) {
         return first;
     }
     int const line = first.value()->lineno;
-    Node *list = new Node("Method body item list", "", line);
-    list->children.push_back(first.value());
+    auto list = std::make_unique<Node>("Method body item list", "", line);
+    list->children.push_back(std::move(first.value()));
 
     while (peek().kind != lexing::TokenKind::KwReturn) {
-        Result<Node *> next = parse_method_body_item();
+        Result<std::unique_ptr<Node>> next = parse_method_body_item();
         if (!next.has_value()) {
             return next;
         }
-        list->children.push_back(next.value());
+        list->children.push_back(std::move(next.value()));
     }
 
-    return Result<Node *>(list);
+    return Result<std::unique_ptr<Node>>(std::move(list));
 }
 
-Result<Node *> Parser::parse_statement() {
+Result<std::unique_ptr<Node>> Parser::parse_statement() {
     const lexing::Token &token = peek();
     const int line = static_cast<int>(token.span.begin.line);
 
     if (match(lexing::TokenKind::LCurly)) {
         if (match(lexing::TokenKind::RCurly)) {
-            return Result<Node *>(new Node("Empty statement", line));
+            return Result<std::unique_ptr<Node>>(
+                std::make_unique<Node>("Empty statement", line));
         }
 
-        Result<Node *> stmts = parse_statement_list();
+        Result<std::unique_ptr<Node>> stmts = parse_statement_list();
         if (!stmts.has_value()) {
             return stmts;
         }
@@ -737,7 +750,7 @@ Result<Node *> Parser::parse_statement() {
         if (!close.has_value()) {
             return std::unexpected(close.error());
         }
-        return Result<Node *>(stmts.value());
+        return Result<std::unique_ptr<Node>>(std::move(stmts.value()));
     }
 
     if (match(lexing::TokenKind::KwIf)) {
@@ -745,7 +758,7 @@ Result<Node *> Parser::parse_statement() {
         if (!lp.has_value()) {
             return std::unexpected(lp.error());
         }
-        Result<Node *> cond = parse_expression(0);
+        Result<std::unique_ptr<Node>> cond = parse_expression(0);
         if (!cond.has_value()) {
             return cond;
         }
@@ -753,20 +766,21 @@ Result<Node *> Parser::parse_statement() {
         if (!rp.has_value()) {
             return std::unexpected(rp.error());
         }
-        Result<Node *> then_stmt = parse_statement();
+        Result<std::unique_ptr<Node>> then_stmt = parse_statement();
         if (!then_stmt.has_value()) {
             return then_stmt;
         }
         if (match(lexing::TokenKind::KwElse)) {
-            Result<Node *> else_stmt = parse_statement();
+            Result<std::unique_ptr<Node>> else_stmt = parse_statement();
             if (!else_stmt.has_value()) {
                 return else_stmt;
             }
-            return Result<Node *>(new IfElseNode(
-                cond.value(), then_stmt.value(), else_stmt.value(), line));
+            return Result<std::unique_ptr<Node>>(std::make_unique<IfElseNode>(
+                std::move(cond.value()), std::move(then_stmt.value()),
+                std::move(else_stmt.value()), line));
         }
-        return Result<Node *>(
-            new IfNode(cond.value(), then_stmt.value(), line));
+        return Result<std::unique_ptr<Node>>(std::make_unique<IfNode>(
+            std::move(cond.value()), std::move(then_stmt.value()), line));
     }
 
     if (match(lexing::TokenKind::KwWhile)) {
@@ -774,7 +788,7 @@ Result<Node *> Parser::parse_statement() {
         if (!lp.has_value()) {
             return std::unexpected(lp.error());
         }
-        Result<Node *> cond = parse_expression(0);
+        Result<std::unique_ptr<Node>> cond = parse_expression(0);
         if (!cond.has_value()) {
             return cond;
         }
@@ -782,12 +796,12 @@ Result<Node *> Parser::parse_statement() {
         if (!rp.has_value()) {
             return std::unexpected(rp.error());
         }
-        Result<Node *> stmt = parse_statement();
+        Result<std::unique_ptr<Node>> stmt = parse_statement();
         if (!stmt.has_value()) {
             return stmt;
         }
-        return Result<Node *>(
-            new WhileNode(cond.value(), stmt.value(), line));
+        return Result<std::unique_ptr<Node>>(std::make_unique<WhileNode>(
+            std::move(cond.value()), std::move(stmt.value()), line));
     }
 
     if (match(lexing::TokenKind::KwPrintln)) {
@@ -795,7 +809,7 @@ Result<Node *> Parser::parse_statement() {
         if (!lp.has_value()) {
             return std::unexpected(lp.error());
         }
-        Result<Node *> expr = parse_expression(0);
+        Result<std::unique_ptr<Node>> expr = parse_expression(0);
         if (!expr.has_value()) {
             return expr;
         }
@@ -807,16 +821,17 @@ Result<Node *> Parser::parse_statement() {
         if (!semi.has_value()) {
             return std::unexpected(semi.error());
         }
-        return Result<Node *>(new PrintNode(expr.value(), line));
+        return Result<std::unique_ptr<Node>>(
+            std::make_unique<PrintNode>(std::move(expr.value()), line));
     }
 
     if (peek().kind == lexing::TokenKind::Identifier) {
-        Result<Node *> id = parse_identifier();
+        Result<std::unique_ptr<Node>> id = parse_identifier();
         if (!id.has_value()) {
             return id;
         }
         if (match(lexing::TokenKind::Assign)) {
-            Result<Node *> expr = parse_expression(0);
+            Result<std::unique_ptr<Node>> expr = parse_expression(0);
             if (!expr.has_value()) {
                 return expr;
             }
@@ -825,11 +840,11 @@ Result<Node *> Parser::parse_statement() {
             if (!semi.has_value()) {
                 return std::unexpected(semi.error());
             }
-            return Result<Node *>(
-                new AssignNode(id.value(), expr.value(), line));
+            return Result<std::unique_ptr<Node>>(std::make_unique<AssignNode>(
+                std::move(id.value()), std::move(expr.value()), line));
         }
         if (match(lexing::TokenKind::LSquare)) {
-            Result<Node *> index = parse_expression(0);
+            Result<std::unique_ptr<Node>> index = parse_expression(0);
             if (!index.has_value()) {
                 return index;
             }
@@ -843,7 +858,7 @@ Result<Node *> Parser::parse_statement() {
             if (!assign.has_value()) {
                 return std::unexpected(assign.error());
             }
-            Result<Node *> expr = parse_expression(0);
+            Result<std::unique_ptr<Node>> expr = parse_expression(0);
             if (!expr.has_value()) {
                 return expr;
             }
@@ -852,8 +867,10 @@ Result<Node *> Parser::parse_statement() {
             if (!semi.has_value()) {
                 return std::unexpected(semi.error());
             }
-            return Result<Node *>(new ArrayAssignNode(
-                id.value(), index.value(), expr.value(), line));
+            return Result<std::unique_ptr<Node>>(
+                std::make_unique<ArrayAssignNode>(
+                    std::move(id.value()), std::move(index.value()),
+                    std::move(expr.value()), line));
         }
         report_error(peek(), "ASSIGN");
         return std::unexpected(
@@ -865,47 +882,47 @@ Result<Node *> Parser::parse_statement() {
         ParseError{.message = "statement", .span = token.span});
 }
 
-Result<Node *> Parser::parse_statement_list() {
-    Result<Node *> first = parse_statement();
+Result<std::unique_ptr<Node>> Parser::parse_statement_list() {
+    Result<std::unique_ptr<Node>> first = parse_statement();
     if (!first.has_value()) {
         return first;
     }
     int const line = first.value()->lineno;
-    Node *list = new Node("Statement list", "", line);
-    list->children.push_back(first.value());
+    auto list = std::make_unique<Node>("Statement list", "", line);
+    list->children.push_back(std::move(first.value()));
 
     while (is_statement_start(peek().kind)) {
-        Result<Node *> next = parse_statement();
+        Result<std::unique_ptr<Node>> next = parse_statement();
         if (!next.has_value()) {
             return next;
         }
-        list->children.push_back(next.value());
+        list->children.push_back(std::move(next.value()));
     }
 
-    return Result<Node *>(list);
+    return Result<std::unique_ptr<Node>>(std::move(list));
 }
 
-Result<Node *> Parser::parse_expression_list() {
-    Result<Node *> first = parse_expression(0);
+Result<std::unique_ptr<Node>> Parser::parse_expression_list() {
+    Result<std::unique_ptr<Node>> first = parse_expression(0);
     if (!first.has_value()) {
         return first;
     }
     int const line = first.value()->lineno;
-    Node *list = new Node("Expression list", "", line);
-    list->children.push_back(first.value());
+    auto list = std::make_unique<Node>("Expression list", "", line);
+    list->children.push_back(std::move(first.value()));
 
     while (match(lexing::TokenKind::Comma)) {
-        Result<Node *> next = parse_expression(0);
+        Result<std::unique_ptr<Node>> next = parse_expression(0);
         if (!next.has_value()) {
             return next;
         }
-        list->children.push_back(next.value());
+        list->children.push_back(std::move(next.value()));
     }
 
-    return Result<Node *>(list);
+    return Result<std::unique_ptr<Node>>(std::move(list));
 }
 
-Result<Node *> Parser::parse_type() {
+Result<std::unique_ptr<Node>> Parser::parse_type() {
     const lexing::Token token = peek();
     const int line = static_cast<int>(token.span.begin.line);
 
@@ -916,73 +933,76 @@ Result<Node *> Parser::parse_type() {
             if (!rs.has_value()) {
                 return std::unexpected(rs.error());
             }
-            return Result<Node *>(new TypeNode("int[]", line));
+            return Result<std::unique_ptr<Node>>(
+                std::make_unique<TypeNode>("int[]", line));
         }
-        return Result<Node *>(new TypeNode("int", line));
+        return Result<std::unique_ptr<Node>>(
+            std::make_unique<TypeNode>("int", line));
     }
 
     if (match(lexing::TokenKind::KwBoolean)) {
-        return Result<Node *>(new TypeNode("boolean", line));
+        return Result<std::unique_ptr<Node>>(
+            std::make_unique<TypeNode>("boolean", line));
     }
 
     if (match(lexing::TokenKind::Identifier)) {
-        return Result<Node *>(
-            new TypeNode(std::string(token.lexeme), line));
+        return Result<std::unique_ptr<Node>>(
+            std::make_unique<TypeNode>(std::string(token.lexeme), line));
     }
 
     report_error(token, "type");
     return std::unexpected(ParseError{.message = "type", .span = token.span});
 }
 
-Result<Node *> Parser::parse_identifier() {
+Result<std::unique_ptr<Node>> Parser::parse_identifier() {
     Result<lexing::Token> id = expect(lexing::TokenKind::Identifier, "ID");
     if (!id.has_value()) {
         return std::unexpected(id.error());
     }
     int const line = static_cast<int>(id.value().span.begin.line);
-    return Result<Node *>(
-        new IdentifierNode(std::string(id.value().lexeme), line));
+    return Result<std::unique_ptr<Node>>(
+        std::make_unique<IdentifierNode>(std::string(id.value().lexeme), line));
 }
 
-Result<Node *> Parser::parse_integer() {
+Result<std::unique_ptr<Node>> Parser::parse_integer() {
     Result<lexing::Token> lit =
         expect(lexing::TokenKind::IntLiteral, "INT_LITERAL");
     if (!lit.has_value()) {
         return std::unexpected(lit.error());
     }
     int const line = static_cast<int>(lit.value().span.begin.line);
-    return Result<Node *>(
-        new IntegerNode(std::string(lit.value().lexeme), line));
+    return Result<std::unique_ptr<Node>>(
+        std::make_unique<IntegerNode>(std::string(lit.value().lexeme), line));
 }
 
-Result<Node *> Parser::parse_expression(int min_bp) {
+Result<std::unique_ptr<Node>> Parser::parse_expression(int min_bp) {
     const lexing::Token token = consume();
     const int line = static_cast<int>(token.span.begin.line);
-    Node *lhs = nullptr;
+    std::unique_ptr<Node> lhs;
 
     switch (token.kind) {
     case lexing::TokenKind::IntLiteral: {
-        lhs = new IntegerNode(std::string(token.lexeme), line);
+        lhs = std::make_unique<IntegerNode>(std::string(token.lexeme), line);
         break;
     }
     case lexing::TokenKind::Identifier: {
-        lhs = new IdentifierNode(std::string(token.lexeme), line);
+        lhs = std::make_unique<IdentifierNode>(std::string(token.lexeme), line);
         break;
     }
     case lexing::TokenKind::KwTrue: {
-        lhs = new TrueNode(line);
+        lhs = std::make_unique<TrueNode>(line);
         break;
     }
     case lexing::TokenKind::KwFalse: {
-        lhs = new FalseNode(line);
+        lhs = std::make_unique<FalseNode>(line);
         break;
     }
     case lexing::TokenKind::KwThis: {
-        lhs = new ThisNode(line);
+        lhs = std::make_unique<ThisNode>(line);
         break;
     }
     case lexing::TokenKind::LParen: {
-        Result<Node *> inner = parse_expression(0);
+        Result<std::unique_ptr<Node>> inner = parse_expression(0);
         if (!inner.has_value()) {
             return inner;
         }
@@ -991,24 +1011,25 @@ Result<Node *> Parser::parse_expression(int min_bp) {
         if (!closing.has_value()) {
             return std::unexpected(closing.error());
         }
-        lhs = inner.value();
+        lhs = std::move(inner.value());
         break;
     }
     case lexing::TokenKind::Bang: {
-        Result<Node *> rhs = parse_expression(BP_PREFIX_NOT);
+        Result<std::unique_ptr<Node>> rhs = parse_expression(BP_PREFIX_NOT);
         if (!rhs.has_value()) {
             return rhs;
         }
-        lhs = new NotNode(rhs.value(), line);
+        lhs = std::make_unique<NotNode>(std::move(rhs.value()), line);
         break;
     }
     case lexing::TokenKind::Minus: {
-        Result<Node *> rhs = parse_expression(BP_PREFIX_MINUS);
+        Result<std::unique_ptr<Node>> rhs = parse_expression(BP_PREFIX_MINUS);
         if (!rhs.has_value()) {
             return rhs;
         }
-        Node *zero = new IntegerNode("0", line);
-        lhs = new MinusNode(zero, rhs.value(), line);
+        auto zero = std::make_unique<IntegerNode>("0", line);
+        lhs = std::make_unique<MinusNode>(std::move(zero),
+                                          std::move(rhs.value()), line);
         break;
     }
     case lexing::TokenKind::KwNew: {
@@ -1018,7 +1039,7 @@ Result<Node *> Parser::parse_expression(int min_bp) {
             if (!open.has_value()) {
                 return std::unexpected(open.error());
             }
-            Result<Node *> length = parse_expression(0);
+            Result<std::unique_ptr<Node>> length = parse_expression(0);
             if (!length.has_value()) {
                 return length;
             }
@@ -1027,7 +1048,8 @@ Result<Node *> Parser::parse_expression(int min_bp) {
             if (!close.has_value()) {
                 return std::unexpected(close.error());
             }
-            lhs = new IntegerArrayAllocationNode(length.value(), line);
+            lhs = std::make_unique<IntegerArrayAllocationNode>(
+                std::move(length.value()), line);
             break;
         }
 
@@ -1045,9 +1067,10 @@ Result<Node *> Parser::parse_expression(int min_bp) {
         if (!close.has_value()) {
             return std::unexpected(close.error());
         }
-        Node *identifier =
-            new IdentifierNode(std::string(id.value().lexeme), line);
-        lhs = new ClassAllocationNode(identifier, line);
+        auto identifier = std::make_unique<IdentifierNode>(
+            std::string(id.value().lexeme), line);
+        lhs =
+            std::make_unique<ClassAllocationNode>(std::move(identifier), line);
         break;
     }
     default:
@@ -1068,79 +1091,97 @@ Result<Node *> Parser::parse_expression(int min_bp) {
 
         switch (op.kind) {
         case lexing::TokenKind::Plus: {
-            Result<Node *> rhs = parse_expression(binding->right);
+            Result<std::unique_ptr<Node>> rhs =
+                parse_expression(binding->right);
             if (!rhs.has_value()) {
                 return rhs;
             }
-            lhs = new PlusNode(lhs, rhs.value(), op_line);
+            lhs = std::make_unique<PlusNode>(std::move(lhs),
+                                             std::move(rhs.value()), op_line);
             break;
         }
         case lexing::TokenKind::Minus: {
-            Result<Node *> rhs = parse_expression(binding->right);
+            Result<std::unique_ptr<Node>> rhs =
+                parse_expression(binding->right);
             if (!rhs.has_value()) {
                 return rhs;
             }
-            lhs = new MinusNode(lhs, rhs.value(), op_line);
+            lhs = std::make_unique<MinusNode>(std::move(lhs),
+                                              std::move(rhs.value()), op_line);
             break;
         }
         case lexing::TokenKind::Star: {
-            Result<Node *> rhs = parse_expression(binding->right);
+            Result<std::unique_ptr<Node>> rhs =
+                parse_expression(binding->right);
             if (!rhs.has_value()) {
                 return rhs;
             }
-            lhs = new MultiplicationNode(lhs, rhs.value(), op_line);
+            lhs = std::make_unique<MultiplicationNode>(
+                std::move(lhs), std::move(rhs.value()), op_line);
             break;
         }
         case lexing::TokenKind::Slash: {
-            Result<Node *> rhs = parse_expression(binding->right);
+            Result<std::unique_ptr<Node>> rhs =
+                parse_expression(binding->right);
             if (!rhs.has_value()) {
                 return rhs;
             }
-            lhs = new DivisionNode(lhs, rhs.value(), op_line);
+            lhs = std::make_unique<DivisionNode>(
+                std::move(lhs), std::move(rhs.value()), op_line);
             break;
         }
         case lexing::TokenKind::OrOr: {
-            Result<Node *> rhs = parse_expression(binding->right);
+            Result<std::unique_ptr<Node>> rhs =
+                parse_expression(binding->right);
             if (!rhs.has_value()) {
                 return rhs;
             }
-            lhs = new OrNode(lhs, rhs.value(), op_line);
+            lhs = std::make_unique<OrNode>(std::move(lhs),
+                                           std::move(rhs.value()), op_line);
             break;
         }
         case lexing::TokenKind::AndAnd: {
-            Result<Node *> rhs = parse_expression(binding->right);
+            Result<std::unique_ptr<Node>> rhs =
+                parse_expression(binding->right);
             if (!rhs.has_value()) {
                 return rhs;
             }
-            lhs = new AndNode(lhs, rhs.value(), op_line);
+            lhs = std::make_unique<AndNode>(std::move(lhs),
+                                            std::move(rhs.value()), op_line);
             break;
         }
         case lexing::TokenKind::Lt: {
-            Result<Node *> rhs = parse_expression(binding->right);
+            Result<std::unique_ptr<Node>> rhs =
+                parse_expression(binding->right);
             if (!rhs.has_value()) {
                 return rhs;
             }
-            lhs = new LessThanNode(lhs, rhs.value(), op_line);
+            lhs = std::make_unique<LessThanNode>(
+                std::move(lhs), std::move(rhs.value()), op_line);
             break;
         }
         case lexing::TokenKind::Gt: {
-            Result<Node *> rhs = parse_expression(binding->right);
+            Result<std::unique_ptr<Node>> rhs =
+                parse_expression(binding->right);
             if (!rhs.has_value()) {
                 return rhs;
             }
-            lhs = new GreaterThanNode(lhs, rhs.value(), op_line);
+            lhs = std::make_unique<GreaterThanNode>(
+                std::move(lhs), std::move(rhs.value()), op_line);
             break;
         }
         case lexing::TokenKind::EqEq: {
-            Result<Node *> rhs = parse_expression(binding->right);
+            Result<std::unique_ptr<Node>> rhs =
+                parse_expression(binding->right);
             if (!rhs.has_value()) {
                 return rhs;
             }
-            lhs = new EqualToNode(lhs, rhs.value(), op_line);
+            lhs = std::make_unique<EqualToNode>(
+                std::move(lhs), std::move(rhs.value()), op_line);
             break;
         }
         case lexing::TokenKind::LSquare: {
-            Result<Node *> index = parse_expression(0);
+            Result<std::unique_ptr<Node>> index = parse_expression(0);
             if (!index.has_value()) {
                 return index;
             }
@@ -1149,12 +1190,14 @@ Result<Node *> Parser::parse_expression(int min_bp) {
             if (!close.has_value()) {
                 return std::unexpected(close.error());
             }
-            lhs = new ArrayAccessNode(lhs, index.value(), op_line);
+            lhs = std::make_unique<ArrayAccessNode>(
+                std::move(lhs), std::move(index.value()), op_line);
             break;
         }
         case lexing::TokenKind::Dot: {
             if (match(lexing::TokenKind::KwLength)) {
-                lhs = new ArrayLengthNode(lhs, op_line);
+                lhs =
+                    std::make_unique<ArrayLengthNode>(std::move(lhs), op_line);
                 break;
             }
 
@@ -1170,14 +1213,14 @@ Result<Node *> Parser::parse_expression(int min_bp) {
             }
 
             if (match(lexing::TokenKind::RParen)) {
-                Node *identifier =
-                    new IdentifierNode(std::string(id.value().lexeme), op_line);
-                lhs = new MethodCallWithoutArgumentsNode(lhs, identifier,
-                                                         op_line);
+                auto identifier = std::make_unique<IdentifierNode>(
+                    std::string(id.value().lexeme), op_line);
+                lhs = std::make_unique<MethodCallWithoutArgumentsNode>(
+                    std::move(lhs), std::move(identifier), op_line);
                 break;
             }
 
-            Result<Node *> expr_list = parse_expression_list();
+            Result<std::unique_ptr<Node>> expr_list = parse_expression_list();
             if (!expr_list.has_value()) {
                 return expr_list;
             }
@@ -1187,10 +1230,11 @@ Result<Node *> Parser::parse_expression(int min_bp) {
                 return std::unexpected(close.error());
             }
 
-            Node *identifier =
-                new IdentifierNode(std::string(id.value().lexeme), op_line);
-            lhs =
-                new MethodCallNode(lhs, identifier, expr_list.value(), op_line);
+            auto identifier = std::make_unique<IdentifierNode>(
+                std::string(id.value().lexeme), op_line);
+            lhs = std::make_unique<MethodCallNode>(
+                std::move(lhs), std::move(identifier),
+                std::move(expr_list.value()), op_line);
             break;
         }
         default:
@@ -1200,7 +1244,7 @@ Result<Node *> Parser::parse_expression(int min_bp) {
         }
     }
 
-    return Result<Node *>(lhs);
+    return Result<std::unique_ptr<Node>>(std::move(lhs));
 }
 
 } // namespace parsing

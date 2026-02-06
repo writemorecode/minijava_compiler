@@ -8,8 +8,11 @@ class AssignNode : public Node {
     Node *expr;
 
   public:
-    AssignNode(Node *id, Node *expr, int l)
-        : Node("Assign", l, {id, expr}), id{id}, expr{expr} {}
+    AssignNode(std::unique_ptr<Node> id_, std::unique_ptr<Node> expr_, int l)
+        : Node("Assign", l) {
+        id = append_child(std::move(id_));
+        expr = append_child(std::move(expr_));
+    }
     std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
@@ -17,12 +20,15 @@ class AssignNode : public Node {
 class ArrayAssignNode : public Node {
     Node *id;
     Node *indexExpr;
-    Node *rightExpr;
+    std::unique_ptr<Node> rightExpr;
 
   public:
-    ArrayAssignNode(Node *id, Node *indexExpr, Node *rightExpr, int l)
-        : Node("Array assign", l, {id, indexExpr}), id{id},
-          indexExpr{indexExpr}, rightExpr{rightExpr} {}
+    ArrayAssignNode(std::unique_ptr<Node> id_, std::unique_ptr<Node> indexExpr_,
+                    std::unique_ptr<Node> rightExpr_, int l)
+        : Node("Array assign", l), rightExpr(std::move(rightExpr_)) {
+        id = append_child(std::move(id_));
+        indexExpr = append_child(std::move(indexExpr_));
+    }
     std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
@@ -31,7 +37,9 @@ class PrintNode : public Node {
     Node *expr;
 
   public:
-    PrintNode(Node *expr, int l) : Node("Print", l, {expr}), expr{expr} {}
+    PrintNode(std::unique_ptr<Node> expr_, int l) : Node("Print", l) {
+        expr = append_child(std::move(expr_));
+    }
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
