@@ -49,7 +49,7 @@ class Scope {
     std::string getName() const;
     [[nodiscard]] Record *getRecord() const;
 
-    std::vector<std::string> getVariableNames() const;
+    std::set<std::string> getVariableNames() const;
     std::set<std::string> getMethodNames() const;
     std::set<std::string> getClassNames() const;
     std::vector<const Scope *> getChildren() const;

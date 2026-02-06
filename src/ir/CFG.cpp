@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "ir/CFG.hpp"
 
@@ -53,8 +54,11 @@ void CFG::generateBytecode(BytecodeProgram &program, SymbolTable &st) {
 
         const auto methodParameters = method->getParameterNames();
         const auto &blockName = basicBlock->getName();
-        auto &bytecodeMethod = program.addBytecodeMethod(
-            blockName, methodScope->getVariableNames());
+        const auto variableNames = methodScope->getVariableNames();
+        std::vector<std::string> variables(variableNames.begin(),
+                                            variableNames.end());
+        auto &bytecodeMethod =
+            program.addBytecodeMethod(blockName, std::move(variables));
         auto &bytecodeBlock = bytecodeMethod.addBytecodeMethodBlock(blockName);
 
         std::for_each(methodParameters.rbegin(), methodParameters.rend(),

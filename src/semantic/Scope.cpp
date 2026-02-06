@@ -97,11 +97,10 @@ void Scope::printScope(int &count, std::ostream &os) const {
     }
 }
 
-std::vector<std::string> Scope::getVariableNames() const {
-    std::vector<std::string> variableNames;
-    variableNames.reserve(variables.size());
+std::set<std::string> Scope::getVariableNames() const {
+    std::set<std::string> variableNames;
     for (const auto &variable : variables) {
-        variableNames.push_back(variable.first);
+        variableNames.insert(variable.first);
     }
     return variableNames;
 }
