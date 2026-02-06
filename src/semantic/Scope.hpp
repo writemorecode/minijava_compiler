@@ -2,6 +2,7 @@
 #define SCOPE_HPP
 
 #include <memory>
+#include <set>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -49,6 +50,9 @@ class Scope {
     [[nodiscard]] Record *getRecord() const;
 
     std::vector<std::string> getVariableNames() const;
+    std::set<std::string> getMethodNames() const;
+    std::set<std::string> getClassNames() const;
+    std::vector<const Scope *> getChildren() const;
 };
 
 #endif

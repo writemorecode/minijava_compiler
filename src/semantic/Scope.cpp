@@ -105,3 +105,28 @@ std::vector<std::string> Scope::getVariableNames() const {
     }
     return variableNames;
 }
+
+std::set<std::string> Scope::getMethodNames() const {
+    std::set<std::string> methodNames;
+    for (const auto &method : methods) {
+        methodNames.insert(method.first);
+    }
+    return methodNames;
+}
+
+std::set<std::string> Scope::getClassNames() const {
+    std::set<std::string> classNames;
+    for (const auto &class_ : classes) {
+        classNames.insert(class_.first);
+    }
+    return classNames;
+}
+
+std::vector<const Scope *> Scope::getChildren() const {
+    std::vector<const Scope *> childScopes;
+    childScopes.reserve(children.size());
+    for (const auto &entry : children) {
+        childScopes.push_back(entry.second.get());
+    }
+    return childScopes;
+}
