@@ -23,6 +23,9 @@ endif()
 file(GLOB_RECURSE ALL_CPP CONFIGURE_DEPENDS ${SRC_DIR}/*.cpp)
 list(REMOVE_ITEM ALL_CPP ${SRC_DIR}/vm/vm.cpp ${SRC_DIR}/main.cpp)
 
+add_compile_options(-fsanitize=address)
+add_link_options(-fsanitize=address)
+
 add_library(minijava_core
     ${ALL_CPP}
 )
