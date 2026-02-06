@@ -204,7 +204,7 @@ void assert_ast_eq(const Node *actual, const ExpectedNode &expected,
 
     auto it = actual->children.begin();
     for (std::size_t i = 0; i < expected.children.size(); ++i, ++it) {
-        assert_ast_eq(*it, expected.children[i],
+        assert_ast_eq(it->get(), expected.children[i],
                       path + "/" + expected.children[i].type + "[" +
                           std::to_string(i) + "]");
     }
@@ -271,5 +271,5 @@ class Empty {
     assert_no_errors(diag.diagnostics);
 
     ExpectedNode expected = expected_tree();
-    assert_ast_eq(parse_result.value(), expected);
+    assert_ast_eq(parse_result.value().get(), expected);
 }
