@@ -2,6 +2,7 @@
 
 #include <deque>
 #include <expected>
+#include <memory>
 #include <string>
 
 #include "ast/Node.h"
@@ -20,7 +21,7 @@ class Parser {
   public:
     Parser(lexing::Lexer lexer, lexing::DiagnosticSink *sink);
 
-    Result<Node *> parse_goal();
+    Result<std::unique_ptr<Node>> parse_goal();
 
     bool has_errors() const;
     int error_count() const;
@@ -35,26 +36,26 @@ class Parser {
     void report_error(const lexing::Token &token,
                       std::string_view expected_label);
 
-    Result<Node *> parse_main_class();
-    Result<Node *> parse_class_decl();
-    Result<Node *> parse_class_decl_list();
-    Result<Node *> parse_class_body();
-    Result<Node *> parse_class_var_decl_list();
-    Result<Node *> parse_method_decl_list();
-    Result<Node *> parse_var_decl();
-    Result<Node *> parse_method_decl();
-    Result<Node *> parse_method_parameter();
-    Result<Node *> parse_method_parameter_list();
-    Result<Node *> parse_method_body();
-    Result<Node *> parse_method_body_item();
-    Result<Node *> parse_method_body_item_list();
-    Result<Node *> parse_statement();
-    Result<Node *> parse_statement_list();
-    Result<Node *> parse_expression_list();
-    Result<Node *> parse_type();
-    Result<Node *> parse_identifier();
-    Result<Node *> parse_integer();
-    Result<Node *> parse_expression(int min_bp = 0);
+    Result<std::unique_ptr<Node>> parse_main_class();
+    Result<std::unique_ptr<Node>> parse_class_decl();
+    Result<std::unique_ptr<Node>> parse_class_decl_list();
+    Result<std::unique_ptr<Node>> parse_class_body();
+    Result<std::unique_ptr<Node>> parse_class_var_decl_list();
+    Result<std::unique_ptr<Node>> parse_method_decl_list();
+    Result<std::unique_ptr<Node>> parse_var_decl();
+    Result<std::unique_ptr<Node>> parse_method_decl();
+    Result<std::unique_ptr<Node>> parse_method_parameter();
+    Result<std::unique_ptr<Node>> parse_method_parameter_list();
+    Result<std::unique_ptr<Node>> parse_method_body();
+    Result<std::unique_ptr<Node>> parse_method_body_item();
+    Result<std::unique_ptr<Node>> parse_method_body_item_list();
+    Result<std::unique_ptr<Node>> parse_statement();
+    Result<std::unique_ptr<Node>> parse_statement_list();
+    Result<std::unique_ptr<Node>> parse_expression_list();
+    Result<std::unique_ptr<Node>> parse_type();
+    Result<std::unique_ptr<Node>> parse_identifier();
+    Result<std::unique_ptr<Node>> parse_integer();
+    Result<std::unique_ptr<Node>> parse_expression(int min_bp = 0);
 
     lexing::Lexer lexer_;
     lexing::DiagnosticSink *sink_ = nullptr;

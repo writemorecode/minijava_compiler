@@ -16,7 +16,7 @@ namespace fs = std::filesystem;
 #include "lexing/StringViewStream.hpp"
 #include "parsing/Parser.hpp"
 
-Node *root = nullptr;
+std::unique_ptr<Node> root;
 int lexical_errors = 0;
 
 enum errCodes {
@@ -266,7 +266,7 @@ int main(int argc, char **argv) {
         errCode = errCodes::SYNTAX_ERROR;
         return errCodes::SYNTAX_ERROR;
     }
-    root = parse_result.value();
+    root = std::move(parse_result.value());
 
     if (lexical_errors) {
         return errCodes::LEXICAL_ERROR;
@@ -289,7 +289,7 @@ int main(int argc, char **argv) {
     }
 
     std::ofstream outStream(outputDirectory / "tree.dot");
-    generateGraphviz(root, outStream);
+    generateGraphviz(root.get(), outStream);
 
     CFG graph;
     std::ofstream controlFlowGraph(outputDirectory / "cfg.dot");
