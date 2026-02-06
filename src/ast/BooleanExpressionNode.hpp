@@ -8,22 +8,26 @@ class BooleanExpressionNode : public Node {
     Node *left, *right;
 
   public:
-    BooleanExpressionNode(const std::string &t, Node *left, Node *right, int l)
-        : Node(t, l, {left, right}), left{left}, right{right} {};
+    BooleanExpressionNode(const std::string &t, std::unique_ptr<Node> left_,
+                          std::unique_ptr<Node> right_, int l)
+        : Node(t, l) {
+        left = append_child(std::move(left_));
+        right = append_child(std::move(right_));
+    }
     std::string checkTypes(SymbolTable &st) const override;
 };
 
 class AndNode : public BooleanExpressionNode {
   public:
-    AndNode(Node *left, Node *right, int l)
-        : BooleanExpressionNode("AND", left, right, l) {};
+    AndNode(std::unique_ptr<Node> left, std::unique_ptr<Node> right, int l)
+        : BooleanExpressionNode("AND", std::move(left), std::move(right), l) {}
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class OrNode : public BooleanExpressionNode {
   public:
-    OrNode(Node *left, Node *right, int l)
-        : BooleanExpressionNode("OR", left, right, l) {};
+    OrNode(std::unique_ptr<Node> left, std::unique_ptr<Node> right, int l)
+        : BooleanExpressionNode("OR", std::move(left), std::move(right), l) {}
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 

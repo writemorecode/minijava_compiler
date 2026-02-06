@@ -8,9 +8,13 @@ class ArithmeticExpressionNode : public Node {
     Node *left, *right;
 
   public:
-    ArithmeticExpressionNode(const std::string &t, Node *left, Node *right,
-                             int l)
-        : Node(t, l, {left, right}), left{left}, right{right} {};
+    ArithmeticExpressionNode(const std::string &t,
+                             std::unique_ptr<Node> left_,
+                             std::unique_ptr<Node> right_, int l)
+        : Node(t, l) {
+        left = append_child(std::move(left_));
+        right = append_child(std::move(right_));
+    }
 
     std::string checkTypes(SymbolTable &st) const override;
 };
@@ -18,32 +22,37 @@ class ArithmeticExpressionNode : public Node {
 class PlusNode : public ArithmeticExpressionNode {
 
   public:
-    PlusNode(Node *left, Node *right, int l)
-        : ArithmeticExpressionNode("Plus", left, right, l) {};
+    PlusNode(std::unique_ptr<Node> left, std::unique_ptr<Node> right, int l)
+        : ArithmeticExpressionNode("Plus", std::move(left), std::move(right),
+                                   l) {}
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class MinusNode : public ArithmeticExpressionNode {
 
   public:
-    MinusNode(Node *left, Node *right, int l)
-        : ArithmeticExpressionNode("Minus", left, right, l) {};
+    MinusNode(std::unique_ptr<Node> left, std::unique_ptr<Node> right, int l)
+        : ArithmeticExpressionNode("Minus", std::move(left), std::move(right),
+                                   l) {}
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class MultiplicationNode : public ArithmeticExpressionNode {
 
   public:
-    MultiplicationNode(Node *left, Node *right, int l)
-        : ArithmeticExpressionNode("Multiplication", left, right, l) {};
+    MultiplicationNode(std::unique_ptr<Node> left, std::unique_ptr<Node> right,
+                       int l)
+        : ArithmeticExpressionNode("Multiplication", std::move(left),
+                                   std::move(right), l) {}
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class DivisionNode : public ArithmeticExpressionNode {
 
   public:
-    DivisionNode(Node *left, Node *right, int l)
-        : ArithmeticExpressionNode("Division", left, right, l) {};
+    DivisionNode(std::unique_ptr<Node> left, std::unique_ptr<Node> right, int l)
+        : ArithmeticExpressionNode("Division", std::move(left),
+                                   std::move(right), l) {}
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 

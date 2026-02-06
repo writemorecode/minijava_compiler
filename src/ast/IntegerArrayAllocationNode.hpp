@@ -4,11 +4,11 @@
 #include "ast/Node.h"
 
 class IntegerArrayAllocationNode : public Node {
-    Node *length;
+    std::unique_ptr<Node> length;
 
   public:
-    IntegerArrayAllocationNode(Node *length, int l)
-        : Node("Integer array allocation", l), length{length} {};
+    IntegerArrayAllocationNode(std::unique_ptr<Node> length_, int l)
+        : Node("Integer array allocation", l), length(std::move(length_)) {}
     std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };

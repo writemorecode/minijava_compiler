@@ -7,26 +7,40 @@ class ControlStatementNode : public Node {
     Node *cond, *stmts;
 
   public:
-    ControlStatementNode(const std::string &t, Node *cond_, Node *stmts_, int l)
-        : Node(t, l, {cond_, stmts_}), cond(cond_), stmts(stmts_) {}
+    ControlStatementNode(const std::string &t, std::unique_ptr<Node> cond_,
+                         std::unique_ptr<Node> stmts_, int l)
+        : Node(t, l) {
+        cond = append_child(std::move(cond_));
+        stmts = append_child(std::move(stmts_));
+    }
     std::string checkTypes(SymbolTable &st) const override;
 };
 class IfNode : public ControlStatementNode {
     Node *cond, *stmt;
 
   public:
-    IfNode(Node *cond, Node *stmt, int l)
-        : ControlStatementNode("If", cond, stmt, l), cond{cond}, stmt{stmt} {}
+    IfNode(std::unique_ptr<Node> cond_, std::unique_ptr<Node> stmt_, int l)
+        : ControlStatementNode("If", std::move(cond_), std::move(stmt_), l) {
+        auto it = children.begin();
+        cond = it->get();
+        ++it;
+        stmt = it->get();
+    }
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 class IfElseNode : public ControlStatementNode {
     Node *cond, *stmt, *elseStmt;
 
   public:
-    IfElseNode(Node *cond, Node *stmt, Node *elseStmt, int l)
-        : ControlStatementNode("If-else", cond, stmt, l), cond{cond},
-          stmt{stmt}, elseStmt{elseStmt} {
-        children.push_back(elseStmt);
+    IfElseNode(std::unique_ptr<Node> cond_, std::unique_ptr<Node> stmt_,
+               std::unique_ptr<Node> elseStmt_, int l)
+        : ControlStatementNode("If-else", std::move(cond_), std::move(stmt_),
+                               l) {
+        auto it = children.begin();
+        cond = it->get();
+        ++it;
+        stmt = it->get();
+        elseStmt = append_child(std::move(elseStmt_));
     }
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
@@ -34,8 +48,12 @@ class WhileNode : public ControlStatementNode {
     Node *cond, *stmt;
 
   public:
-    WhileNode(Node *cond, Node *stmt, int l)
-        : ControlStatementNode("While", cond, stmt, l), cond{cond}, stmt{stmt} {
+    WhileNode(std::unique_ptr<Node> cond_, std::unique_ptr<Node> stmt_, int l)
+        : ControlStatementNode("While", std::move(cond_), std::move(stmt_), l) {
+        auto it = children.begin();
+        cond = it->get();
+        ++it;
+        stmt = it->get();
     }
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };

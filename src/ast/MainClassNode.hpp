@@ -8,10 +8,15 @@ class MainClassNode : public Node {
     std::string mainClassName, mainMethodArgumentName;
 
   public:
-    MainClassNode(Node *id_, Node *arg_, Node *body_, int l)
-        : Node("Main Class", l, {id_, arg_, body_}), id{id_}, arg{arg_},
-          body{body_}, mainClassName{id->value},
-          mainMethodArgumentName{arg->value} {};
+    MainClassNode(std::unique_ptr<Node> id_, std::unique_ptr<Node> arg_,
+                  std::unique_ptr<Node> body_, int l)
+        : Node("Main Class", l) {
+        id = append_child(std::move(id_));
+        arg = append_child(std::move(arg_));
+        body = append_child(std::move(body_));
+        mainClassName = id->value;
+        mainMethodArgumentName = arg->value;
+    }
 
     bool buildTable(SymbolTable &st) const override;
     std::string checkTypes(SymbolTable &st) const override;
