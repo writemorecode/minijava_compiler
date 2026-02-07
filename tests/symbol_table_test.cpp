@@ -8,9 +8,9 @@
 #include <vector>
 
 #include "ast/Node.h"
+#include "lexing/Diagnostics.hpp"
 #include "lexing/Lexer.hpp"
 #include "lexing/StringViewStream.hpp"
-#include "lexing/Token.hpp"
 #include "parsing/Parser.hpp"
 #include "semantic/Class.hpp"
 #include "semantic/Method.hpp"
@@ -61,7 +61,8 @@ const Scope *find_child_scope(const Scope *parent, std::string_view name) {
     return nullptr;
 }
 
-[[maybe_unused]] constexpr std::string_view kGoldenProgram2Source = R"(public class Main {
+[[maybe_unused]] constexpr std::string_view kGoldenProgram2Source =
+    R"(public class Main {
   public static void main(String[] args) {
     System.out.println(new Point().sum(1, 2));
     System.out.println(new Point().isOrigin());
@@ -171,15 +172,12 @@ class Foo {
 
     EXPECT_EQ(program->getVariableNames(), std::set<std::string>{});
     EXPECT_EQ(program->getMethodNames(), std::set<std::string>{});
-    EXPECT_EQ(program->getClassNames(),
-              (std::set<std::string>{"Main", "Foo"}));
+    EXPECT_EQ(program->getClassNames(), (std::set<std::string>{"Main", "Foo"}));
 
     const Scope *main_scope = find_child_scope(program, "Class: Main");
     ASSERT_NE(main_scope, nullptr);
-    EXPECT_EQ(main_scope->getVariableNames(),
-              (std::set<std::string>{"this"}));
-    EXPECT_EQ(main_scope->getMethodNames(),
-              (std::set<std::string>{"main"}));
+    EXPECT_EQ(main_scope->getVariableNames(), (std::set<std::string>{"this"}));
+    EXPECT_EQ(main_scope->getMethodNames(), (std::set<std::string>{"main"}));
     EXPECT_EQ(main_scope->getClassNames(), std::set<std::string>{});
 
     const Scope *main_method_scope =
@@ -222,8 +220,7 @@ class Foo {
     EXPECT_EQ(bar_scope->getMethodNames(), std::set<std::string>{});
     EXPECT_EQ(bar_scope->getClassNames(), std::set<std::string>{});
 
-    const auto *bar_record =
-        dynamic_cast<Method *>(bar_scope->getRecord());
+    const auto *bar_record = dynamic_cast<Method *>(bar_scope->getRecord());
     ASSERT_NE(bar_record, nullptr);
     EXPECT_EQ(bar_record->getType(), "int");
     const auto &bar_params = bar_record->getParameters();
@@ -239,8 +236,7 @@ class Foo {
     EXPECT_EQ(baz_scope->getMethodNames(), std::set<std::string>{});
     EXPECT_EQ(baz_scope->getClassNames(), std::set<std::string>{});
 
-    const auto *baz_record =
-        dynamic_cast<Method *>(baz_scope->getRecord());
+    const auto *baz_record = dynamic_cast<Method *>(baz_scope->getRecord());
     ASSERT_NE(baz_record, nullptr);
     EXPECT_EQ(baz_record->getType(), "boolean");
     EXPECT_EQ(baz_record->getParameterCount(), 0u);
@@ -264,10 +260,8 @@ TEST(SymbolTable, GoldenProgram2) {
 
     const Scope *main_scope = find_child_scope(program, "Class: Main");
     ASSERT_NE(main_scope, nullptr);
-    EXPECT_EQ(main_scope->getVariableNames(),
-              (std::set<std::string>{"this"}));
-    EXPECT_EQ(main_scope->getMethodNames(),
-              (std::set<std::string>{"main"}));
+    EXPECT_EQ(main_scope->getVariableNames(), (std::set<std::string>{"this"}));
+    EXPECT_EQ(main_scope->getMethodNames(), (std::set<std::string>{"main"}));
     EXPECT_EQ(main_scope->getClassNames(), std::set<std::string>{});
     EXPECT_EQ(main_scope->getChildren().size(), 1u);
 
@@ -290,12 +284,8 @@ TEST(SymbolTable, GoldenProgram2) {
     EXPECT_EQ(point_scope->getVariableNames(),
               (std::set<std::string>{"this", "x", "y", "history", "util"}));
     EXPECT_EQ(point_scope->getMethodNames(),
-              (std::set<std::string>{"sum",
-                                     "move",
-                                     "isOrigin",
-                                     "setHistory",
-                                     "historySize",
-                                     "self"}));
+              (std::set<std::string>{"sum", "move", "isOrigin", "setHistory",
+                                     "historySize", "self"}));
     EXPECT_EQ(point_scope->getClassNames(), std::set<std::string>{});
     EXPECT_EQ(point_scope->getChildren().size(), 6u);
 
@@ -321,8 +311,7 @@ TEST(SymbolTable, GoldenProgram2) {
     EXPECT_EQ(sum_scope->getMethodNames(), std::set<std::string>{});
     EXPECT_EQ(sum_scope->getClassNames(), std::set<std::string>{});
 
-    const auto *sum_record =
-        dynamic_cast<Method *>(sum_scope->getRecord());
+    const auto *sum_record = dynamic_cast<Method *>(sum_scope->getRecord());
     ASSERT_NE(sum_record, nullptr);
     EXPECT_EQ(sum_record->getType(), "int");
     const auto &sum_params = sum_record->getParameters();
@@ -339,8 +328,7 @@ TEST(SymbolTable, GoldenProgram2) {
     EXPECT_EQ(move_scope->getMethodNames(), std::set<std::string>{});
     EXPECT_EQ(move_scope->getClassNames(), std::set<std::string>{});
 
-    const auto *move_record =
-        dynamic_cast<Method *>(move_scope->getRecord());
+    const auto *move_record = dynamic_cast<Method *>(move_scope->getRecord());
     ASSERT_NE(move_record, nullptr);
     EXPECT_EQ(move_record->getType(), "int");
     const auto &move_params = move_record->getParameters();
@@ -383,8 +371,7 @@ TEST(SymbolTable, GoldenProgram2) {
     const Scope *history_size_scope =
         find_child_scope(point_scope, "Method: historySize");
     ASSERT_NE(history_size_scope, nullptr);
-    EXPECT_EQ(history_size_scope->getVariableNames(),
-              std::set<std::string>{});
+    EXPECT_EQ(history_size_scope->getVariableNames(), std::set<std::string>{});
     EXPECT_EQ(history_size_scope->getMethodNames(), std::set<std::string>{});
     EXPECT_EQ(history_size_scope->getClassNames(), std::set<std::string>{});
 
@@ -400,16 +387,14 @@ TEST(SymbolTable, GoldenProgram2) {
     EXPECT_EQ(self_scope->getMethodNames(), std::set<std::string>{});
     EXPECT_EQ(self_scope->getClassNames(), std::set<std::string>{});
 
-    const auto *self_record =
-        dynamic_cast<Method *>(self_scope->getRecord());
+    const auto *self_record = dynamic_cast<Method *>(self_scope->getRecord());
     ASSERT_NE(self_record, nullptr);
     EXPECT_EQ(self_record->getType(), "Point");
     EXPECT_EQ(self_record->getParameterCount(), 0u);
 
     const Scope *util_scope = find_child_scope(program, "Class: Util");
     ASSERT_NE(util_scope, nullptr);
-    EXPECT_EQ(util_scope->getVariableNames(),
-              (std::set<std::string>{"this"}));
+    EXPECT_EQ(util_scope->getVariableNames(), (std::set<std::string>{"this"}));
     EXPECT_EQ(util_scope->getMethodNames(),
               (std::set<std::string>{"greater", "max"}));
     EXPECT_EQ(util_scope->getClassNames(), std::set<std::string>{});
@@ -441,8 +426,7 @@ TEST(SymbolTable, GoldenProgram2) {
     EXPECT_EQ(max_scope->getMethodNames(), std::set<std::string>{});
     EXPECT_EQ(max_scope->getClassNames(), std::set<std::string>{});
 
-    const auto *max_record =
-        dynamic_cast<Method *>(max_scope->getRecord());
+    const auto *max_record = dynamic_cast<Method *>(max_scope->getRecord());
     ASSERT_NE(max_record, nullptr);
     EXPECT_EQ(max_record->getType(), "int");
     const auto &max_params = max_record->getParameters();

@@ -1,5 +1,6 @@
 #include "lexing/Lexer.hpp"
 #include "lexing/CharStream.hpp"
+#include "lexing/Diagnostics.hpp"
 #include "lexing/Token.hpp"
 
 #include <cctype>

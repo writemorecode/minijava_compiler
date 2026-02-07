@@ -3,7 +3,7 @@
 #include <iostream>
 #include <ostream>
 
-#include "lexing/Token.hpp"
+#include "lexing/Diagnostics.hpp"
 
 namespace lexing {
 
