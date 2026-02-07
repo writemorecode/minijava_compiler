@@ -1,17 +1,26 @@
 #pragma once
 
+#include <cstdint>
 #include <deque>
 #include <expected>
 #include <memory>
-#include <string>
+#include <optional>
 
 #include "ast/Node.h"
 #include "lexing/Lexer.hpp"
 #include "lexing/Token.hpp"
 namespace parsing {
 
+enum class ParseErrorKind : std::uint8_t {
+    ExpectedToken,
+    ExpectedExpression,
+    ExpectedStatement,
+    ExpectedType,
+};
+
 struct ParseError {
-    std::string message;
+    ParseErrorKind kind;
+    std::optional<lexing::TokenKind> expected_token;
     lexing::SourceSpan span{};
 };
 
@@ -30,11 +39,9 @@ class Parser {
     const lexing::Token &peek(std::size_t n = 0);
     lexing::Token consume();
     bool match(lexing::TokenKind kind);
-    Result<lexing::Token> expect(lexing::TokenKind kind,
-                                 std::string_view expected_label);
+    Result<lexing::Token> expect(lexing::TokenKind kind);
 
-    void report_error(const lexing::Token &token,
-                      std::string_view expected_label);
+    void report_error(const lexing::Token &token, const ParseError &error);
 
     Result<std::unique_ptr<Node>> parse_main_class();
     Result<std::unique_ptr<Node>> parse_class_decl();

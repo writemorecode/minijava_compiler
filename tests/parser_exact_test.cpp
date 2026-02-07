@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 
+#include "ast/Node.h"
 #include "lexing/Lexer.hpp"
 #include "lexing/StringViewStream.hpp"
 #include "lexing/Token.hpp"
@@ -40,15 +41,14 @@ struct ExpectedNode {
 
 ExpectedNode node(std::string type, std::string value = "",
                   std::vector<ExpectedNode> children = {}) {
-    return ExpectedNode{std::move(type), std::move(value),
-                        std::move(children)};
+    return ExpectedNode{.type=std::move(type), .value=std::move(value), .children=std::move(children)};
 }
 
-ExpectedNode id(std::string name) { return node("Identifier", name); }
+ExpectedNode id(std::string name) { return node("Identifier", std::move(name)); }
 
-ExpectedNode type_node(std::string name) { return node("Type", name); }
+ExpectedNode type_node(std::string name) { return node("Type", std::move(name)); }
 
-ExpectedNode integer(std::string value) { return node("Integer", value); }
+ExpectedNode integer(std::string value) { return node("Integer", std::move(value)); }
 
 ExpectedNode unary(std::string type, ExpectedNode expr) {
     return node(std::move(type), "", {std::move(expr)});
@@ -59,22 +59,19 @@ ExpectedNode binary(std::string type, ExpectedNode left, ExpectedNode right) {
 }
 
 ExpectedNode expected_tree() {
-    ExpectedNode arithmetic_expr = binary(
-        "Minus",
-        binary("Plus", integer("1"), integer("2")),
+    ExpectedNode const arithmetic_expr = binary(
+        "Minus", binary("Plus", integer("1"), integer("2")),
         binary("Division", binary("Multiplication", integer("3"), integer("4")),
                integer("5")));
 
-    ExpectedNode complex_condition = binary(
-        "OR",
-        binary("AND",
-               unary("Negated expression", id("flag")),
-               binary("Less-than", id("a"), id("b"))),
-        binary("Greater-than", id("a"), id("b")));
+    ExpectedNode const complex_condition =
+        binary("OR",
+               binary("AND", unary("Negated expression", id("flag")),
+                      binary("Less-than", id("a"), id("b"))),
+               binary("Greater-than", id("a"), id("b")));
 
-    ExpectedNode main_statements = node(
-        "Statement list",
-        "",
+    ExpectedNode const main_statements = node(
+        "Statement list", "",
         {
             node("Assign", "", {id("a"), arithmetic_expr}),
             node("Assign", "",
@@ -82,54 +79,40 @@ ExpectedNode expected_tree() {
             node("Assign", "", {id("flag"), node("TRUE")}),
             node("Assign", "", {id("flag"), node("FALSE")}),
             node("If", "", {complex_condition, node("Empty statement")}),
-            node("If-else",
-                 "",
+            node("If-else", "",
                  {
                      binary("EQ", id("a"), id("b")),
-                     node("Statement list",
-                          "",
+                     node("Statement list", "",
                           {node("Print", "", {integer("0")})}),
                      node("Empty statement"),
                  }),
-            node("While",
-                 "",
+            node("While", "",
                  {
                      binary("Less-than", id("b"), integer("10")),
-                     node("Statement list",
-                          "",
-                          {node("Assign",
-                                "",
+                     node("Statement list", "",
+                          {node("Assign", "",
                                 {id("b"),
                                  binary("Plus", id("b"), integer("1"))})}),
                  }),
             node("Assign", "", {id("arr"), node("Integer array allocation")}),
             node("Assign", "", {id("a"), node("Array length")}),
-            node("Assign",
-                 "",
-                 {id("b"),
-                  node("Array access", "", {id("arr"), integer("1")})}),
+            node(
+                "Assign", "",
+                {id("b"), node("Array access", "", {id("arr"), integer("1")})}),
             node("Assign", "", {id("foo"), node("Class allocation", "Foo")}),
-            node("Assign",
-                 "",
-                 {id("a"),
-                  node("Method call",
-                       "",
-                       {id("foo"),
-                        id("bar"),
-                        node("Expression list",
-                             "",
-                             {integer("8"), integer("9")})})}),
-            node("Assign",
-                 "",
-                 {id("a"),
-                  node("Method call", "", {id("foo"), id("baz")})}),
+            node("Assign", "",
+                 {id("a"), node("Method call", "",
+                                {id("foo"), id("bar"),
+                                 node("Expression list", "",
+                                      {integer("8"), integer("9")})})}),
+            node("Assign", "",
+                 {id("a"), node("Method call", "", {id("foo"), id("baz")})}),
             node("Print", "", {id("a")}),
             node("Array assign", "", {id("arr"), integer("2")}),
         });
 
-    ExpectedNode foo_fields =
-        node("Variable declaration list",
-             "",
+    ExpectedNode const foo_fields =
+        node("Variable declaration list", "",
              {
                  node("Variable", "", {type_node("int"), id("x")}),
                  node("Variable", "", {type_node("boolean"), id("flag")}),
@@ -137,61 +120,41 @@ ExpectedNode expected_tree() {
                  node("Variable", "", {type_node("Foo"), id("other")}),
              });
 
-    ExpectedNode bar_method = node(
-        "Method",
-        "",
-        {type_node("int"),
-         id("bar"),
-         node("Method parameter list",
-              "",
+    ExpectedNode const bar_method = node(
+        "Method", "",
+        {type_node("int"), id("bar"),
+         node("Method parameter list", "",
               {
                   node("Method parameter", "", {type_node("int"), id("x")}),
                   node("Method parameter", "", {type_node("int"), id("y")}),
               }),
-         node("Method body",
-              "",
-              {node("Method body item list",
-                    "",
-                    {node("Variable declaration",
-                          "",
-                          {node("Variable",
-                                "",
-                                {type_node("int"), id("z")})}),
-                     node("Statement",
-                          "",
-                          {node("Assign",
-                                "",
-                                {id("z"),
-                                 binary("Plus", id("x"), id("y"))})})}),
-               node("this")})});
+         node(
+             "Method body", "",
+             {node("Method body item list", "",
+                   {node("Variable declaration", "",
+                         {node("Variable", "", {type_node("int"), id("z")})}),
+                    node("Statement", "",
+                         {node("Assign", "",
+                               {id("z"), binary("Plus", id("x"), id("y"))})})}),
+              node("this")})});
 
-    ExpectedNode baz_method = node("Method",
-                                   "",
-                                   {type_node("int"),
-                                    id("baz"),
-                                    node("Method body", "",
-                                         {integer("0")})});
+    ExpectedNode const baz_method = node(
+        "Method", "",
+        {type_node("int"), id("baz"), node("Method body", "", {integer("0")})});
 
-    ExpectedNode foo_class = node(
-        "Class",
-        "",
-        {id("Foo"),
-         node("Class body",
-              "",
-              {foo_fields,
-               node("Method declaration list", "",
-                    {bar_method, baz_method})})});
+    ExpectedNode const foo_class =
+        node("Class", "",
+             {id("Foo"), node("Class body", "",
+                              {foo_fields, node("Method declaration list", "",
+                                                {bar_method, baz_method})})});
 
-    ExpectedNode empty_class =
+    ExpectedNode const empty_class =
         node("Class", "", {id("Empty"), node("Empty class body")});
 
-    return node("Class declaration list",
-                "",
-                {node("Main Class",
-                      "",
-                      {id("Main"), id("args"), main_statements}),
-                 foo_class,
-                 empty_class});
+    return node(
+        "Class declaration list", "",
+        {node("Main Class", "", {id("Main"), id("args"), main_statements}),
+         foo_class, empty_class});
 }
 
 void assert_ast_eq(const Node *actual, const ExpectedNode &expected,
@@ -208,6 +171,14 @@ void assert_ast_eq(const Node *actual, const ExpectedNode &expected,
                       path + "/" + expected.children[i].type + "[" +
                           std::to_string(i) + "]");
     }
+}
+
+parsing::Result<std::unique_ptr<Node>>
+parse_source(std::string_view source, CollectingDiagnosticSink &diag) {
+    auto stream = std::make_unique<lexing::StringViewStream>(source);
+    lexing::Lexer lexer(std::move(stream), source, &diag);
+    parsing::Parser parser(std::move(lexer), &diag);
+    return parser.parse_goal();
 }
 
 } // namespace
@@ -260,16 +231,84 @@ class Foo {
 class Empty {
 }
 )";
-
     CollectingDiagnosticSink diag;
-    auto stream = std::make_unique<lexing::StringViewStream>(source);
-    lexing::Lexer lexer(std::move(stream), source, &diag);
-    parsing::Parser parser(std::move(lexer), &diag);
-
-    auto parse_result = parser.parse_goal();
+    auto parse_result = parse_source(source, diag);
     ASSERT_TRUE(parse_result.has_value());
     assert_no_errors(diag.diagnostics);
 
-    ExpectedNode expected = expected_tree();
+    ExpectedNode const expected = expected_tree();
     assert_ast_eq(parse_result.value().get(), expected);
+}
+
+TEST(ParserExact, ParseErrorKindExpectedTokenAssign) {
+    constexpr std::string_view source =
+        R"(public class Main {
+  public static void main(String[] args) {
+    x 1;
+  }
+}
+)";
+
+    CollectingDiagnosticSink diag;
+    auto parse_result = parse_source(source, diag);
+    ASSERT_FALSE(parse_result.has_value());
+    const parsing::ParseError &error = parse_result.error();
+    EXPECT_EQ(error.kind, parsing::ParseErrorKind::ExpectedToken);
+    ASSERT_TRUE(error.expected_token.has_value());
+    EXPECT_EQ(error.expected_token.value(), lexing::TokenKind::Assign);
+}
+
+TEST(ParserExact, ParseErrorKindExpectedType) {
+    constexpr std::string_view source =
+        R"(public class Main {
+  public static void main(String[] args) {
+    x = 1;
+  }
+}
+
+class Foo {
+  public ;
+}
+)";
+
+    CollectingDiagnosticSink diag;
+    auto parse_result = parse_source(source, diag);
+    ASSERT_FALSE(parse_result.has_value());
+    const parsing::ParseError &error = parse_result.error();
+    EXPECT_EQ(error.kind, parsing::ParseErrorKind::ExpectedType);
+    EXPECT_FALSE(error.expected_token.has_value());
+}
+
+TEST(ParserExact, ParseErrorKindExpectedExpression) {
+    constexpr std::string_view source =
+        R"(public class Main {
+  public static void main(String[] args) {
+    x = ;
+  }
+}
+)";
+
+    CollectingDiagnosticSink diag;
+    auto parse_result = parse_source(source, diag);
+    ASSERT_FALSE(parse_result.has_value());
+    const parsing::ParseError &error = parse_result.error();
+    EXPECT_EQ(error.kind, parsing::ParseErrorKind::ExpectedExpression);
+    EXPECT_FALSE(error.expected_token.has_value());
+}
+
+TEST(ParserExact, ParseErrorKindExpectedStatement) {
+    constexpr std::string_view source =
+        R"(public class Main {
+  public static void main(String[] args) {
+    return 0;
+  }
+}
+)";
+
+    CollectingDiagnosticSink diag;
+    auto parse_result = parse_source(source, diag);
+    ASSERT_FALSE(parse_result.has_value());
+    const parsing::ParseError &error = parse_result.error();
+    EXPECT_EQ(error.kind, parsing::ParseErrorKind::ExpectedStatement);
+    EXPECT_FALSE(error.expected_token.has_value());
 }
