@@ -328,12 +328,11 @@ void Parser::report_error(const lexing::Token &token, const ParseError &error) {
         err += expected_label;
     }
 
-    std::string message = "Syntax errors found! See the logs below:\n";
-    message += "\t@error at line ";
+    std::string message = "Error on line ";
     message += std::to_string(token.span.begin.line);
-    message += ". Cannot generate a syntax for this input:";
+    message += ": ";
     message += err;
-    message += "\nEnd of syntax errors!\n";
+    message += ".\n";
 
     if (sink_ != nullptr) {
         sink_->emit({.severity = lexing::Severity::Error,
