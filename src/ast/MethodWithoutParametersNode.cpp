@@ -12,10 +12,10 @@ bool MethodWithoutParametersNode::buildTable(SymbolTable &st) const {
     currentClass->addMethod(currentMethod);
 
     st.enterMethodScope(currentMethod);
-    body->buildTable(st);
+    bool validBody = body->buildTable(st);
     st.exitScope();
 
-    return true;
+    return validBody;
 }
 
 std::string MethodWithoutParametersNode::checkTypes(SymbolTable &st) const {

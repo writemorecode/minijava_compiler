@@ -13,10 +13,10 @@ bool ClassNode::buildTable(SymbolTable &st) const {
     auto *currentClass = st.lookupClass(className);
     st.enterClassScope(currentClass);
     st.addVariable(className, "this");
-    body->buildTable(st);
+    bool validBody = body->buildTable(st);
     st.exitScope();
 
-    return valid;
+    return valid && validBody;
 }
 
 std::string ClassNode::checkTypes(SymbolTable &st) const {
