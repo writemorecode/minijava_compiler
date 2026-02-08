@@ -16,6 +16,12 @@ class MethodWithoutParametersNode : public Node {
         body = append_child(std::move(body_));
     }
 
+    void accept(AstVisitor &visitor) const override;
+
+    [[nodiscard]] const std::string &getMethodName() const { return id->value; }
+    [[nodiscard]] const std::string &getMethodType() const { return type->value; }
+    [[nodiscard]] const Node &getBodyNode() const { return *body; }
+
     bool buildTable(SymbolTable &st) const override;
     std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;

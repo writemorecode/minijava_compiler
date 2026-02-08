@@ -1,5 +1,9 @@
 #include "ast/MainClassNode.hpp"
 
+#include "ast/AstVisitor.hpp"
+
+void MainClassNode::accept(AstVisitor &visitor) const { visitor.visit(*this); }
+
 bool MainClassNode::buildTable(SymbolTable &st) const {
     if (st.lookupClass(mainClassName)) {
         std::cerr << "Error: (line " << lineno << ") Class '" << mainClassName

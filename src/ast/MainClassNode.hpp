@@ -18,6 +18,16 @@ class MainClassNode : public Node {
         mainMethodArgumentName = arg->value;
     }
 
+    void accept(AstVisitor &visitor) const override;
+
+    [[nodiscard]] const std::string &getMainClassName() const {
+        return mainClassName;
+    }
+    [[nodiscard]] const std::string &getMainMethodArgumentName() const {
+        return mainMethodArgumentName;
+    }
+    [[nodiscard]] const Node &getBodyNode() const { return *body; }
+
     bool buildTable(SymbolTable &st) const override;
     std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;

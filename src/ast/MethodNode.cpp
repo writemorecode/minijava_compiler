@@ -1,5 +1,9 @@
 #include "ast/MethodNode.hpp"
 
+#include "ast/AstVisitor.hpp"
+
+void MethodNode::accept(AstVisitor &visitor) const { visitor.visit(*this); }
+
 bool MethodNode::buildTable(SymbolTable &st) const {
     bool valid = true;
     if (st.lookupMethod(methodName)) {
