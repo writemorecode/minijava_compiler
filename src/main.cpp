@@ -15,6 +15,7 @@ namespace fs = std::filesystem;
 #include "lexing/SourceBuffer.hpp"
 #include "lexing/StringViewStream.hpp"
 #include "parsing/Parser.hpp"
+#include "semantic/SymbolTableVisitor.hpp"
 
 std::unique_ptr<Node> root;
 int lexical_errors = 0;
@@ -273,19 +274,24 @@ int main(int argc, char **argv) {
     }
 
     SymbolTable st;
-    bool symbolTableSuccess = root->buildTable(st);
+    lexing::LegacyDiagnosticSink semantic_diag;
+    auto symbol_table_result = build_symbol_table(*root, st, &semantic_diag);
+    bool symbolTableSuccess = symbol_table_result.ok();
     if (!symbolTableSuccess) {
         std::cout << "Symbol table construction failed.\n";
     }
 
-    auto rootType = root->checkTypes(st);
-    bool typeCheckSuccess = !rootType.empty();
-    if (!typeCheckSuccess) {
-        std::cout << "Type checking failed.\n";
+    bool typeCheckSuccess = true;
+    if (symbolTableSuccess) {
+        auto rootType = root->checkTypes(st);
+        typeCheckSuccess = !rootType.empty();
+        if (!typeCheckSuccess) {
+            std::cout << "Type checking failed.\n";
+        }
     }
 
     if (!symbolTableSuccess || !typeCheckSuccess) {
-        return errCode;
+        return errCodes::SEMANTIC_ERROR;
     }
 
     std::ofstream outStream(outputDirectory / "tree.dot");
