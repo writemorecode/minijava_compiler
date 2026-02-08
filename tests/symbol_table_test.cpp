@@ -16,6 +16,7 @@
 #include "semantic/Method.hpp"
 #include "semantic/Scope.hpp"
 #include "semantic/SymbolTable.hpp"
+#include "semantic/SymbolTableVisitor.hpp"
 
 namespace {
 
@@ -35,6 +36,27 @@ void assert_no_errors(const std::vector<lexing::Diagnostic> &diagnostics) {
     }
     ASSERT_EQ(error_count, 0)
         << "Unexpected diagnostic errors: " << error_count;
+}
+
+int count_error_diagnostics(
+    const std::vector<lexing::Diagnostic> &diagnostics) {
+    int count = 0;
+    for (const auto &d : diagnostics) {
+        if (d.severity == lexing::Severity::Error) {
+            count += 1;
+        }
+    }
+    return count;
+}
+
+const lexing::Diagnostic *
+find_first_error(const std::vector<lexing::Diagnostic> &diagnostics) {
+    for (const auto &d : diagnostics) {
+        if (d.severity == lexing::Severity::Error) {
+            return &d;
+        }
+    }
+    return nullptr;
 }
 
 std::unique_ptr<Node> parse_program(std::string_view source) {
@@ -164,7 +186,10 @@ class Foo {
     ASSERT_NE(root, nullptr);
 
     SymbolTable st;
-    ASSERT_TRUE(root->buildTable(st));
+    CollectingDiagnosticSink semantic_diag;
+    const auto symbol_result = build_symbol_table(*root, st, &semantic_diag);
+    ASSERT_TRUE(symbol_result.ok());
+    ASSERT_EQ(count_error_diagnostics(semantic_diag.diagnostics), 0);
 
     const Scope *program = st.getCurrentScope();
     ASSERT_NE(program, nullptr);
@@ -247,7 +272,10 @@ TEST(SymbolTable, GoldenProgram2) {
     ASSERT_NE(root, nullptr);
 
     SymbolTable st;
-    ASSERT_TRUE(root->buildTable(st));
+    CollectingDiagnosticSink semantic_diag;
+    const auto symbol_result = build_symbol_table(*root, st, &semantic_diag);
+    ASSERT_TRUE(symbol_result.ok());
+    ASSERT_EQ(count_error_diagnostics(semantic_diag.diagnostics), 0);
 
     const Scope *program = st.getCurrentScope();
     ASSERT_NE(program, nullptr);
@@ -438,4 +466,173 @@ TEST(SymbolTable, GoldenProgram2) {
 
     const auto root_type = root->checkTypes(st);
     EXPECT_EQ(root_type, "void");
+}
+
+TEST(SymbolTable, DuplicateClassReportsDiagnostic) {
+    constexpr std::string_view source = R"(public class Main {
+  public static void main(String[] args) {
+    System.out.println(0);
+  }
+}
+
+class Foo {
+}
+
+class Foo {
+}
+)";
+
+    auto root = parse_program(source);
+    ASSERT_NE(root, nullptr);
+
+    SymbolTable st;
+    CollectingDiagnosticSink semantic_diag;
+    const auto symbol_result = build_symbol_table(*root, st, &semantic_diag);
+
+    ASSERT_FALSE(symbol_result.ok());
+    ASSERT_EQ(symbol_result.error_count, 1);
+    ASSERT_EQ(count_error_diagnostics(semantic_diag.diagnostics), 1);
+
+    const auto *error = find_first_error(semantic_diag.diagnostics);
+    ASSERT_NE(error, nullptr);
+    EXPECT_EQ(error->span.begin.line, 10u);
+    EXPECT_NE(error->message.find("Class 'Foo' already declared"),
+              std::string::npos);
+}
+
+TEST(SymbolTable, DuplicateMethodReportsDiagnostic) {
+    constexpr std::string_view source = R"(public class Main {
+  public static void main(String[] args) {
+    System.out.println(0);
+  }
+}
+
+class Foo {
+  public int bar() {
+    return 0;
+  }
+
+  public int bar() {
+    return 1;
+  }
+}
+)";
+
+    auto root = parse_program(source);
+    ASSERT_NE(root, nullptr);
+
+    SymbolTable st;
+    CollectingDiagnosticSink semantic_diag;
+    const auto symbol_result = build_symbol_table(*root, st, &semantic_diag);
+
+    ASSERT_FALSE(symbol_result.ok());
+    ASSERT_EQ(symbol_result.error_count, 1);
+    ASSERT_EQ(count_error_diagnostics(semantic_diag.diagnostics), 1);
+
+    const auto *error = find_first_error(semantic_diag.diagnostics);
+    ASSERT_NE(error, nullptr);
+    EXPECT_EQ(error->span.begin.line, 12u);
+    EXPECT_NE(error->message.find("Method 'bar' already declared"),
+              std::string::npos);
+}
+
+TEST(SymbolTable, DuplicateParameterReportsDiagnostic) {
+    constexpr std::string_view source = R"(public class Main {
+  public static void main(String[] args) {
+    System.out.println(0);
+  }
+}
+
+class Foo {
+  public int bar(int x, int x) {
+    return x;
+  }
+}
+)";
+
+    auto root = parse_program(source);
+    ASSERT_NE(root, nullptr);
+
+    SymbolTable st;
+    CollectingDiagnosticSink semantic_diag;
+    const auto symbol_result = build_symbol_table(*root, st, &semantic_diag);
+
+    ASSERT_FALSE(symbol_result.ok());
+    ASSERT_EQ(symbol_result.error_count, 1);
+    ASSERT_EQ(count_error_diagnostics(semantic_diag.diagnostics), 1);
+
+    const auto *error = find_first_error(semantic_diag.diagnostics);
+    ASSERT_NE(error, nullptr);
+    EXPECT_EQ(error->span.begin.line, 8u);
+    EXPECT_NE(error->message.find("Parameter 'x' already declared"),
+              std::string::npos);
+}
+
+TEST(SymbolTable, DuplicateLocalVariableReportsDiagnostic) {
+    constexpr std::string_view source = R"(public class Main {
+  public static void main(String[] args) {
+    System.out.println(0);
+  }
+}
+
+class Foo {
+  public int bar() {
+    int x;
+    int x;
+    return x;
+  }
+}
+)";
+
+    auto root = parse_program(source);
+    ASSERT_NE(root, nullptr);
+
+    SymbolTable st;
+    CollectingDiagnosticSink semantic_diag;
+    const auto symbol_result = build_symbol_table(*root, st, &semantic_diag);
+
+    ASSERT_FALSE(symbol_result.ok());
+    ASSERT_EQ(symbol_result.error_count, 1);
+    ASSERT_EQ(count_error_diagnostics(semantic_diag.diagnostics), 1);
+
+    const auto *error = find_first_error(semantic_diag.diagnostics);
+    ASSERT_NE(error, nullptr);
+    EXPECT_EQ(error->span.begin.line, 10u);
+    EXPECT_NE(error->message.find("Variable 'x' already declared"),
+              std::string::npos);
+}
+
+TEST(SymbolTable, DuplicateFieldReportsDiagnostic) {
+    constexpr std::string_view source = R"(public class Main {
+  public static void main(String[] args) {
+    System.out.println(0);
+  }
+}
+
+class Foo {
+  int x;
+  int x;
+
+  public int bar() {
+    return x;
+  }
+}
+)";
+
+    auto root = parse_program(source);
+    ASSERT_NE(root, nullptr);
+
+    SymbolTable st;
+    CollectingDiagnosticSink semantic_diag;
+    const auto symbol_result = build_symbol_table(*root, st, &semantic_diag);
+
+    ASSERT_FALSE(symbol_result.ok());
+    ASSERT_EQ(symbol_result.error_count, 1);
+    ASSERT_EQ(count_error_diagnostics(semantic_diag.diagnostics), 1);
+
+    const auto *error = find_first_error(semantic_diag.diagnostics);
+    ASSERT_NE(error, nullptr);
+    EXPECT_EQ(error->span.begin.line, 9u);
+    EXPECT_NE(error->message.find("Variable 'x' already declared"),
+              std::string::npos);
 }
