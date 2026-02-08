@@ -58,9 +58,21 @@ std::string MethodCallNode::checkTypes(SymbolTable &st) const {
 }
 
 Operand MethodCallNode::generateIR(CFG &graph, SymbolTable &st) {
-    const auto &caller = object->checkTypes(st);
+    const auto caller = object->checkTypes(st);
+    if (caller.empty()) {
+        return "";
+    }
+
     auto *callingClass = st.lookupClass(caller);
+    if (callingClass == nullptr) {
+        return "";
+    }
+
     auto const *method = callingClass->lookupMethod(id->value);
+    if (method == nullptr) {
+        return "";
+    }
+
     const auto &methodType = method->getType();
 
     for (const auto &arg : exprList->children) {
