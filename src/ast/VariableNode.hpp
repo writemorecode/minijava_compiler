@@ -14,6 +14,15 @@ class VariableNode : public Node {
         name = append_child(std::move(name_));
     }
 
+    void accept(AstVisitor &visitor) const override;
+
+    [[nodiscard]] const std::string &getVariableType() const {
+        return type->value;
+    }
+    [[nodiscard]] const std::string &getVariableName() const {
+        return name->value;
+    }
+
     bool buildTable(SymbolTable &st) const override;
     std::string checkTypes(SymbolTable &st) const override;
 };

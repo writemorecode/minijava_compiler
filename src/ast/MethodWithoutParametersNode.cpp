@@ -1,5 +1,11 @@
 #include "ast/MethodWithoutParametersNode.hpp"
 
+#include "ast/AstVisitor.hpp"
+
+void MethodWithoutParametersNode::accept(AstVisitor &visitor) const {
+    visitor.visit(*this);
+}
+
 bool MethodWithoutParametersNode::buildTable(SymbolTable &st) const {
     if (st.lookupMethod(id->value)) {
         std::cerr << "Error: (line " << lineno << ") Method '" << id->value

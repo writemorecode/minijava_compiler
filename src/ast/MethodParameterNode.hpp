@@ -13,6 +13,16 @@ class MethodParameterNode : public Node {
         type = append_child(std::move(type_));
         id = append_child(std::move(id_));
     }
+
+    void accept(AstVisitor &visitor) const override;
+
+    [[nodiscard]] const std::string &getParameterType() const {
+        return type->value;
+    }
+    [[nodiscard]] const std::string &getParameterName() const {
+        return id->value;
+    }
+
     bool buildTable(SymbolTable &st) const override;
 };
 

@@ -19,6 +19,14 @@ class MethodNode : public Node {
         methodName = id->value;
         methodType = type->value;
     }
+
+    void accept(AstVisitor &visitor) const override;
+
+    [[nodiscard]] const std::string &getMethodName() const { return methodName; }
+    [[nodiscard]] const std::string &getMethodType() const { return methodType; }
+    [[nodiscard]] const Node &getParametersNode() const { return *params; }
+    [[nodiscard]] const Node &getBodyNode() const { return *body; }
+
     bool buildTable(SymbolTable &st) const override;
     std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;

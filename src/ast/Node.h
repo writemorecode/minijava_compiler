@@ -12,6 +12,8 @@
 
 #include "ir/CFG.hpp"
 
+class AstVisitor;
+
 class Node {
   public:
     std::string type{}, value{};
@@ -30,6 +32,8 @@ class Node {
     virtual std::string checkTypes(SymbolTable &st) const;
 
     virtual Operand generateIR(CFG &graph, SymbolTable &st);
+
+    virtual void accept(AstVisitor &visitor) const;
 
     void print(int depth) const;
     void printGraphviz(int &count, std::ostream &outStream);

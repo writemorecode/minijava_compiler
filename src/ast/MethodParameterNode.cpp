@@ -1,5 +1,11 @@
 #include "ast/MethodParameterNode.hpp"
 
+#include "ast/AstVisitor.hpp"
+
+void MethodParameterNode::accept(AstVisitor &visitor) const {
+    visitor.visit(*this);
+}
+
 bool MethodParameterNode::buildTable(SymbolTable &st) const {
     if (st.lookupVariableInScope(id->value)) {
         std::cerr << "Error: (line " << lineno << ") Parameter '" << id->value

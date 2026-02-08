@@ -1,4 +1,6 @@
 #include "ast/Node.h"
+
+#include "ast/AstVisitor.hpp"
 #include "semantic/SymbolTable.hpp"
 
 bool Node::buildTable(SymbolTable &st) const {
@@ -31,6 +33,8 @@ Operand Node::generateIR(CFG &graph, SymbolTable &st) {
     }
     return "foobar";
 }
+
+void Node::accept(AstVisitor &visitor) const { visitor.visit(*this); }
 
 void Node::print(int depth = 0) const {
     for (int i = 0; i < depth; i++) {
