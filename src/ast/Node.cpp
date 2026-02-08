@@ -2,15 +2,10 @@
 
 #include "ast/AstVisitor.hpp"
 #include "semantic/SymbolTable.hpp"
+#include "semantic/SymbolTableVisitor.hpp"
 
 bool Node::buildTable(SymbolTable &st) const {
-    bool valid = true;
-    for (const auto &child : children) {
-        if (!child->buildTable(st)) {
-            valid = false;
-        }
-    }
-    return valid;
+    return build_symbol_table(*this, st).ok();
 }
 
 std::string Node::checkTypes(SymbolTable &st) const {

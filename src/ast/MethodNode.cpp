@@ -4,27 +4,6 @@
 
 void MethodNode::accept(AstVisitor &visitor) const { visitor.visit(*this); }
 
-bool MethodNode::buildTable(SymbolTable &st) const {
-    bool valid = true;
-    if (st.lookupMethod(methodName)) {
-        std::cerr << "Error: (line " << lineno << ") Method '" << methodName
-                  << "' already declared.\n";
-        valid = false;
-    }
-
-    st.addMethod(methodType, methodName);
-    auto *currentMethod = st.lookupMethod(methodName);
-    auto *currentClass = dynamic_cast<Class *>(st.getCurrentRecord());
-    currentClass->addMethod(currentMethod);
-
-    st.enterMethodScope(currentMethod);
-    bool validParams = params->buildTable(st);
-    bool validBody = body->buildTable(st);
-    st.exitScope();
-
-    return valid && validParams && validBody;
-}
-
 std::string MethodNode::checkTypes(SymbolTable &st) const {
     st.enterMethodScope(methodName);
     const auto signatureReturnType = type->checkTypes(st);
