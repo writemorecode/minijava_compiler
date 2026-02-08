@@ -23,7 +23,6 @@ class VariableNode : public Node {
         return name->value;
     }
 
-    bool buildTable(SymbolTable &st) const override;
     std::string checkTypes(SymbolTable &st) const override;
 };
 

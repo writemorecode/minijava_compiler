@@ -22,7 +22,6 @@ class MethodWithoutParametersNode : public Node {
     [[nodiscard]] const std::string &getMethodType() const { return type->value; }
     [[nodiscard]] const Node &getBodyNode() const { return *body; }
 
-    bool buildTable(SymbolTable &st) const override;
     std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };

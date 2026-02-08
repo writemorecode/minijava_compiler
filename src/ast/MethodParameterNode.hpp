@@ -23,7 +23,6 @@ class MethodParameterNode : public Node {
         return id->value;
     }
 
-    bool buildTable(SymbolTable &st) const override;
 };
 
 #endif
