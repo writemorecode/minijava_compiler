@@ -28,7 +28,6 @@ class MainClassNode : public Node {
     }
     [[nodiscard]] const Node &getBodyNode() const { return *body; }
 
-    std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 

@@ -13,7 +13,6 @@ class ControlStatementNode : public Node {
         cond = append_child(std::move(cond_));
         stmts = append_child(std::move(stmts_));
     }
-    std::string checkTypes(SymbolTable &st) const override;
 };
 class IfNode : public ControlStatementNode {
     Node *cond, *stmt;

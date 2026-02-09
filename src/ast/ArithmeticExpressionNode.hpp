@@ -8,15 +8,12 @@ class ArithmeticExpressionNode : public Node {
     Node *left, *right;
 
   public:
-    ArithmeticExpressionNode(const std::string &t,
-                             std::unique_ptr<Node> left_,
+    ArithmeticExpressionNode(const std::string &t, std::unique_ptr<Node> left_,
                              std::unique_ptr<Node> right_, int l)
         : Node(t, l) {
         left = append_child(std::move(left_));
         right = append_child(std::move(right_));
     }
-
-    std::string checkTypes(SymbolTable &st) const override;
 };
 
 class PlusNode : public ArithmeticExpressionNode {

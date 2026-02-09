@@ -22,8 +22,6 @@ class VariableNode : public Node {
     [[nodiscard]] const std::string &getVariableName() const {
         return name->value;
     }
-
-    std::string checkTypes(SymbolTable &st) const override;
 };
 
 #endif

@@ -23,6 +23,7 @@
 #include "semantic/Scope.hpp"
 #include "semantic/SymbolTable.hpp"
 #include "semantic/SymbolTableVisitor.hpp"
+#include "semantic/TypeCheckVisitor.hpp"
 #include "semantic/TypeNode.hpp"
 
 namespace {
@@ -89,16 +90,6 @@ const Scope *find_child_scope(const Scope *parent, std::string_view name) {
     }
     return nullptr;
 }
-
-class FailingTypeNode final : public Node {
-  public:
-    explicit FailingTypeNode(int line) : Node("Failing type node", line) {}
-
-    std::string checkTypes(SymbolTable &st) const override {
-        (void)st;
-        return "";
-    }
-};
 
 [[maybe_unused]] constexpr std::string_view kGoldenProgram2Source =
     R"(public class Main {
@@ -481,8 +472,12 @@ TEST(SymbolTable, GoldenProgram2) {
     EXPECT_EQ(max_params[1]->getID(), "b");
     EXPECT_EQ(max_params[1]->getType(), "int");
 
-    const auto root_type = root->checkTypes(st);
-    EXPECT_EQ(root_type, "void");
+    TypeInfo type_info;
+    CollectingDiagnosticSink type_diag;
+    const auto type_result = check_types(*root, st, &type_info, &type_diag);
+    EXPECT_TRUE(type_result.ok());
+    EXPECT_EQ(type_result.error_count, 0);
+    EXPECT_EQ(count_error_diagnostics(type_diag.diagnostics), 0);
 }
 
 TEST(SymbolTable, DuplicateClassReportsDiagnostic) {
@@ -655,32 +650,92 @@ class Foo {
 }
 
 TEST(SymbolTable, ControlStatementPropagatesStatementTypeFailure) {
+    constexpr std::string_view source = R"(public class Main {
+  public static void main(String[] args) {
+    System.out.println(0);
+  }
+}
+
+class Foo {
+  public int bar() {
+    int x;
+    if (true) {
+      x = false;
+    }
+    return x;
+  }
+}
+)";
+
+    auto root = parse_program(source);
+    ASSERT_NE(root, nullptr);
+
     SymbolTable st;
+    CollectingDiagnosticSink semantic_diag;
+    const auto symbol_result = build_symbol_table(*root, st, &semantic_diag);
+    ASSERT_TRUE(symbol_result.ok());
 
-    IfNode if_node(std::make_unique<TrueNode>(1),
-                   std::make_unique<FailingTypeNode>(1), 1);
-
-    EXPECT_EQ(if_node.checkTypes(st), "");
+    TypeInfo type_info;
+    CollectingDiagnosticSink type_diag;
+    const auto type_result = check_types(*root, st, &type_info, &type_diag);
+    EXPECT_FALSE(type_result.ok());
+    EXPECT_GE(count_error_diagnostics(type_diag.diagnostics), 1);
 }
 
 TEST(SymbolTable, MethodWithoutParametersReturnMismatchFailsTypeCheck) {
+    constexpr std::string_view source = R"(public class Main {
+  public static void main(String[] args) {
+    System.out.println(0);
+  }
+}
+
+class Foo {
+  public int bar() {
+    return true;
+  }
+}
+)";
+
+    auto root = parse_program(source);
+    ASSERT_NE(root, nullptr);
+
     SymbolTable st;
+    CollectingDiagnosticSink semantic_diag;
+    const auto symbol_result = build_symbol_table(*root, st, &semantic_diag);
+    ASSERT_TRUE(symbol_result.ok());
 
-    MethodWithoutParametersNode method(
-        std::make_unique<TypeNode>("int", 1),
-        std::make_unique<IdentifierNode>("foo", 1),
-        std::make_unique<ReturnOnlyMethodBodyNode>(
-            std::make_unique<TrueNode>(1), 1),
-        1);
-
-    EXPECT_EQ(method.checkTypes(st), "");
+    TypeInfo type_info;
+    CollectingDiagnosticSink type_diag;
+    const auto type_result = check_types(*root, st, &type_info, &type_diag);
+    EXPECT_FALSE(type_result.ok());
+    EXPECT_GE(count_error_diagnostics(type_diag.diagnostics), 1);
 }
 
 TEST(SymbolTable, ClassAllocationRequiresDeclaredClassType) {
+    constexpr std::string_view source = R"(public class Main {
+  public static void main(String[] args) {
+    System.out.println(0);
+  }
+}
+
+class Foo {
+  public MissingClass bar() {
+    return new MissingClass();
+  }
+}
+)";
+
+    auto root = parse_program(source);
+    ASSERT_NE(root, nullptr);
+
     SymbolTable st;
+    CollectingDiagnosticSink semantic_diag;
+    const auto symbol_result = build_symbol_table(*root, st, &semantic_diag);
+    ASSERT_TRUE(symbol_result.ok());
 
-    ClassAllocationNode allocation(
-        std::make_unique<IdentifierNode>("MissingClass", 1), 1);
-
-    EXPECT_EQ(allocation.checkTypes(st), "");
+    TypeInfo type_info;
+    CollectingDiagnosticSink type_diag;
+    const auto type_result = check_types(*root, st, &type_info, &type_diag);
+    EXPECT_FALSE(type_result.ok());
+    EXPECT_GE(count_error_diagnostics(type_diag.diagnostics), 1);
 }

@@ -13,8 +13,6 @@ class IntegerNode : public Node {
     IntegerNode(const std::string &value_, int l)
         : Node("Integer", value_, l), value{std::stoi(value_)} {}
 
-    std::string checkTypes(SymbolTable &st) const override;
-
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 

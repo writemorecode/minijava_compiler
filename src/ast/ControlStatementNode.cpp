@@ -1,32 +1,6 @@
 #include "ast/ControlStatementNode.hpp"
 #include "ir/Tac.hpp"
 
-std::string ControlStatementNode::checkTypes(SymbolTable &st) const {
-    const auto condType = cond->checkTypes(st);
-    const auto stmtType = stmts->checkTypes(st);
-
-    bool valid = true;
-
-    if (condType.empty()) {
-        valid = false;
-    } else if (condType != "boolean") {
-        std::cerr << "Error: ";
-        std::cerr << "(line " << lineno << ") ";
-        std::cerr << "Condition for " << type << "-statement of invalid type "
-                  << condType << ".\n";
-        valid = false;
-    }
-
-    if (stmtType.empty()) {
-        valid = false;
-    }
-
-    if (!valid) {
-        return "";
-    }
-    return "void";
-}
-
 Operand IfNode::generateIR(CFG &graph, SymbolTable &st) {
     auto *trueBlock = graph.newBlock();
     auto *joinBlock = graph.newBlock();

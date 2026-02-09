@@ -67,8 +67,8 @@ void SymbolTableVisitor::visit(const ClassNode &node) {
 
     if (table_.lookupClass(class_name) != nullptr) {
         emit_error(node.lineno, "Error: (line " + std::to_string(node.lineno) +
-                                   ") Class '" + class_name +
-                                   "' already declared.\n");
+                                    ") Class '" + class_name +
+                                    "' already declared.\n");
         return;
     }
 
@@ -88,10 +88,9 @@ void SymbolTableVisitor::visit(const MainClassNode &node) {
     const auto &main_class_name = node.getMainClassName();
 
     if (table_.lookupClass(main_class_name) != nullptr) {
-        emit_error(node.lineno,
-                   "Error: (line " + std::to_string(node.lineno) +
-                       ") Class '" + main_class_name +
-                       "' already declared.\n");
+        emit_error(node.lineno, "Error: (line " + std::to_string(node.lineno) +
+                                    ") Class '" + main_class_name +
+                                    "' already declared.\n");
         return;
     }
 
@@ -122,9 +121,9 @@ void SymbolTableVisitor::visit(const MethodNode &node) {
     const auto &method_name = node.getMethodName();
 
     if (current_class != nullptr && current_class->lookupMethod(method_name)) {
-        emit_error(node.lineno,
-                   "Error: (line " + std::to_string(node.lineno) +
-                       ") Method '" + method_name + "' already declared.\n");
+        emit_error(node.lineno, "Error: (line " + std::to_string(node.lineno) +
+                                    ") Method '" + method_name +
+                                    "' already declared.\n");
         return;
     }
 
@@ -147,9 +146,9 @@ void SymbolTableVisitor::visit(const MethodWithoutParametersNode &node) {
     const auto &method_name = node.getMethodName();
 
     if (current_class != nullptr && current_class->lookupMethod(method_name)) {
-        emit_error(node.lineno,
-                   "Error: (line " + std::to_string(node.lineno) +
-                       ") Method '" + method_name + "' already declared.\n");
+        emit_error(node.lineno, "Error: (line " + std::to_string(node.lineno) +
+                                    ") Method '" + method_name +
+                                    "' already declared.\n");
         return;
     }
 
@@ -170,10 +169,9 @@ void SymbolTableVisitor::visit(const MethodParameterNode &node) {
     const auto &parameter_name = node.getParameterName();
 
     if (table_.lookupVariableInScope(parameter_name) != nullptr) {
-        emit_error(node.lineno,
-                   "Error: (line " + std::to_string(node.lineno) +
-                       ") Parameter '" + parameter_name +
-                       "' already declared.\n");
+        emit_error(node.lineno, "Error: (line " + std::to_string(node.lineno) +
+                                    ") Parameter '" + parameter_name +
+                                    "' already declared.\n");
         return;
     }
 
@@ -181,9 +179,8 @@ void SymbolTableVisitor::visit(const MethodParameterNode &node) {
     auto *parameter = table_.lookupVariable(parameter_name);
 
     auto *current_scope = table_.getCurrentScope();
-    auto *current_method =
-        dynamic_cast<Method *>(current_scope != nullptr ? current_scope->getRecord()
-                                                        : nullptr);
+    auto *current_method = dynamic_cast<Method *>(
+        current_scope != nullptr ? current_scope->getRecord() : nullptr);
     if (current_method != nullptr) {
         current_method->addParameter(parameter);
     }
@@ -193,10 +190,9 @@ void SymbolTableVisitor::visit(const VariableNode &node) {
     const auto &variable_name = node.getVariableName();
 
     if (table_.lookupVariableInScope(variable_name) != nullptr) {
-        emit_error(node.lineno,
-                   "Error: (line " + std::to_string(node.lineno) +
-                       ") Variable '" + variable_name +
-                       "' already declared.\n");
+        emit_error(node.lineno, "Error: (line " + std::to_string(node.lineno) +
+                                    ") Variable '" + variable_name +
+                                    "' already declared.\n");
         return;
     }
 

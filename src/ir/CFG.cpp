@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "ir/CFG.hpp"
+#include "semantic/TypeCheckVisitor.hpp"
 
 std::string CFG::getTemporaryName() {
     auto name = "_t" + std::to_string(temporaryIndex);
@@ -44,6 +45,13 @@ BBlock *CFG::addMethodRootBlock(const std::string &className,
     return ptr;
 }
 
+const std::string *CFG::typeOf(const Node &node) const {
+    if (type_info_ == nullptr) {
+        return nullptr;
+    }
+    return type_info_->get(node);
+}
+
 void CFG::generateBytecode(BytecodeProgram &program, SymbolTable &st) {
     for (auto *basicBlock : methodBlocks) {
         const auto &className = basicBlock->getClassName();
@@ -56,7 +64,7 @@ void CFG::generateBytecode(BytecodeProgram &program, SymbolTable &st) {
         const auto &blockName = basicBlock->getName();
         const auto variableNames = methodScope->getVariableNames();
         std::vector<std::string> variables(variableNames.begin(),
-                                            variableNames.end());
+                                           variableNames.end());
         auto &bytecodeMethod =
             program.addBytecodeMethod(blockName, std::move(variables));
         auto &bytecodeBlock = bytecodeMethod.addBytecodeMethodBlock(blockName);

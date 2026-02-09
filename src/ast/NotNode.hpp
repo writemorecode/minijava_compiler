@@ -11,7 +11,6 @@ class NotNode : public Node {
         : Node("Negated expression", l) {
         expr = append_child(std::move(expr_));
     }
-    std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 

@@ -9,8 +9,6 @@ class TypeNode : public Node {
   public:
     TypeNode(const std::string &value_, int l)
         : Node("Type", value_, l), value{value_} {}
-
-    std::string checkTypes(SymbolTable &st) const override;
 };
 
 #endif

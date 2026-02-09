@@ -16,6 +16,7 @@ namespace fs = std::filesystem;
 #include "lexing/StringViewStream.hpp"
 #include "parsing/Parser.hpp"
 #include "semantic/SymbolTableVisitor.hpp"
+#include "semantic/TypeCheckVisitor.hpp"
 
 std::unique_ptr<Node> root;
 int lexical_errors = 0;
@@ -282,9 +283,11 @@ int main(int argc, char **argv) {
     }
 
     bool typeCheckSuccess = true;
+    TypeInfo type_info;
     if (symbolTableSuccess) {
-        auto rootType = root->checkTypes(st);
-        typeCheckSuccess = !rootType.empty();
+        const auto type_check_result =
+            check_types(*root, st, &type_info, &semantic_diag);
+        typeCheckSuccess = type_check_result.ok();
         if (!typeCheckSuccess) {
             std::cout << "Type checking failed.\n";
         }
@@ -298,6 +301,7 @@ int main(int argc, char **argv) {
     generateGraphviz(root.get(), outStream);
 
     CFG graph;
+    graph.setTypeInfo(&type_info);
     std::ofstream controlFlowGraph(outputDirectory / "cfg.dot");
 
     if (!controlFlowGraph.is_open()) {

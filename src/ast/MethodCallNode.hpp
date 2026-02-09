@@ -16,7 +16,6 @@ class MethodCallNode : public Node {
         id = append_child(std::move(id_));
         exprList = append_child(std::move(exprList_));
     }
-    std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 

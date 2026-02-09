@@ -14,7 +14,6 @@ class BooleanExpressionNode : public Node {
         left = append_child(std::move(left_));
         right = append_child(std::move(right_));
     }
-    std::string checkTypes(SymbolTable &st) const override;
 };
 
 class AndNode : public BooleanExpressionNode {

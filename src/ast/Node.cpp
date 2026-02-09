@@ -8,20 +8,6 @@ bool Node::buildTable(SymbolTable &st) const {
     return build_symbol_table(*this, st).ok();
 }
 
-std::string Node::checkTypes(SymbolTable &st) const {
-    bool valid = true;
-    for (const auto &child : children) {
-        auto type = child->checkTypes(st);
-        if (type.empty()) {
-            valid = false;
-        }
-    }
-    if (valid) {
-        return "void";
-    }
-    return "";
-}
-
 Operand Node::generateIR(CFG &graph, SymbolTable &st) {
     for (auto &child : children) {
         child->generateIR(graph, st);

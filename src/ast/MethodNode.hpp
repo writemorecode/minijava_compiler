@@ -22,12 +22,15 @@ class MethodNode : public Node {
 
     void accept(AstVisitor &visitor) const override;
 
-    [[nodiscard]] const std::string &getMethodName() const { return methodName; }
-    [[nodiscard]] const std::string &getMethodType() const { return methodType; }
+    [[nodiscard]] const std::string &getMethodName() const {
+        return methodName;
+    }
+    [[nodiscard]] const std::string &getMethodType() const {
+        return methodType;
+    }
     [[nodiscard]] const Node &getParametersNode() const { return *params; }
     [[nodiscard]] const Node &getBodyNode() const { return *body; }
 
-    std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
