@@ -7,6 +7,12 @@
 #include <string_view>
 #include <vector>
 
+#include "ast/BooleanNode.hpp"
+#include "ast/ClassAllocationNode.hpp"
+#include "ast/ControlStatementNode.hpp"
+#include "ast/IdentifierNode.hpp"
+#include "ast/MethodBodyNode.hpp"
+#include "ast/MethodWithoutParametersNode.hpp"
 #include "ast/Node.h"
 #include "lexing/Diagnostics.hpp"
 #include "lexing/Lexer.hpp"
@@ -17,6 +23,7 @@
 #include "semantic/Scope.hpp"
 #include "semantic/SymbolTable.hpp"
 #include "semantic/SymbolTableVisitor.hpp"
+#include "semantic/TypeNode.hpp"
 
 namespace {
 
@@ -82,6 +89,16 @@ const Scope *find_child_scope(const Scope *parent, std::string_view name) {
     }
     return nullptr;
 }
+
+class FailingTypeNode final : public Node {
+  public:
+    explicit FailingTypeNode(int line) : Node("Failing type node", line) {}
+
+    std::string checkTypes(SymbolTable &st) const override {
+        (void)st;
+        return "";
+    }
+};
 
 [[maybe_unused]] constexpr std::string_view kGoldenProgram2Source =
     R"(public class Main {
@@ -635,4 +652,35 @@ class Foo {
     EXPECT_EQ(error->span.begin.line, 9u);
     EXPECT_NE(error->message.find("Variable 'x' already declared"),
               std::string::npos);
+}
+
+TEST(SymbolTable, ControlStatementPropagatesStatementTypeFailure) {
+    SymbolTable st;
+
+    IfNode if_node(std::make_unique<TrueNode>(1),
+                   std::make_unique<FailingTypeNode>(1), 1);
+
+    EXPECT_EQ(if_node.checkTypes(st), "");
+}
+
+TEST(SymbolTable, MethodWithoutParametersReturnMismatchFailsTypeCheck) {
+    SymbolTable st;
+
+    MethodWithoutParametersNode method(
+        std::make_unique<TypeNode>("int", 1),
+        std::make_unique<IdentifierNode>("foo", 1),
+        std::make_unique<ReturnOnlyMethodBodyNode>(
+            std::make_unique<TrueNode>(1), 1),
+        1);
+
+    EXPECT_EQ(method.checkTypes(st), "");
+}
+
+TEST(SymbolTable, ClassAllocationRequiresDeclaredClassType) {
+    SymbolTable st;
+
+    ClassAllocationNode allocation(
+        std::make_unique<IdentifierNode>("MissingClass", 1), 1);
+
+    EXPECT_EQ(allocation.checkTypes(st), "");
 }
