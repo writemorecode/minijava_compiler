@@ -13,7 +13,6 @@ class AssignNode : public Node {
         id = append_child(std::move(id_));
         expr = append_child(std::move(expr_));
     }
-    std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
@@ -29,7 +28,7 @@ class ArrayAssignNode : public Node {
         id = append_child(std::move(id_));
         indexExpr = append_child(std::move(indexExpr_));
     }
-    std::string checkTypes(SymbolTable &st) const override;
+    [[nodiscard]] const Node &getRightExprNode() const { return *rightExpr; }
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 

@@ -7,12 +7,16 @@
 #include "ir/BBlock.hpp"
 #include "semantic/SymbolTable.hpp"
 
+class Node;
+class TypeInfo;
+
 class CFG {
   private:
     BBlock *currentBlock = nullptr;
     std::vector<BBlock *> methodBlocks;
     int temporaryIndex = 0;
     int blockIndex = 0;
+    const TypeInfo *type_info_ = nullptr;
 
   public:
     std::string getTemporaryName();
@@ -29,6 +33,9 @@ class CFG {
     [[nodiscard]] BBlock *addMethodBlock();
     [[nodiscard]] BBlock *addMethodRootBlock(const std::string &className,
                                              const std::string &methodName);
+
+    void setTypeInfo(const TypeInfo *info) { type_info_ = info; }
+    [[nodiscard]] const std::string *typeOf(const Node &node) const;
 
     void generateBytecode(BytecodeProgram &program, SymbolTable &st);
 };

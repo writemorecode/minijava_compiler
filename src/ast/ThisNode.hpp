@@ -8,7 +8,6 @@ class ThisNode : public Node {
 
   public:
     ThisNode(int l) : Node("this", l) {}
-    std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 

@@ -13,7 +13,6 @@ class MethodBodyNode : public Node {
         body = append_child(std::move(body_));
         returnValue = append_child(std::move(returnValue_));
     }
-    std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 class ReturnOnlyMethodBodyNode : public Node {
@@ -24,7 +23,6 @@ class ReturnOnlyMethodBodyNode : public Node {
         : Node("Method body", l) {
         returnValue = append_child(std::move(returnValue_));
     }
-    std::string checkTypes(SymbolTable &st) const override;
     Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 #endif

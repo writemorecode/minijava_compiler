@@ -1,45 +1,16 @@
 #include "ast/MethodCallWithoutArgumentsNode.hpp"
-
-std::string MethodCallWithoutArgumentsNode::checkTypes(SymbolTable &st) const {
-    const auto caller = object->checkTypes(st);
-    if (caller == "") {
-        return "";
-    }
-    const auto callingClass = st.lookupClass(caller);
-    if (!callingClass) {
-        std::cerr << "Error: (line " << lineno << ") Method '" << id->value
-                  << "' not declared for class '" << caller << "'.\n";
-        return "";
-    }
-
-    const auto method = callingClass->lookupMethod(id->value);
-    if (method == nullptr) {
-        std::cerr << "Error: (line " << lineno << ") Method '" << id->value
-                  << "' not declared for class '" << callingClass->getID()
-                  << "'.\n";
-        return "";
-    }
-
-    const auto numExpectedArguments = method->getParameterCount();
-    if (numExpectedArguments != 0) {
-        std::cerr << "Error: ";
-        std::cerr << "(line " << lineno << ") ";
-        std::cerr << "Method '" << method->getID();
-        std::cerr << "' expects " << numExpectedArguments << " arguments, ";
-        std::cerr << "no arguments passed.\n";
-        return "";
-    }
-    return method->getType();
-}
+#include <cassert>
 
 Operand MethodCallWithoutArgumentsNode::generateIR(CFG &graph,
                                                    SymbolTable &st) {
-    const auto caller = object->checkTypes(st);
-    if (caller.empty()) {
+    const auto *caller_type = graph.typeOf(*object);
+    assert(caller_type != nullptr &&
+           "Type information missing for method call receiver");
+    if (caller_type == nullptr || caller_type->empty()) {
         return "";
     }
 
-    auto *callingClass = st.lookupClass(caller);
+    auto *callingClass = st.lookupClass(*caller_type);
     if (callingClass == nullptr) {
         return "";
     }
@@ -54,6 +25,7 @@ Operand MethodCallWithoutArgumentsNode::generateIR(CFG &graph,
     const auto &name = graph.getTemporaryName();
     st.addVariable(methodType, name);
     const auto &methodName = id->value;
-    graph.addInstruction(new MethodCallTac(name, methodName, caller, "1"));
+    graph.addInstruction(
+        new MethodCallTac(name, methodName, *caller_type, "1"));
     return name;
 }

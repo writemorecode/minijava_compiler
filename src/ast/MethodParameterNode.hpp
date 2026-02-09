@@ -22,7 +22,6 @@ class MethodParameterNode : public Node {
     [[nodiscard]] const std::string &getParameterName() const {
         return id->value;
     }
-
 };
 
 #endif

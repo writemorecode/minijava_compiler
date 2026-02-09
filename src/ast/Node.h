@@ -23,13 +23,12 @@ class Node {
     Node(const std::string &t, int l) : type(t), lineno(l) {}
     Node(const std::string &t, const std::string &v, int l)
         : type(t), value(v), lineno(l) {}
-    Node(const std::string &t, int l, std::list<std::unique_ptr<Node>> children_)
+    Node(const std::string &t, int l,
+         std::list<std::unique_ptr<Node>> children_)
         : type(t), lineno(l), children(std::move(children_)) {}
     virtual ~Node() = default;
 
     virtual bool buildTable(SymbolTable &st) const;
-
-    virtual std::string checkTypes(SymbolTable &st) const;
 
     virtual Operand generateIR(CFG &graph, SymbolTable &st);
 
