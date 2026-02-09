@@ -21,6 +21,7 @@ std::string MethodWithoutParametersNode::checkTypes(SymbolTable &st) const {
                   << signatureReturnType << "' in method '" << id->value
                   << "' does not match returned type '" << bodyReturnType
                   << "'.\n";
+        return "";
     }
 
     return type->value;
