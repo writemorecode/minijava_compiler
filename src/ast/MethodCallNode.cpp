@@ -23,6 +23,7 @@ Operand MethodCallNode::generateIR(CFG &graph, SymbolTable &st) {
     }
 
     const auto &methodType = method->getType();
+    object->generateIR(graph, st);
 
     for (const auto &arg : exprList->children) {
         const auto &argName = arg->generateIR(graph, st);
@@ -33,7 +34,7 @@ Operand MethodCallNode::generateIR(CFG &graph, SymbolTable &st) {
     st.addVariable(methodType, name);
 
     const auto &methodName = id->value;
-    const auto argCount = std::to_string(exprList->children.size() + 1);
+    const auto argCount = std::to_string(exprList->children.size());
     graph.addInstruction(
         new MethodCallTac(name, methodName, *caller_type, argCount));
     return name;
