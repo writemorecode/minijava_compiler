@@ -4,7 +4,7 @@
 Operand ArrayLengthNode::generateIR(CFG &graph, SymbolTable &st) {
     auto name = graph.getTemporaryName();
     st.addIntegerVariable(name);
-    auto arrayName = array->value;
+    auto arrayName = array->generateIR(graph, st);
     graph.addInstruction(new ArrayLengthTac(name, arrayName));
     return name;
 }
