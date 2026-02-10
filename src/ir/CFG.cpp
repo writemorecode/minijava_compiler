@@ -94,12 +94,19 @@ void CFG::generateBytecode(BytecodeProgram &program, SymbolTable &st) {
         const auto &className = basicBlock->getClassName();
         const auto &methodName = basicBlock->getMethodName();
 
-        const auto *methodScope = st.resolveScope(className, methodName);
+        auto *methodScope = st.resolveScope(className, methodName);
         const auto *method = dynamic_cast<Method *>(methodScope->getRecord());
 
         const auto methodParameters = method->getParameterNames();
         const auto &blockName = basicBlock->getName();
-        const auto variableNames = methodScope->getVariableNames();
+        auto variableNames = methodScope->getVariableNames();
+        if (const auto *classScope = methodScope->getParent();
+            classScope != nullptr) {
+            const auto classVariableNames = classScope->getVariableNames();
+            variableNames.insert(classVariableNames.begin(),
+                                 classVariableNames.end());
+        }
+
         std::vector<std::string> variables(variableNames.begin(),
                                            variableNames.end());
         auto &bytecodeMethod =
