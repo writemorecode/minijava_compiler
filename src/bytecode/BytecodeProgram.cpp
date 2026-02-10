@@ -11,8 +11,10 @@
 
 BytecodeMethod &
 BytecodeProgram::addBytecodeMethod(const std::string &name,
-                                   std::vector<std::string> variables) {
-    methods.push_back(BytecodeMethod(name, std::move(variables)));
+                                   std::vector<std::string> variables,
+                                   std::vector<std::string> fieldVariables) {
+    methods.push_back(
+        BytecodeMethod(name, std::move(variables), std::move(fieldVariables)));
     return methods.back();
 }
 

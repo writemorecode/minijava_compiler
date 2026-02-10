@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <set>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -96,22 +97,26 @@ void CFG::generateBytecode(BytecodeProgram &program, SymbolTable &st) {
 
         auto *methodScope = st.resolveScope(className, methodName);
         const auto *method = dynamic_cast<Method *>(methodScope->getRecord());
+        const auto *classScope = methodScope->getParent();
 
         const auto methodParameters = method->getParameterNames();
         const auto &blockName = basicBlock->getName();
-        auto variableNames = methodScope->getVariableNames();
-        if (const auto *classScope = methodScope->getParent();
-            classScope != nullptr) {
-            const auto classVariableNames = classScope->getVariableNames();
-            variableNames.insert(classVariableNames.begin(),
-                                 classVariableNames.end());
-        }
+        const auto variableNames = methodScope->getVariableNames();
+        auto fieldVariableNames = classScope != nullptr
+                                      ? classScope->getVariableNames()
+                                      : std::set<std::string>{};
 
         std::vector<std::string> variables(variableNames.begin(),
                                            variableNames.end());
-        auto &bytecodeMethod =
-            program.addBytecodeMethod(blockName, std::move(variables));
+        std::vector<std::string> fieldVariables(fieldVariableNames.begin(),
+                                                fieldVariableNames.end());
+        auto &bytecodeMethod = program.addBytecodeMethod(
+            blockName, std::move(variables), std::move(fieldVariables));
         auto &bytecodeBlock = bytecodeMethod.addBytecodeMethodBlock(blockName);
+
+        if (basicBlock != mainRoot) {
+            bytecodeBlock.store("this");
+        }
 
         std::for_each(methodParameters.rbegin(), methodParameters.rend(),
                       [&bytecodeBlock](const auto &param) {

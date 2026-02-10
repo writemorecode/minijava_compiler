@@ -22,21 +22,36 @@ void ArrayCopyTac::print(std::ostream &os) const {
     os << result << "[" << lhs << "]"
        << " := " << rhs << "\n";
 }
+void ArrayCopyTac::generateBytecode(BytecodeMethodBlock &block) {
+    block.push(result).push(lhsOp).push(rhsOp).array_store();
+}
 
 void ArrayAccessTac::print(std::ostream &os) const {
     os << result << " := " << lhs << "[" << rhs << "]\n";
+}
+void ArrayAccessTac::generateBytecode(BytecodeMethodBlock &block) {
+    block.push(lhsOp).push(rhsOp).array_load().store(result);
 }
 
 void ArrayLengthTac::print(std::ostream &os) const {
     os << result << " := length " << rhs << "\n";
 }
+void ArrayLengthTac::generateBytecode(BytecodeMethodBlock &block) {
+    block.push(rhsOp).array_length().store(result);
+}
 
 void NewTac::print(std::ostream &os) const {
     os << result << " := new " << rhs << "\n";
 }
+void NewTac::generateBytecode(BytecodeMethodBlock &block) {
+    block.new_object(rhs).store(result);
+}
 
 void NewArrayTac::print(std::ostream &os) const {
     os << result << " := new int, " << rhs << "\n";
+}
+void NewArrayTac::generateBytecode(BytecodeMethodBlock &block) {
+    block.push(rhsOp).new_array().store(result);
 }
 
 void JumpTac::print(std::ostream &os) const { os << "goto " << result << "\n"; }
@@ -52,10 +67,11 @@ void CondJumpTac::generateBytecode(BytecodeMethodBlock &block) {
 }
 
 void MethodCallTac::print(std::ostream &os) const {
-    os << result << " := call " << lhs << ", " << rhs << "\n";
+    os << result << " := call " << op << " on " << lhs << ", " << rhs
+       << " args\n";
 }
 void MethodCallTac::generateBytecode(BytecodeMethodBlock &block) {
-    block.call(lhs + "." + op).store(result);
+    block.push(lhsOp).call(op).store(result);
 }
 
 void ParamTac::print(std::ostream &os) const { os << "param " << rhs << "\n"; }

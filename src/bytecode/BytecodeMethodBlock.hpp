@@ -39,6 +39,11 @@ class BytecodeMethodBlock {
     BytecodeMethodBlock &write();
 
     BytecodeMethodBlock &call(const std::string &method);
+    BytecodeMethodBlock &new_object(const std::string &className);
+    BytecodeMethodBlock &new_array();
+    BytecodeMethodBlock &array_load();
+    BytecodeMethodBlock &array_store();
+    BytecodeMethodBlock &array_length();
 
     BytecodeMethodBlock &jump(const std::string &location);
     BytecodeMethodBlock &cjump(const std::string &location);

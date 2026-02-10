@@ -21,12 +21,12 @@ Operand MethodCallWithoutArgumentsNode::generateIR(CFG &graph,
     }
 
     const auto &methodType = method->getType();
-    object->generateIR(graph, st);
+    const auto receiver = object->generateIR(graph, st);
 
     const auto &name = graph.getTemporaryName();
     st.addVariable(methodType, name);
     const auto &methodName = id->value;
-    graph.addInstruction(
-        new MethodCallTac(name, methodName, *caller_type, "0"));
+    const auto methodTarget = *caller_type + "." + methodName;
+    graph.addInstruction(new MethodCallTac(name, receiver, methodTarget, 0));
     return name;
 }

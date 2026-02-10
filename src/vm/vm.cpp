@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <cstdint>
 #include <cstdlib>
 #include <fstream>
 #include <ios>
@@ -6,6 +8,7 @@
 #include <stack>
 #include <stdexcept>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "bytecode/Opcode.hpp"
@@ -18,6 +21,17 @@ struct Instruction {
     Instruction(Opcode op_, size_t argNum_, const std::string &argStr_)
         : op(op_), argNumber(argNum_), argString(argStr_) {};
 };
+
+[[nodiscard]] std::string
+class_name_from_method_name(const std::string &methodName) {
+    const auto separator = methodName.find('.');
+    if (separator == std::string::npos) {
+        return methodName;
+    }
+    return methodName.substr(0, separator);
+}
+
+using Value = std::int64_t;
 
 struct Block {
     std::vector<Instruction> instructions;
@@ -34,7 +48,8 @@ struct Block {
 };
 
 struct Method {
-    std::vector<std::string> variables;
+    std::vector<std::string> localVariables;
+    std::vector<std::string> fieldVariables;
     std::unordered_map<std::string, Block> blocks;
 
     void print() const {
@@ -48,32 +63,56 @@ struct Method {
 class Activation {
     size_t pc = 0;
     Method method;
-    std::unordered_map<std::string, size_t> variables;
+    std::unordered_map<std::string, Value> localVariables;
+    std::unordered_set<std::string> fieldVariables;
     std::string currentBlock;
+    std::string className;
+    Value thisReference = 0;
 
   public:
     explicit Activation(const Method &method_, const std::string &currentBlock_)
-        : method(method_), currentBlock(currentBlock_) {
-        for (const auto &name : method.variables) {
-            variables[name] = 0;
+        : method(method_), fieldVariables(method_.fieldVariables.begin(),
+                                          method_.fieldVariables.end()),
+          currentBlock(currentBlock_),
+          className(class_name_from_method_name(currentBlock_)) {
+        for (const auto &name : method.localVariables) {
+            localVariables[name] = 0;
         }
     };
     auto getPC() const { return pc; }
     auto getCurrentBlockName() const { return currentBlock; }
+    [[nodiscard]] const auto &getClassName() const { return className; }
     const auto &step() {
-        const auto &block = method.blocks[currentBlock];
+        const auto it = method.blocks.find(currentBlock);
+        if (it == method.blocks.end()) {
+            throw std::invalid_argument("block " + currentBlock +
+                                        " not found");
+        }
+        const auto &block = it->second;
+        if (pc >= block.instructions.size()) {
+            throw std::out_of_range("instruction pointer out of bounds in " +
+                                    currentBlock);
+        }
         return block.instructions[pc++];
     }
-    void setVariable(const std::string &name, size_t value) {
-        variables[name] = value;
+    [[nodiscard]] bool hasLocalVariable(const std::string &name) const {
+        return localVariables.contains(name);
     }
-    [[nodiscard]] size_t getVariable(const std::string &name) const {
-        if (const auto &it = variables.find(name); it != variables.end()) {
+    [[nodiscard]] bool hasFieldVariable(const std::string &name) const {
+        return fieldVariables.contains(name);
+    }
+    [[nodiscard]] Value getLocalVariable(const std::string &name) const {
+        if (const auto &it = localVariables.find(name);
+            it != localVariables.end()) {
             return it->second;
         }
-        // FIXME: Find a way to remove this exception
         throw std::invalid_argument("variable " + name + " not found");
     }
+    void setLocalVariable(const std::string &name, Value value) {
+        localVariables[name] = value;
+    }
+    [[nodiscard]] Value getThisReference() const { return thisReference; }
+    void setThisReference(Value value) { thisReference = value; }
     void setCurrentBlock(const std::string &blockName) {
         currentBlock = blockName;
         pc = 0;
@@ -83,6 +122,19 @@ class Program {
     std::string mainMethodName;
     Method mainMethod;
     std::unordered_map<std::string, Method> methods;
+    std::unordered_map<std::string, std::vector<std::string>> classFieldNames;
+
+    void registerMethodFields(const std::string &methodName,
+                              const Method &method) {
+        const auto className = class_name_from_method_name(methodName);
+        auto &fields = classFieldNames[className];
+        for (const auto &fieldName : method.fieldVariables) {
+            if (std::find(fields.begin(), fields.end(), fieldName) ==
+                fields.end()) {
+                fields.push_back(fieldName);
+            }
+        }
+    }
 
   public:
     const auto &getMain() const { return mainMethod; }
@@ -98,10 +150,24 @@ class Program {
     Program(const std::string &mainMethodName_, const Method &mainMethod_,
             const std::unordered_map<std::string, Method> &methods_)
         : mainMethodName(mainMethodName_), mainMethod(mainMethod_),
-          methods(methods_) {};
+          methods(methods_) {
+        registerMethodFields(mainMethodName, mainMethod);
+        for (const auto &[methodName, method] : methods) {
+            registerMethodFields(methodName, method);
+        }
+    };
 
     void print() const;
     std::string getMainMethodName() const { return mainMethodName; }
+    [[nodiscard]] const std::vector<std::string> &
+    getClassFieldNames(const std::string &className) const {
+        static const std::vector<std::string> empty;
+        if (const auto &it = classFieldNames.find(className);
+            it != classFieldNames.end()) {
+            return it->second;
+        }
+        return empty;
+    }
 };
 
 void Program::print() const {
@@ -114,11 +180,18 @@ void Program::print() const {
 }
 
 class VM {
-    std::stack<size_t> dataStack;
+    struct ObjectInstance {
+        std::string className;
+        std::unordered_map<std::string, Value> fields;
+    };
+
+    std::stack<Value> dataStack;
     std::stack<std::shared_ptr<Activation>> activations;
     std::shared_ptr<Activation> currentActivation;
 
     Program program;
+    std::vector<ObjectInstance> objects;
+    std::vector<std::vector<Value>> arrays;
 
     Instruction step() {
         if (currentActivation == nullptr) {
@@ -127,16 +200,86 @@ class VM {
         }
         return currentActivation->step();
     }
-    void setVariableValue(const std::string &name, size_t value) {
-        currentActivation->setVariable(name, value);
+
+    [[nodiscard]] ObjectInstance &getObjectByReference(Value reference) {
+        if (reference <= 0 || static_cast<size_t>(reference) > objects.size()) {
+            throw std::invalid_argument("invalid object reference");
+        }
+        return objects[static_cast<size_t>(reference - 1)];
     }
-    size_t getVariableValue(const std::string &name) const {
-        return currentActivation->getVariable(name);
+    [[nodiscard]] const ObjectInstance &
+    getObjectByReference(Value reference) const {
+        if (reference <= 0 || static_cast<size_t>(reference) > objects.size()) {
+            throw std::invalid_argument("invalid object reference");
+        }
+        return objects[static_cast<size_t>(reference - 1)];
     }
 
-    void push(size_t value) { dataStack.push(value); }
+    [[nodiscard]] std::vector<Value> &getArrayByReference(Value reference) {
+        if (reference <= 0 || static_cast<size_t>(reference) > arrays.size()) {
+            throw std::invalid_argument("invalid array reference");
+        }
+        return arrays[static_cast<size_t>(reference - 1)];
+    }
+
+    [[nodiscard]] Value allocateObject(const std::string &className) {
+        ObjectInstance object{.className = className, .fields = {}};
+        for (const auto &fieldName : program.getClassFieldNames(className)) {
+            if (fieldName == "this") {
+                continue;
+            }
+            object.fields[fieldName] = 0;
+        }
+
+        objects.push_back(std::move(object));
+        return static_cast<Value>(objects.size());
+    }
+
+    void setVariableValue(const std::string &name, Value value) {
+        if (currentActivation->hasLocalVariable(name)) {
+            currentActivation->setLocalVariable(name, value);
+            return;
+        }
+        if (currentActivation->hasFieldVariable(name)) {
+            if (name == "this") {
+                currentActivation->setThisReference(value);
+                return;
+            }
+            const auto thisReference = currentActivation->getThisReference();
+            if (thisReference == 0) {
+                throw std::invalid_argument("this not initialized");
+            }
+            auto &object = getObjectByReference(thisReference);
+            object.fields[name] = value;
+            return;
+        }
+        throw std::invalid_argument("variable " + name + " not found");
+    }
+    [[nodiscard]] Value getVariableValue(const std::string &name) {
+        if (currentActivation->hasLocalVariable(name)) {
+            return currentActivation->getLocalVariable(name);
+        }
+        if (currentActivation->hasFieldVariable(name)) {
+            if (name == "this") {
+                return currentActivation->getThisReference();
+            }
+            const auto thisReference = currentActivation->getThisReference();
+            if (thisReference == 0) {
+                throw std::invalid_argument("this not initialized");
+            }
+            const auto &object = getObjectByReference(thisReference);
+            if (const auto &it = object.fields.find(name);
+                it != object.fields.end()) {
+                return it->second;
+            }
+            throw std::invalid_argument("field " + name + " not found");
+        }
+        throw std::invalid_argument("variable " + name + " not found");
+    }
+
+    void push(Value value) { dataStack.push(value); }
     void push(const std::string &name) { push(getVariableValue(name)); }
-    size_t pop() {
+    Value pop() {
         if (dataStack.empty()) {
             throw std::runtime_error("empty data stack");
         }
@@ -212,6 +355,46 @@ void VM::run() {
             std::cout << value << "\n";
             break;
         }
+        case Opcode::NEW: {
+            push(allocateObject(instruction.argString));
+            break;
+        }
+        case Opcode::NEW_ARRAY: {
+            const auto length = pop();
+            if (length < 0) {
+                throw std::invalid_argument("negative array length");
+            }
+            arrays.emplace_back(length, 0);
+            push(static_cast<Value>(arrays.size()));
+            break;
+        }
+        case Opcode::ARRAY_LOAD: {
+            const auto index = pop();
+            const auto arrayReference = pop();
+            const auto &array = getArrayByReference(arrayReference);
+            if (index < 0 || static_cast<size_t>(index) >= array.size()) {
+                throw std::invalid_argument("array index out of bounds");
+            }
+            push(array[static_cast<size_t>(index)]);
+            break;
+        }
+        case Opcode::ARRAY_STORE: {
+            const auto value = pop();
+            const auto index = pop();
+            const auto arrayReference = pop();
+            auto &array = getArrayByReference(arrayReference);
+            if (index < 0 || static_cast<size_t>(index) >= array.size()) {
+                throw std::invalid_argument("array index out of bounds");
+            }
+            array[static_cast<size_t>(index)] = value;
+            break;
+        }
+        case Opcode::ARRAY_LENGTH: {
+            const auto arrayReference = pop();
+            const auto &array = getArrayByReference(arrayReference);
+            push(array.size());
+            break;
+        }
         case Opcode::ADD: {
             auto x = pop();
             auto y = pop();
@@ -272,7 +455,7 @@ void VM::run() {
             break;
         }
         case Opcode::CONST: {
-            push(instruction.argNumber);
+            push(static_cast<Value>(instruction.argNumber));
             break;
         }
         case Opcode::LOAD: {
@@ -300,7 +483,8 @@ void VM::run() {
     case Opcode::CJMP:
     case Opcode::CALL:
     case Opcode::LOAD:
-    case Opcode::STORE: {
+    case Opcode::STORE:
+    case Opcode::NEW: {
         argString = reader.readString();
         break;
     }
@@ -328,7 +512,8 @@ void VM::run() {
 }
 
 [[nodiscard]] Method readMethod(Deserializer &reader) {
-    const auto variableNames = reader.readStringVector();
+    const auto localVariableNames = reader.readStringVector();
+    const auto fieldVariableNames = reader.readStringVector();
 
     const auto blockCount = reader.readInteger();
     // std::cout << "Block count: " << blockCount << "\n";
@@ -339,7 +524,7 @@ void VM::run() {
         blocks.emplace(blockName, readBlock(reader));
     }
 
-    return {variableNames, blocks};
+    return {localVariableNames, fieldVariableNames, blocks};
 }
 
 [[nodiscard]] Program readProgram(Deserializer &reader) {

@@ -50,6 +50,7 @@ class ArrayCopyTac : public Tac {
                  const Operand &z_)
         : Tac(result_, index_, ":=", z_) {};
     void print(std::ostream &os) const override;
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 class ArrayAccessTac : public Tac {
   public:
@@ -57,17 +58,20 @@ class ArrayAccessTac : public Tac {
                    const Operand &z_)
         : Tac(result_, y_, "", z_) {};
     void print(std::ostream &os) const override;
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 class ArrayLengthTac : public Tac {
   public:
     ArrayLengthTac(const std::string &result, const Operand &y_)
         : Tac(result, y_) {};
     void print(std::ostream &os) const override;
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 class NewTac : public Tac {
   public:
     NewTac(const std::string &result, const Operand &y_) : Tac(result, y_) {};
     void print(std::ostream &os) const override;
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class NewArrayTac : public Tac {
@@ -75,6 +79,7 @@ class NewArrayTac : public Tac {
     NewArrayTac(const std::string &result, const Operand &length_)
         : Tac(result, length_) {};
     void print(std::ostream &os) const override;
+    void generateBytecode(BytecodeMethodBlock &block) override;
 };
 
 class NotTac : public Tac {
@@ -102,9 +107,9 @@ class CondJumpTac : public Tac {
 
 class MethodCallTac : public Tac {
   public:
-    MethodCallTac(const std::string &result, const std::string &objectName,
-                  const Operand &methodName, const Operand &argCount)
-        : Tac(result, methodName, objectName, argCount) {};
+    MethodCallTac(const std::string &result, const Operand &receiver,
+                  const std::string &methodTarget, const Operand &argCount)
+        : Tac(result, receiver, methodTarget, argCount) {};
     void print(std::ostream &os) const override;
     void generateBytecode(BytecodeMethodBlock &block) override;
 };
