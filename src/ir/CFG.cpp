@@ -1,10 +1,41 @@
 #include <algorithm>
 #include <iostream>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "ir/CFG.hpp"
 #include "semantic/TypeCheckVisitor.hpp"
+
+namespace {
+void appendStopToLeafBlocks(BBlock *root, BytecodeMethod &method) {
+    std::vector<BBlock *> stack{root};
+    std::unordered_set<BBlock *> visited;
+
+    while (!stack.empty()) {
+        auto *block = stack.back();
+        stack.pop_back();
+
+        if (!visited.insert(block).second) {
+            continue;
+        }
+
+        const auto hasTrueBlock = block->hasTrueBlock();
+        const auto hasFalseBlock = block->hasFalseBlock();
+        if (!hasTrueBlock && !hasFalseBlock) {
+            method.getBytecodeMethodBlock(block->getName()).stop();
+            continue;
+        }
+
+        if (hasTrueBlock) {
+            stack.push_back(block->getTrueBlock());
+        }
+        if (hasFalseBlock) {
+            stack.push_back(block->getFalseBlock());
+        }
+    }
+}
+} // namespace
 
 std::string CFG::getTemporaryName() {
     auto name = "_t" + std::to_string(temporaryIndex);
@@ -53,7 +84,13 @@ const std::string *CFG::typeOf(const Node &node) const {
 }
 
 void CFG::generateBytecode(BytecodeProgram &program, SymbolTable &st) {
+    BBlock *mainRoot = nullptr;
+
     for (auto *basicBlock : methodBlocks) {
+        if (mainRoot == nullptr) {
+            mainRoot = basicBlock;
+        }
+
         const auto &className = basicBlock->getClassName();
         const auto &methodName = basicBlock->getMethodName();
 
@@ -76,8 +113,9 @@ void CFG::generateBytecode(BytecodeProgram &program, SymbolTable &st) {
 
         basicBlock->generateBytecode(bytecodeMethod);
     }
-    const auto mainName = methodBlocks.front()->getName();
-    auto &mainMethod = program.getBytecodeMethod(mainName);
-    auto &mainBlock = mainMethod.getBytecodeMethodBlock(mainName);
-    mainBlock.stop();
+
+    if (mainRoot != nullptr) {
+        auto &mainMethod = program.getBytecodeMethod(mainRoot->getName());
+        appendStopToLeafBlocks(mainRoot, mainMethod);
+    }
 }
