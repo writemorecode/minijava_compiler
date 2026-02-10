@@ -48,7 +48,7 @@ void CondJumpTac::print(std::ostream &os) const {
     os << "iffalse " << lhs << " goto " << rhs << "\n";
 }
 void CondJumpTac::generateBytecode(BytecodeMethodBlock &block) {
-    block.push(lhs).cjump(rhs);
+    block.push(lhsOp).cjump(rhs);
 }
 
 void MethodCallTac::print(std::ostream &os) const {
