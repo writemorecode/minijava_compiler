@@ -26,6 +26,7 @@ void BytecodeMethod::print(std::ostream &os) const {
 void BytecodeMethod::serialize(Serializer &serializer) const {
     serializer.writeString(name);
     serializer.writeStringVector(variables);
+    serializer.writeStringVector(fieldVariables);
     serializer.writeInteger(blocks.size());
     for (const auto &block : blocks) {
         serializer.writeString(block.getName());

@@ -12,7 +12,8 @@ class BytecodeProgram {
   public:
     [[nodiscard]] BytecodeMethod &
     addBytecodeMethod(const std::string &name,
-                      std::vector<std::string> variables);
+                      std::vector<std::string> variables,
+                      std::vector<std::string> fieldVariables);
 
     [[nodiscard]] BytecodeMethod &getBytecodeMethod(const std::string &name);
 

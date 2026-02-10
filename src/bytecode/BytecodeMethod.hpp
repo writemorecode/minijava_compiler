@@ -11,11 +11,14 @@ class BytecodeMethod {
 
     std::string name;
     std::vector<std::string> variables;
+    std::vector<std::string> fieldVariables;
 
   public:
     BytecodeMethod(const std::string &name_,
-                   std::vector<std::string> variables_)
-        : name(name_), variables(std::move(variables_)) {};
+                   std::vector<std::string> variables_,
+                   std::vector<std::string> fieldVariables_)
+        : name(name_), variables(std::move(variables_)),
+          fieldVariables(std::move(fieldVariables_)) {};
 
     bool operator==(const std::string &otherName) const {
         return name == otherName;
@@ -32,6 +35,9 @@ class BytecodeMethod {
     void print(std::ostream &os) const;
 
     [[nodiscard]] const auto &getVariables() const { return variables; }
+    [[nodiscard]] const auto &getFieldVariables() const {
+        return fieldVariables;
+    }
 
     void serialize(Serializer &serializer) const;
 };

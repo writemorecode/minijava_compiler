@@ -88,6 +88,28 @@ BytecodeMethodBlock &BytecodeMethodBlock::call(const std::string &method) {
         new StringParameterInstruction(Opcode::CALL, method));
     return *this;
 }
+BytecodeMethodBlock &
+BytecodeMethodBlock::new_object(const std::string &className) {
+    addBytecodeInstruction(
+        new StringParameterInstruction(Opcode::NEW, className));
+    return *this;
+}
+BytecodeMethodBlock &BytecodeMethodBlock::new_array() {
+    addBytecodeInstruction(new StackParameterInstruction(Opcode::NEW_ARRAY));
+    return *this;
+}
+BytecodeMethodBlock &BytecodeMethodBlock::array_load() {
+    addBytecodeInstruction(new StackParameterInstruction(Opcode::ARRAY_LOAD));
+    return *this;
+}
+BytecodeMethodBlock &BytecodeMethodBlock::array_store() {
+    addBytecodeInstruction(new StackParameterInstruction(Opcode::ARRAY_STORE));
+    return *this;
+}
+BytecodeMethodBlock &BytecodeMethodBlock::array_length() {
+    addBytecodeInstruction(new StackParameterInstruction(Opcode::ARRAY_LENGTH));
+    return *this;
+}
 
 BytecodeMethodBlock &BytecodeMethodBlock::jump(const std::string &location) {
     addBytecodeInstruction(
