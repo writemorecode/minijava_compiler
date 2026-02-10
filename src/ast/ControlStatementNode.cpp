@@ -15,8 +15,6 @@ Operand IfNode::generateIR(CFG &graph, SymbolTable &st) {
     currentBlock->setTrueBlock(trueBlock);
     currentBlock->setFalseBlock(joinBlock);
 
-    trueBlock->setTrueBlock(joinBlock);
-
     graph.setCurrentBlock(trueBlock);
     stmt->generateIR(graph, st);
     graph.addInstruction(new JumpTac(joinLabel));
@@ -43,16 +41,15 @@ Operand IfElseNode::generateIR(CFG &graph, SymbolTable &st) {
     currentBlock->setTrueBlock(trueBlock);
     currentBlock->setFalseBlock(falseBlock);
 
-    trueBlock->setTrueBlock(joinBlock);
-    falseBlock->setTrueBlock(joinBlock);
-
     graph.setCurrentBlock(trueBlock);
     stmt->generateIR(graph, st);
     graph.addInstruction(new JumpTac(joinLabel));
+    graph.getCurrentBlock()->setTrueBlock(joinBlock);
 
     graph.setCurrentBlock(falseBlock);
     elseStmt->generateIR(graph, st);
     graph.addInstruction(new JumpTac(joinLabel));
+    graph.getCurrentBlock()->setTrueBlock(joinBlock);
 
     graph.setCurrentBlock(joinBlock);
 
@@ -76,7 +73,6 @@ Operand WhileNode::generateIR(CFG &graph, SymbolTable &st) {
     graph.addInstruction(new JumpTac(bodyBlock->getName()));
 
     graph.setCurrentBlock(bodyBlock);
-    currentBlock->setTrueBlock(headerBlock);
     stmt->generateIR(graph, st);
     graph.getCurrentBlock()->setTrueBlock(headerBlock);
     graph.addInstruction(new JumpTac(headerLabel));
