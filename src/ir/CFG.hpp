@@ -1,6 +1,7 @@
 #ifndef CFG_HPP
 #define CFG_HPP
 
+#include <memory>
 #include <vector>
 
 #include "bytecode/BytecodeProgram.hpp"
@@ -13,10 +14,15 @@ class TypeInfo;
 class CFG {
   private:
     BBlock *currentBlock = nullptr;
-    std::vector<BBlock *> methodBlocks;
+    std::vector<std::unique_ptr<BBlock>> allBlocks;
+    std::vector<BBlock *> methodRoots;
     int temporaryIndex = 0;
     int blockIndex = 0;
     const TypeInfo *type_info_ = nullptr;
+
+    [[nodiscard]] BBlock *ownBlock(std::unique_ptr<BBlock> block);
+    void resetVisitedFlags() const;
+    void resetGeneratedFlags() const;
 
   public:
     std::string getTemporaryName();

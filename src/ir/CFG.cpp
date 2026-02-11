@@ -51,29 +51,50 @@ std::string CFG::getBlockName() {
 }
 
 void CFG::printGraphviz(std::ostream &os) const {
+    resetVisitedFlags();
     os << "digraph {\n";
     os << "graph [splines=ortho]\n";
     os << "node [shape=box]\n";
-    for (const auto &el : methodBlocks) {
+    for (auto *el : methodRoots) {
         el->printBlockGraphviz(os);
     }
     os << "}\n";
 }
 
-BBlock *CFG::newBlock() { return new BBlock(getBlockName()); }
+BBlock *CFG::ownBlock(std::unique_ptr<BBlock> block) {
+    auto *ptr = block.get();
+    allBlocks.push_back(std::move(block));
+    return ptr;
+}
+
+void CFG::resetVisitedFlags() const {
+    for (const auto &block : allBlocks) {
+        block->resetVisited();
+    }
+}
+
+void CFG::resetGeneratedFlags() const {
+    for (const auto &block : allBlocks) {
+        block->resetGenerated();
+    }
+}
+
+BBlock *CFG::newBlock() {
+    return ownBlock(std::make_unique<BBlock>(getBlockName()));
+}
 
 void CFG::addInstruction(Tac *ptr) { currentBlock->addInstruction(ptr); }
 
 BBlock *CFG::addMethodBlock() {
-    auto *ptr = new BBlock(getBlockName());
-    methodBlocks.push_back(ptr);
+    auto *ptr = ownBlock(std::make_unique<BBlock>(getBlockName()));
+    methodRoots.push_back(ptr);
     return ptr;
 }
 
 BBlock *CFG::addMethodRootBlock(const std::string &className,
                                 const std::string &methodName) {
-    auto *ptr = new BBlock(className, methodName);
-    methodBlocks.push_back(ptr);
+    auto *ptr = ownBlock(std::make_unique<BBlock>(className, methodName));
+    methodRoots.push_back(ptr);
     return ptr;
 }
 
@@ -85,9 +106,10 @@ const std::string *CFG::typeOf(const Node &node) const {
 }
 
 void CFG::generateBytecode(BytecodeProgram &program, SymbolTable &st) {
+    resetGeneratedFlags();
     BBlock *mainRoot = nullptr;
 
-    for (auto *basicBlock : methodBlocks) {
+    for (auto *basicBlock : methodRoots) {
         if (mainRoot == nullptr) {
             mainRoot = basicBlock;
         }
