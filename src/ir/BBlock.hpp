@@ -42,9 +42,11 @@ class BBlock {
 
     [[nodiscard]] bool isVisited() const { return visited; }
     void markVisited() { visited = true; };
+    void resetVisited() { visited = false; };
 
     [[nodiscard]] bool isGenerated() const { return generated; }
     void markGenerated() { generated = true; };
+    void resetGenerated() { generated = false; };
 
     void generateBytecode(BytecodeMethod &method);
 };
