@@ -27,8 +27,6 @@ class MainClassNode : public Node {
         return mainMethodArgumentName;
     }
     [[nodiscard]] const Node &getBodyNode() const { return *body; }
-
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

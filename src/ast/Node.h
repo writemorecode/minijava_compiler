@@ -10,9 +10,8 @@
 #include <utility>
 #include <vector>
 
-#include "ir/CFG.hpp"
-
 class AstVisitor;
+class SymbolTable;
 
 class Node {
   public:
@@ -29,8 +28,6 @@ class Node {
     virtual ~Node() = default;
 
     virtual bool buildTable(SymbolTable &st) const;
-
-    virtual Operand generateIR(CFG &graph, SymbolTable &st);
 
     virtual void accept(AstVisitor &visitor) const;
 

@@ -30,8 +30,6 @@ class MethodNode : public Node {
     }
     [[nodiscard]] const Node &getParametersNode() const { return *params; }
     [[nodiscard]] const Node &getBodyNode() const { return *body; }
-
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

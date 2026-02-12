@@ -8,7 +8,6 @@ class ThisNode : public Node {
 
   public:
     ThisNode(int l) : Node("this", l) {}
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif // THISNODE_HPP

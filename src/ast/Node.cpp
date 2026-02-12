@@ -8,13 +8,6 @@ bool Node::buildTable(SymbolTable &st) const {
     return build_symbol_table(*this, st).ok();
 }
 
-Operand Node::generateIR(CFG &graph, SymbolTable &st) {
-    for (auto &child : children) {
-        child->generateIR(graph, st);
-    }
-    return "foobar";
-}
-
 void Node::accept(AstVisitor &visitor) const { visitor.visit(*this); }
 
 void Node::print(int depth = 0) const {

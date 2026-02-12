@@ -13,7 +13,6 @@ class AssignNode : public Node {
         id = append_child(std::move(id_));
         expr = append_child(std::move(expr_));
     }
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class ArrayAssignNode : public Node {
@@ -29,7 +28,6 @@ class ArrayAssignNode : public Node {
         indexExpr = append_child(std::move(indexExpr_));
     }
     [[nodiscard]] const Node &getRightExprNode() const { return *rightExpr; }
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class PrintNode : public Node {
@@ -39,7 +37,6 @@ class PrintNode : public Node {
     PrintNode(std::unique_ptr<Node> expr_, int l) : Node("Print", l) {
         expr = append_child(std::move(expr_));
     }
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif
