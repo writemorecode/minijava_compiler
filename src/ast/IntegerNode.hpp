@@ -12,8 +12,6 @@ class IntegerNode : public Node {
   public:
     IntegerNode(const std::string &value_, int l)
         : Node("Integer", value_, l), value{std::stoi(value_)} {}
-
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

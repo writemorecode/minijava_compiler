@@ -10,6 +10,7 @@ namespace fs = std::filesystem;
 #include "ast/Node.h"
 #include "bytecode/BytecodeProgram.hpp"
 #include "ir/CFG.hpp"
+#include "ir/IRGenerationVisitor.hpp"
 #include "lexing/LegacyDiagnostics.hpp"
 #include "lexing/Lexer.hpp"
 #include "lexing/SourceBuffer.hpp"
@@ -309,7 +310,11 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    root->generateIR(graph, st);
+    const auto ir_result = generate_ir(*root, graph, st, &semantic_diag);
+    if (!ir_result.ok()) {
+        std::cout << "IR generation failed.\n";
+        return errCodes::SEMANTIC_ERROR;
+    }
     graph.printGraphviz(controlFlowGraph);
 
     std::ofstream stGraph(outputDirectory / "st.dot");

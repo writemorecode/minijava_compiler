@@ -10,7 +10,6 @@ class IntegerArrayAllocationNode : public Node {
     IntegerArrayAllocationNode(std::unique_ptr<Node> length_, int l)
         : Node("Integer array allocation", l), length(std::move(length_)) {}
     [[nodiscard]] const Node &getLengthNode() const { return *length; }
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif // INTEGERARRAYALLOCATIONNODE_HPP

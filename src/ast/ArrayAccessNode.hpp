@@ -13,7 +13,6 @@ class ArrayAccessNode : public Node {
         array = append_child(std::move(array_));
         index = append_child(std::move(index_));
     }
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif // ARRAYACCESSNODE_HPP

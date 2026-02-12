@@ -13,7 +13,6 @@ class MethodBodyNode : public Node {
         body = append_child(std::move(body_));
         returnValue = append_child(std::move(returnValue_));
     }
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 class ReturnOnlyMethodBodyNode : public Node {
     Node *returnValue;
@@ -23,6 +22,5 @@ class ReturnOnlyMethodBodyNode : public Node {
         : Node("Method body", l) {
         returnValue = append_child(std::move(returnValue_));
     }
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 #endif

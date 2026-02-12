@@ -21,7 +21,6 @@ class LessThanNode : public LogicalExpressionNode {
     LessThanNode(std::unique_ptr<Node> left, std::unique_ptr<Node> right, int l)
         : LogicalExpressionNode("Less-than", std::move(left), std::move(right),
                                 l) {}
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class GreaterThanNode : public LogicalExpressionNode {
@@ -30,7 +29,6 @@ class GreaterThanNode : public LogicalExpressionNode {
                     int l)
         : LogicalExpressionNode("Greater-than", std::move(left),
                                 std::move(right), l) {}
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 class EqualToNode : public Node {
@@ -43,7 +41,6 @@ class EqualToNode : public Node {
         left = append_child(std::move(left_));
         right = append_child(std::move(right_));
     }
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

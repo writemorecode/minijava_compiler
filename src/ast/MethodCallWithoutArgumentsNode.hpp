@@ -12,7 +12,6 @@ class MethodCallWithoutArgumentsNode : public Node {
         object = append_child(std::move(object_));
         id = append_child(std::move(id_));
     }
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

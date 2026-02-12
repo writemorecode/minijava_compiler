@@ -25,7 +25,6 @@ class IfNode : public ControlStatementNode {
         ++it;
         stmt = it->get();
     }
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 class IfElseNode : public ControlStatementNode {
     Node *cond, *stmt, *elseStmt;
@@ -41,7 +40,6 @@ class IfElseNode : public ControlStatementNode {
         stmt = it->get();
         elseStmt = append_child(std::move(elseStmt_));
     }
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 class WhileNode : public ControlStatementNode {
     Node *cond, *stmt;
@@ -54,7 +52,6 @@ class WhileNode : public ControlStatementNode {
         ++it;
         stmt = it->get();
     }
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

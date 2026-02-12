@@ -23,8 +23,6 @@ class MethodWithoutParametersNode : public Node {
         return type->value;
     }
     [[nodiscard]] const Node &getBodyNode() const { return *body; }
-
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

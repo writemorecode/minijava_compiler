@@ -18,8 +18,6 @@ class ClassNode : public Node {
 
     [[nodiscard]] const std::string &getClassName() const { return className; }
     [[nodiscard]] const Node &getBodyNode() const { return *body; }
-
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif

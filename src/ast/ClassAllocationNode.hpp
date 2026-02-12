@@ -9,7 +9,6 @@ class ClassAllocationNode : public Node {
   public:
     ClassAllocationNode(std::unique_ptr<Node> object, int l)
         : Node("Class allocation", object->value, l), id{object->value} {}
-    Operand generateIR(CFG &graph, SymbolTable &st) override;
 };
 
 #endif // CLASSALLOCATIONNODE_HPP
