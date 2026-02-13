@@ -29,6 +29,21 @@ class Tac {
     virtual void generateBytecode([[maybe_unused]] BytecodeMethodBlock &block) {
     };
 
+    [[nodiscard]] const std::string &getResult() const { return result; }
+    [[nodiscard]] const Operand &getLhsOperand() const { return lhsOp; }
+    [[nodiscard]] const Operand &getRhsOperand() const { return rhsOp; }
+    [[nodiscard]] const std::string &getOperator() const { return op; }
+
+    void setResult(const std::string &value) { result = value; }
+    void setLhsOperand(const Operand &value) {
+        lhsOp = value;
+        lhs = to_string(lhsOp);
+    }
+    void setRhsOperand(const Operand &value) {
+        rhsOp = value;
+        rhs = to_string(rhsOp);
+    }
+
     Tac(const std::string &result_) : result{result_} {}
     Tac(const std::string &result_, const Operand &lhs_, const std::string &op_,
         const Operand &rhs_)

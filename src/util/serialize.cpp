@@ -6,6 +6,9 @@
 void Serializer::writeInteger(size_t value) {
     os.write(reinterpret_cast<const char *>(&value), sizeof(value));
 }
+void Serializer::writeSignedInteger(std::int64_t value) {
+    os.write(reinterpret_cast<const char *>(&value), sizeof(value));
+}
 void Serializer::writeOpcode(Opcode value) {
     os.write(reinterpret_cast<const char *>(&value), sizeof(value));
 }
@@ -22,6 +25,11 @@ void Serializer::writeStringVector(const std::vector<std::string> &vec) {
 
 size_t Deserializer::readInteger() {
     size_t value = 0;
+    is.read(reinterpret_cast<char *>(&value), sizeof(value));
+    return value;
+}
+std::int64_t Deserializer::readSignedInteger() {
+    std::int64_t value = 0;
     is.read(reinterpret_cast<char *>(&value), sizeof(value));
     return value;
 }

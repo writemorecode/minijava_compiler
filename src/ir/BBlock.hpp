@@ -37,6 +37,8 @@ class BBlock {
     BBlock *getFalseBlock() { return falseExit; }
 
     void addInstruction(Tac *ptr);
+    [[nodiscard]] const auto &getInstructions() const { return instructions; }
+    [[nodiscard]] auto &getInstructions() { return instructions; }
 
     void printBlockGraphviz(std::ostream &os);
 

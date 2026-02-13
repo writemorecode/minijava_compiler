@@ -19,8 +19,7 @@ void BytecodeMethodBlock::addBytecodeInstruction(BytecodeInstruction *instr) {
 BytecodeMethodBlock &BytecodeMethodBlock::push(const Operand &operand) {
     if (const auto *ptr = std::get_if<int>(&operand)) {
         addBytecodeInstruction(
-            new IntegerParameterInstruction(Opcode::CONST,
-                                            static_cast<size_t>(*ptr)));
+            new IntegerParameterInstruction(Opcode::CONST, *ptr));
     } else if (const auto *ptr = std::get_if<std::string>(&operand)) {
         addBytecodeInstruction(
             new StringParameterInstruction(Opcode::LOAD, *ptr));

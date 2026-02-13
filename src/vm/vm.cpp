@@ -16,9 +16,9 @@
 
 struct Instruction {
     Opcode op;
-    size_t argNumber;
+    std::int64_t argNumber;
     std::string argString;
-    Instruction(Opcode op_, size_t argNum_, const std::string &argStr_)
+    Instruction(Opcode op_, std::int64_t argNum_, const std::string &argStr_)
         : op(op_), argNumber(argNum_), argString(argStr_) {};
 };
 
@@ -90,8 +90,7 @@ class Activation {
     const auto &step() {
         const auto it = method.blocks.find(currentBlock);
         if (it == method.blocks.end()) {
-            throw std::invalid_argument("block " + currentBlock +
-                                        " not found");
+            throw std::invalid_argument("block " + currentBlock + " not found");
         }
         const auto &block = it->second;
         if (pc >= block.instructions.size()) {
@@ -460,7 +459,7 @@ void VM::run() {
             break;
         }
         case Opcode::CONST: {
-            push(static_cast<Value>(instruction.argNumber));
+            push(instruction.argNumber);
             break;
         }
         case Opcode::LOAD: {
@@ -480,7 +479,7 @@ void VM::run() {
 }
 
 [[nodiscard]] Instruction readInstruction(Deserializer &reader) {
-    size_t argNumber = 0;
+    std::int64_t argNumber = 0;
     std::string argString;
     auto op = reader.readOpcode();
     switch (op) {
@@ -494,7 +493,7 @@ void VM::run() {
         break;
     }
     case Opcode::CONST: {
-        argNumber = reader.readInteger();
+        argNumber = reader.readSignedInteger();
         break;
     }
     default: {

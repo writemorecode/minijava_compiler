@@ -11,6 +11,8 @@ namespace fs = std::filesystem;
 #include "bytecode/BytecodeProgram.hpp"
 #include "ir/CFG.hpp"
 #include "ir/IRGenerationVisitor.hpp"
+#include "ir/passes/ConstantFoldingPass.hpp"
+#include "ir/passes/IRPassManager.hpp"
 #include "lexing/LegacyDiagnostics.hpp"
 #include "lexing/Lexer.hpp"
 #include "lexing/SourceBuffer.hpp"
@@ -315,6 +317,11 @@ int main(int argc, char **argv) {
         std::cout << "IR generation failed.\n";
         return errCodes::SEMANTIC_ERROR;
     }
+
+    IRPassManager pass_manager;
+    pass_manager.addPass(std::make_unique<ConstantFoldingPass>());
+    (void)pass_manager.run(graph);
+
     graph.printGraphviz(controlFlowGraph);
 
     std::ofstream stGraph(outputDirectory / "st.dot");
