@@ -11,6 +11,7 @@ namespace fs = std::filesystem;
 #include "bytecode/BytecodeProgram.hpp"
 #include "ir/CFG.hpp"
 #include "ir/IRGenerationVisitor.hpp"
+#include "ir/passes/ConditionalJumpFoldingPass.hpp"
 #include "ir/passes/ConstantFoldingPass.hpp"
 #include "ir/passes/IRPassManager.hpp"
 #include "lexing/LegacyDiagnostics.hpp"
@@ -320,6 +321,7 @@ int main(int argc, char **argv) {
 
     IRPassManager pass_manager;
     pass_manager.addPass(std::make_unique<ConstantFoldingPass>());
+    pass_manager.addPass(std::make_unique<ConditionalJumpFoldingPass>());
     (void)pass_manager.run(graph);
 
     graph.printGraphviz(controlFlowGraph);

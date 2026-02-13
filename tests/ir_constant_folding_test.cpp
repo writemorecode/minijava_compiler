@@ -16,6 +16,7 @@
 #include "bytecode/Opcode.hpp"
 #include "ir/CFG.hpp"
 #include "ir/IRGenerationVisitor.hpp"
+#include "ir/passes/ConditionalJumpFoldingPass.hpp"
 #include "ir/passes/ConstantFoldingPass.hpp"
 #include "ir/passes/IRPassManager.hpp"
 #include "lexing/Diagnostics.hpp"
@@ -90,6 +91,7 @@ compile_with_constant_folding(std::string_view source) {
 
     IRPassManager pass_manager;
     pass_manager.addPass(std::make_unique<ConstantFoldingPass>());
+    pass_manager.addPass(std::make_unique<ConditionalJumpFoldingPass>());
     (void)pass_manager.run(graph);
 
     auto program = std::make_unique<BytecodeProgram>();
@@ -231,6 +233,120 @@ class Foo {
     ASSERT_NE(program, nullptr);
     const auto instructions = collect_instructions(*program);
     EXPECT_TRUE(contains_instruction(instructions, Opcode::DIV));
+}
+
+TEST(IRConstantFolding,
+     IfElseConstantTrue_RemovesCjmp_ElseBecomesUnreachable) {
+    constexpr std::string_view source =
+        R"(public class Main {
+  public static void main(String[] args) {
+    System.out.println(new Foo().run());
+  }
+}
+
+class Foo {
+  public int run() {
+    int x;
+    if (true) {
+      x = 111;
+    } else {
+      x = 222;
+    }
+    return x;
+  }
+}
+)";
+
+    const auto program = compile_with_constant_folding(source);
+    ASSERT_NE(program, nullptr);
+    const auto instructions = collect_instructions(*program);
+    EXPECT_FALSE(contains_instruction(instructions, Opcode::CJMP));
+    EXPECT_TRUE(contains_const(instructions, 111));
+    EXPECT_FALSE(contains_const(instructions, 222));
+}
+
+TEST(IRConstantFolding,
+     IfElseConstantFalse_RemovesCjmp_ThenBecomesUnreachable) {
+    constexpr std::string_view source =
+        R"(public class Main {
+  public static void main(String[] args) {
+    System.out.println(new Foo().run());
+  }
+}
+
+class Foo {
+  public int run() {
+    int x;
+    if (false) {
+      x = 333;
+    } else {
+      x = 444;
+    }
+    return x;
+  }
+}
+)";
+
+    const auto program = compile_with_constant_folding(source);
+    ASSERT_NE(program, nullptr);
+    const auto instructions = collect_instructions(*program);
+    EXPECT_FALSE(contains_instruction(instructions, Opcode::CJMP));
+    EXPECT_FALSE(contains_const(instructions, 333));
+    EXPECT_TRUE(contains_const(instructions, 444));
+}
+
+TEST(IRConstantFolding, WhileConstantFalse_RemovesCjmp_BodyBecomesUnreachable) {
+    constexpr std::string_view source =
+        R"(public class Main {
+  public static void main(String[] args) {
+    System.out.println(new Foo().run());
+  }
+}
+
+class Foo {
+  public int run() {
+    int x;
+    x = 5;
+    while (false) {
+      x = 777;
+    }
+    return x;
+  }
+}
+)";
+
+    const auto program = compile_with_constant_folding(source);
+    ASSERT_NE(program, nullptr);
+    const auto instructions = collect_instructions(*program);
+    EXPECT_FALSE(contains_instruction(instructions, Opcode::CJMP));
+    EXPECT_TRUE(contains_const(instructions, 5));
+    EXPECT_FALSE(contains_const(instructions, 777));
+}
+
+TEST(IRConstantFolding, NonConstantCondition_KeepsCjmp) {
+    constexpr std::string_view source =
+        R"(public class Main {
+  public static void main(String[] args) {
+    System.out.println(new Foo().run());
+  }
+}
+
+class Foo {
+  public int run() {
+    int x;
+    x = 1;
+    while (x < 3) {
+      x = x + 1;
+    }
+    return x;
+  }
+}
+)";
+
+    const auto program = compile_with_constant_folding(source);
+    ASSERT_NE(program, nullptr);
+    const auto instructions = collect_instructions(*program);
+    EXPECT_TRUE(contains_instruction(instructions, Opcode::CJMP));
 }
 
 TEST(IRConstantFolding, SignedSerializerRoundTrip) {
