@@ -27,6 +27,19 @@ BytecodeMethod &BytecodeProgram::getBytecodeMethod(const std::string &name) {
     return *it;
 }
 
+std::vector<const BytecodeInstruction *>
+BytecodeProgram::getInstructions() const {
+    std::vector<const BytecodeInstruction *> instructions;
+    for (const auto &method : methods) {
+        for (const auto &block : method.getBlocks()) {
+            for (const auto &instruction : block.getInstructions()) {
+                instructions.push_back(instruction.get());
+            }
+        }
+    }
+    return instructions;
+}
+
 void BytecodeProgram::print(std::ostream &os) const {
     for (const auto &method : methods) {
         method.print(os);

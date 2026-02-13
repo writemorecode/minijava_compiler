@@ -16,6 +16,8 @@ class BytecodeProgram {
                       std::vector<std::string> fieldVariables);
 
     [[nodiscard]] BytecodeMethod &getBytecodeMethod(const std::string &name);
+    [[nodiscard]] std::vector<const BytecodeInstruction *>
+    getInstructions() const;
 
     void print(std::ostream &os) const;
 
