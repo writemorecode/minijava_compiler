@@ -45,6 +45,7 @@ class IntegerParameterInstruction : public BytecodeInstruction {
         : BytecodeInstruction(opcode_), param(param_) {};
     void print(std::ostream &os) const override;
     void serialize(Serializer &serializer) const override;
+    [[nodiscard]] std::int64_t getParam() const { return param; }
 };
 
 class StringParameterInstruction : public BytecodeInstruction {
