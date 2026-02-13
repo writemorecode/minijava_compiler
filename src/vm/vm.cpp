@@ -37,7 +37,12 @@ struct Block {
     std::vector<Instruction> instructions;
     void print() const {
         for (const auto &instr : instructions) {
-            std::cout << "\t\t" << mnemonics[instr.op] << "\t";
+            const auto opcodeIndex =
+                static_cast<size_t>(static_cast<std::uint8_t>(instr.op));
+            if (opcodeIndex >= mnemonics.size()) {
+                throw std::invalid_argument("invalid opcode in block print");
+            }
+            std::cout << "\t\t" << mnemonics[opcodeIndex] << "\t";
             if (instr.argString.empty()) {
                 std::cout << instr.argNumber << "\n";
             } else {
@@ -392,7 +397,7 @@ void VM::run() {
         case Opcode::ARRAY_LENGTH: {
             const auto arrayReference = pop();
             const auto &array = getArrayByReference(arrayReference);
-            push(array.size());
+            push(static_cast<Value>(array.size()));
             break;
         }
         case Opcode::ADD: {

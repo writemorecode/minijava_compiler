@@ -1,6 +1,7 @@
 #ifndef BYTECODE_INSTRUCTION_HPP
 #define BYTECODE_INSTRUCTION_HPP
 
+#include <cstdint>
 #include <ostream>
 #include <vector>
 
@@ -14,7 +15,9 @@ class BytecodeInstruction {
 
   public:
     BytecodeInstruction(Opcode opcode_)
-        : opcode(opcode_), mnemonic(mnemonics[opcode]) {};
+        : opcode(opcode_),
+          mnemonic(mnemonics.at(
+              static_cast<size_t>(static_cast<std::uint8_t>(opcode_)))) {};
     virtual ~BytecodeInstruction() = default;
     virtual void print(std::ostream &os) const = 0;
 

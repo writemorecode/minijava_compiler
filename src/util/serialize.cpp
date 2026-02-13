@@ -1,5 +1,8 @@
 #include "util/serialize.hpp"
 
+#include <limits>
+#include <stdexcept>
+
 void Serializer::writeInteger(size_t value) {
     os.write(reinterpret_cast<const char *>(&value), sizeof(value));
 }
@@ -25,7 +28,11 @@ size_t Deserializer::readInteger() {
 std::string Deserializer::readString() {
     const auto length = readInteger();
     std::string str(length, '\0');
-    is.read(str.data(), length);
+    if (length >
+        static_cast<size_t>(std::numeric_limits<std::streamsize>::max())) {
+        throw std::length_error("string length exceeds streamsize");
+    }
+    is.read(str.data(), static_cast<std::streamsize>(length));
     return str;
 }
 std::vector<std::string> Deserializer::readStringVector() {
