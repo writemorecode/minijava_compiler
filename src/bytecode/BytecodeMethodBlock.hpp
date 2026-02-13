@@ -18,6 +18,7 @@ class BytecodeMethodBlock {
 
     BytecodeMethodBlock(const std::string &name_) : name(name_) {};
     [[nodiscard]] const std::string &getName() const { return name; }
+    [[nodiscard]] const auto &getInstructions() const { return instructions; }
     void print(std::ostream &os) const;
     void addBytecodeInstruction(BytecodeInstruction *instr);
 

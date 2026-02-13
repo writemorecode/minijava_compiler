@@ -34,6 +34,7 @@ class BytecodeMethod {
 
     void print(std::ostream &os) const;
 
+    [[nodiscard]] const auto &getBlocks() const { return blocks; }
     [[nodiscard]] const auto &getVariables() const { return variables; }
     [[nodiscard]] const auto &getFieldVariables() const {
         return fieldVariables;
