@@ -15,7 +15,7 @@ void StackParameterInstruction::serialize(Serializer &serializer) const {
 };
 void IntegerParameterInstruction::serialize(Serializer &serializer) const {
     serializer.writeOpcode(opcode);
-    serializer.writeInteger(param);
+    serializer.writeSignedInteger(param);
 };
 void StringParameterInstruction::serialize(Serializer &serializer) const {
     serializer.writeOpcode(opcode);

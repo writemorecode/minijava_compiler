@@ -15,9 +15,8 @@ class BytecodeInstruction {
 
   public:
     BytecodeInstruction(Opcode opcode_)
-        : opcode(opcode_),
-          mnemonic(mnemonics.at(
-              static_cast<size_t>(static_cast<std::uint8_t>(opcode_)))) {};
+        : opcode(opcode_), mnemonic(mnemonics.at(static_cast<size_t>(
+                               static_cast<std::uint8_t>(opcode_)))) {};
     virtual ~BytecodeInstruction() = default;
     virtual void print(std::ostream &os) const = 0;
 
@@ -39,10 +38,10 @@ class StackParameterInstruction : public BytecodeInstruction {
 class IntegerParameterInstruction : public BytecodeInstruction {
     // An instruction which takes one integer parameter
     // and pushes one result back to the stack
-    size_t param;
+    std::int64_t param;
 
   public:
-    IntegerParameterInstruction(Opcode opcode_, size_t param_)
+    IntegerParameterInstruction(Opcode opcode_, std::int64_t param_)
         : BytecodeInstruction(opcode_), param(param_) {};
     void print(std::ostream &os) const override;
     void serialize(Serializer &serializer) const override;

@@ -39,6 +39,7 @@ class CFG {
     [[nodiscard]] BBlock *addMethodBlock();
     [[nodiscard]] BBlock *addMethodRootBlock(const std::string &className,
                                              const std::string &methodName);
+    [[nodiscard]] const auto &getMethodRoots() const { return methodRoots; }
 
     void setTypeInfo(const TypeInfo *info) { type_info_ = info; }
     [[nodiscard]] const std::string *typeOf(const Node &node) const;
