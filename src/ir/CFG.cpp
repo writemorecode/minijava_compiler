@@ -58,6 +58,11 @@ void CFG::printGraphviz(std::ostream &os) const {
     for (auto *el : methodRoots) {
         el->printBlockGraphviz(os);
     }
+    for (const auto &block : allBlocks) {
+        if (!block->isVisited()) {
+            block->printBlockGraphviz(os);
+        }
+    }
     os << "}\n";
 }
 
