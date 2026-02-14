@@ -65,6 +65,7 @@ if(BUILD_TESTING)
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/parser_exact_test.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/parser_syntax_error_files_test.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/ir_constant_folding_test.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/ir_unreachable_block_elimination_test.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/symbol_table_test.cpp
     )
     target_link_libraries(minijava_tests PRIVATE GTest::gtest_main minijava_core)

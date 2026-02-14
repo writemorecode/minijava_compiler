@@ -1,6 +1,7 @@
 #ifndef CFG_HPP
 #define CFG_HPP
 
+#include <cstddef>
 #include <memory>
 #include <vector>
 
@@ -40,6 +41,8 @@ class CFG {
     [[nodiscard]] BBlock *addMethodRootBlock(const std::string &className,
                                              const std::string &methodName);
     [[nodiscard]] const auto &getMethodRoots() const { return methodRoots; }
+    [[nodiscard]] std::size_t getBlockCount() const { return allBlocks.size(); }
+    [[nodiscard]] bool removeUnreachableBlocks();
 
     void setTypeInfo(const TypeInfo *info) { type_info_ = info; }
     [[nodiscard]] const std::string *typeOf(const Node &node) const;

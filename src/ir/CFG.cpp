@@ -98,6 +98,54 @@ BBlock *CFG::addMethodRootBlock(const std::string &className,
     return ptr;
 }
 
+bool CFG::removeUnreachableBlocks() {
+    std::vector<BBlock *> stack;
+    std::unordered_set<BBlock *> reachable;
+    stack.reserve(methodRoots.size());
+
+    for (auto *root : methodRoots) {
+        if (root != nullptr) {
+            stack.push_back(root);
+        }
+    }
+
+    while (!stack.empty()) {
+        auto *block = stack.back();
+        stack.pop_back();
+
+        if (!reachable.insert(block).second) {
+            continue;
+        }
+
+        if (block->hasTrueBlock()) {
+            stack.push_back(block->getTrueBlock());
+        }
+        if (block->hasFalseBlock()) {
+            stack.push_back(block->getFalseBlock());
+        }
+    }
+
+    methodRoots.erase(
+        std::remove_if(methodRoots.begin(), methodRoots.end(),
+                       [&reachable](BBlock *root) {
+                           return root == nullptr ||
+                                  !reachable.contains(root);
+                       }),
+        methodRoots.end());
+
+    if (currentBlock != nullptr && !reachable.contains(currentBlock)) {
+        currentBlock = nullptr;
+    }
+
+    const auto old_size = allBlocks.size();
+    allBlocks.erase(std::remove_if(allBlocks.begin(), allBlocks.end(),
+                                   [&reachable](const auto &block) {
+                                       return !reachable.contains(block.get());
+                                   }),
+                    allBlocks.end());
+    return allBlocks.size() != old_size;
+}
+
 const std::string *CFG::typeOf(const Node &node) const {
     if (type_info_ == nullptr) {
         return nullptr;
